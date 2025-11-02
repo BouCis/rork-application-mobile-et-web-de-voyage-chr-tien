@@ -96,27 +96,65 @@ export type ChapterResponse = {
   translation_note: string;
 };
 
+// Minimal jeu de données local (LSG) en secours
+const LOCAL_LSG: Record<string, Record<number, { verse: number; text: string }[]>> = {
+  Jean: {
+    3: [
+      { verse: 1, text: "Il y eut un homme d'entre les pharisiens, nommé Nicodème, un chef des Juifs." },
+      { verse: 2, text: "Qui vint, lui, auprès de Jésus, de nuit, et lui dit: Rabbi, nous savons que tu es un docteur venu de Dieu; car personne ne peut faire ces miracles que tu fais, si Dieu n'est avec lui." },
+      { verse: 3, text: "Jésus lui répondit: En vérité, en vérité, je te le dis, si un homme ne naît de nouveau, il ne peut voir le royaume de Dieu." },
+      { verse: 4, text: "Nicodème lui dit: Comment un homme peut-il naître quand il est vieux? Peut-il rentrer dans le sein de sa mère et naître?" },
+      { verse: 5, text: "Jésus répondit: En vérité, en vérité, je te le dis, si un homme ne naît d'eau et d'Esprit, il ne peut entrer dans le royaume de Dieu." },
+      { verse: 6, text: "Ce qui est né de la chair est chair, et ce qui est né de l'Esprit est esprit." },
+      { verse: 7, text: "Ne t'étonne pas que je t'aie dit: Il faut que vous naissiez de nouveau." },
+      { verse: 8, text: "Le vent souffle où il veut, et tu en entends le bruit; mais tu ne sais d'où il vient ni où il va. Il en est ainsi de tout homme qui est né de l'Esprit." },
+      { verse: 9, text: "Nicodème lui dit: Comment cela peut-il se faire?" },
+      { verse: 10, text: "Jésus lui répondit: Tu es le docteur d'Israël, et tu ne sais pas ces choses!" },
+      { verse: 16, text: "Car Dieu a tant aimé le monde qu'il a donné son Fils unique, afin que quiconque croit en lui ne périsse point, mais qu'il ait la vie éternelle." },
+    ],
+  },
+};
+
 export async function fetchChapter(bookFr: string, chapter: number): Promise<BibleVerse[]> {
   const info = getBookInfoByFrName(bookFr);
   if (!info) throw new Error('Livre introuvable');
   const passage = encodeURIComponent(`${info.en} ${chapter}`);
-  const url = `https://bible-api.com/${passage}?translation=ls1910`;
-  console.log('[Bible] Fetching chapter:', url);
-  const res = await fetch(url);
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`Erreur de chargement (${res.status}): ${text}`);
+  const primaryUrl = `https://bible-api.com/${passage}?translation=ls1910`;
+  console.log('[Bible] Fetching chapter (primary):', primaryUrl);
+
+  try {
+    const res = await fetch(primaryUrl);
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`HTTP ${res.status} ${text}`);
+    }
+    const data: ChapterResponse = await res.json();
+    const verses: BibleVerse[] = (data.verses || []).map((v, idx) => ({
+      id: `${info.fr}-${chapter}-${v.verse}-${idx}`,
+      book: info.fr,
+      chapter: v.chapter,
+      verse: v.verse,
+      text: (v.text || '').trim(),
+      version: 'LSG',
+    }));
+    if (verses.length > 0) return verses;
+    throw new Error('Réponse vide');
+  } catch (err) {
+    console.warn('[Bible] Primary source failed, using local fallback if available', err);
+    const local = LOCAL_LSG[info.fr]?.[chapter] ?? [];
+    if (local.length > 0) {
+      const verses: BibleVerse[] = local.map((v, idx) => ({
+        id: `${info.fr}-${chapter}-${v.verse}-${idx}`,
+        book: info.fr,
+        chapter,
+        verse: v.verse,
+        text: v.text,
+        version: 'LSG',
+      }));
+      return verses;
+    }
+    throw new Error("Impossible de charger le chapitre (source distante indisponible et aucun secours local)");
   }
-  const data: ChapterResponse = await res.json();
-  const verses: BibleVerse[] = (data.verses || []).map((v, idx) => ({
-    id: `${info.fr}-${chapter}-${v.verse}-${idx}`,
-    book: info.fr,
-    chapter: v.chapter,
-    verse: v.verse,
-    text: (v.text || '').trim(),
-    version: 'LSG',
-  }));
-  return verses;
 }
 
 const BOOKMARKS_KEY = '@bible_bookmarks_v1';
