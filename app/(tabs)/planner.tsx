@@ -10,6 +10,7 @@ import {
   Alert,
   Platform,
   Image,
+  Pressable,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -363,7 +364,7 @@ export default function PlannerScreen() {
                   <Text style={styles.destinationDescription} numberOfLines={2}>
                     {destination.description}
                   </Text>
-                  <TouchableOpacity
+                  <Pressable
                     testID={`btn-explore-${destination.id}`}
                     style={styles.exploreButton}
                     onPress={() => handleExplorePress(destination)}
@@ -373,7 +374,7 @@ export default function PlannerScreen() {
                   >
                     <Text style={styles.exploreButtonText}>Explorer</Text>
                     <ArrowRight color={theme.colors.primary} size={16} />
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               </TouchableOpacity>
             ))}
