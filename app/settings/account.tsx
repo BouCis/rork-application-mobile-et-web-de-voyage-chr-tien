@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert, Image, Platform } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { User, Camera, Save } from 'lucide-react-native';
+import { User, Camera, Save, Calendar } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
 import { useApp } from '@/store/AppContext';
 import type { User as UserType } from '@/types';
@@ -12,6 +13,8 @@ export default function AccountSettingsScreen() {
   const insets = useSafeAreaInsets();
   const { user, saveUser } = useApp();
   const [saving, setSaving] = useState<boolean>(false);
+  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   
   const [formData, setFormData] = useState<Partial<UserType>>({
     firstName: user?.firstName || '',
@@ -25,6 +28,21 @@ export default function AccountSettingsScreen() {
 
   const updateField = <K extends keyof UserType>(key: K, value: UserType[K]) => {
     setFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const formatDate = (date: Date): string => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const handleDateChange = (event: any, date?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (date) {
+      setSelectedDate(date);
+      updateField('dateOfBirth', formatDate(date));
+    }
   };
 
   const handleSave = async () => {
@@ -152,20 +170,38 @@ export default function AccountSettingsScreen() {
                 placeholder="+33 6 12 34 56 78"
                 placeholderTextColor={theme.colors.textLight}
                 value={formData.phone}
-                onChangeText={(text) => updateField('phone', text)}
+                onChangeText={(text) => {
+                  const cleanedPhone = text.replace(/[^0-9+\s()-]/g, '');
+                  updateField('phone', cleanedPhone);
+                }}
                 keyboardType="phone-pad"
               />
             </View>
 
             <View style={styles.formField}>
               <Text style={styles.formLabel}>Date de naissance</Text>
-              <TextInput
-                style={styles.formInput}
-                placeholder="JJ/MM/AAAA"
-                placeholderTextColor={theme.colors.textLight}
-                value={formData.dateOfBirth}
-                onChangeText={(text) => updateField('dateOfBirth', text)}
-              />
+              <TouchableOpacity 
+                style={styles.datePickerButton}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Calendar color={theme.colors.textLight} size={20} />
+                <Text style={[
+                  styles.datePickerText,
+                  !formData.dateOfBirth && styles.datePickerPlaceholder
+                ]}>
+                  {formData.dateOfBirth || 'JJ/MM/AAAA'}
+                </Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={selectedDate}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={handleDateChange}
+                  maximumDate={new Date()}
+                  minimumDate={new Date(1900, 0, 1)}
+                />
+              )}
             </View>
 
             <View style={styles.formField}>
@@ -363,5 +399,24 @@ const styles = StyleSheet.create({
   },
   genderChipTextActive: {
     color: theme.colors.white,
+  },
+  datePickerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.md,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    gap: theme.spacing.sm,
+  },
+  datePickerText: {
+    flex: 1,
+    fontSize: theme.fontSize.md,
+    color: theme.colors.text,
+  },
+  datePickerPlaceholder: {
+    color: theme.colors.textLight,
   },
 });

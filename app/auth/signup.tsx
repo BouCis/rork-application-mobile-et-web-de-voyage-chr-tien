@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   ActivityIndicator
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { 
@@ -76,6 +77,9 @@ export default function SignUpScreen() {
     bio: '',
   });
 
+  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
   const updateField = <K extends keyof FormData>(key: K, value: FormData[K]) => {
@@ -93,6 +97,21 @@ export default function SignUpScreen() {
   const validatePhone = (phone: string): boolean => {
     const phoneRegex = /^[\d\s+()-]{10,}$/;
     return phoneRegex.test(phone);
+  };
+
+  const formatDate = (date: Date): string => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const handleDateChange = (event: any, date?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (date) {
+      setSelectedDate(date);
+      updateField('dateOfBirth', formatDate(date));
+    }
   };
 
   const validateStep = (step: Step): boolean => {
@@ -303,7 +322,10 @@ export default function SignUpScreen() {
             placeholder="+33 6 12 34 56 78"
             placeholderTextColor={theme.colors.textLight}
             value={formData.phone}
-            onChangeText={(text) => updateField('phone', text)}
+            onChangeText={(text) => {
+              const cleanedPhone = text.replace(/[^0-9+\s()-]/g, '');
+              updateField('phone', cleanedPhone);
+            }}
             keyboardType="phone-pad"
           />
         </View>
@@ -312,16 +334,28 @@ export default function SignUpScreen() {
 
       <View style={styles.formField}>
         <Text style={styles.formLabel}>Date de naissance</Text>
-        <View style={styles.inputWithIcon}>
+        <TouchableOpacity 
+          style={styles.inputWithIcon}
+          onPress={() => setShowDatePicker(true)}
+        >
           <Calendar color={theme.colors.textLight} size={20} />
-          <TextInput
-            style={styles.formInputWithIcon}
-            placeholder="JJ/MM/AAAA"
-            placeholderTextColor={theme.colors.textLight}
-            value={formData.dateOfBirth}
-            onChangeText={(text) => updateField('dateOfBirth', text)}
+          <Text style={[
+            styles.datePickerText,
+            !formData.dateOfBirth && styles.datePickerPlaceholder
+          ]}>
+            {formData.dateOfBirth || 'JJ/MM/AAAA'}
+          </Text>
+        </TouchableOpacity>
+        {showDatePicker && (
+          <DateTimePicker
+            value={selectedDate}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={handleDateChange}
+            maximumDate={new Date()}
+            minimumDate={new Date(1900, 0, 1)}
           />
-        </View>
+        )}
       </View>
 
       <View style={styles.formField}>
@@ -799,6 +833,15 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.md,
     fontSize: theme.fontSize.md,
     color: theme.colors.text,
+  },
+  datePickerText: {
+    flex: 1,
+    paddingVertical: theme.spacing.md,
+    fontSize: theme.fontSize.md,
+    color: theme.colors.text,
+  },
+  datePickerPlaceholder: {
+    color: theme.colors.textLight,
   },
   formTextArea: {
     height: 120,
