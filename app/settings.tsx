@@ -18,7 +18,11 @@ import {
   FileText,
   Mail,
   LogOut,
-  Trash2
+  Trash2,
+  MapPin,
+  Calculator,
+  Bookmark,
+  Camera
 } from 'lucide-react-native';
 import { useTheme } from '@/store/ThemeContext';
 import { useApp } from '@/store/AppContext';
@@ -169,6 +173,41 @@ export default function SettingsScreen() {
   });
 
   const menuSections = [
+    {
+      title: '👤 Personnel',
+      items: [
+        { 
+          icon: User, 
+          label: 'Mon profil', 
+          description: 'Voir et modifier mon profil',
+          onPress: () => router.push('/(tabs)/profile') 
+        },
+        { 
+          icon: MapPin, 
+          label: 'Mes voyages', 
+          description: 'Historique et voyages planifiés',
+          onPress: () => router.push('/(tabs)/planner') 
+        },
+        { 
+          icon: Calculator, 
+          label: 'Budget & infos admin', 
+          description: 'Calculateur de budget, visa, santé',
+          onPress: () => router.push('/trip/budget-admin') 
+        },
+        { 
+          icon: Bookmark, 
+          label: 'Favoris', 
+          description: 'Destinations et contenus sauvegardés',
+          onPress: () => Alert.alert('Favoris', 'Fonctionnalité à venir') 
+        },
+        { 
+          icon: Camera, 
+          label: 'Ma galerie', 
+          description: 'Photos de voyages',
+          onPress: () => router.push('/(tabs)/gallery') 
+        },
+      ],
+    },
     {
       title: '🎨 Apparence',
       items: [
