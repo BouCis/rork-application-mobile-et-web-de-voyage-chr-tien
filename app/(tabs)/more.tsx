@@ -11,21 +11,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import {
-  User,
   Plane,
   Car,
   MessageSquare,
   MapPin,
-  Bookmark,
   Settings,
   HelpCircle,
   Info,
   LogOut,
   ChevronRight,
-  Globe,
-  Camera,
-  Calendar,
-  CreditCard,
   BookOpen,
   Heart,
   Music,
@@ -72,29 +66,7 @@ export default function MoreScreen() {
     );
   }, []);
 
-  const handleSavedPress = useCallback(() => {
-    console.log('[More] Saved pressed');
-    Alert.alert(
-      '🔖 Favoris',
-      'Vos destinations et établissements sauvegardés.\n\nFonctionnalité à venir.',
-      [{ text: 'OK' }]
-    );
-  }, []);
 
-  const handleTripsPress = useCallback(() => {
-    console.log('[More] Trips pressed');
-    router.push('/trip/create');
-  }, []);
-
-  const handleBudgetPress = useCallback(() => {
-    console.log('[More] Budget & Admin pressed');
-    router.push('/trip/budget-admin');
-  }, []);
-
-  const handleProfilePress = useCallback(() => {
-    console.log('[More] Profile pressed');
-    router.push('/(tabs)/profile');
-  }, []);
 
   const handleSettingsPress = useCallback(() => {
     console.log('[More] Settings pressed');
@@ -187,33 +159,7 @@ export default function MoreScreen() {
     },
   ];
 
-  const personalItems: MenuItem[] = [
-    {
-      icon: User,
-      label: 'Mon profil',
-      onPress: handleProfilePress,
-    },
-    {
-      icon: Calendar,
-      label: 'Mes voyages',
-      onPress: handleTripsPress,
-    },
-    {
-      icon: CreditCard,
-      label: 'Budget & Infos Admin',
-      onPress: handleBudgetPress,
-    },
-    {
-      icon: Bookmark,
-      label: 'Favoris',
-      onPress: handleSavedPress,
-    },
-    {
-      icon: Camera,
-      label: 'Mes moments',
-      onPress: () => router.push('/(tabs)/gallery'),
-    },
-  ];
+
 
   const settingsItems: MenuItem[] = [
     {
@@ -276,32 +222,6 @@ export default function MoreScreen() {
                     </Text>
                   )}
                 </LinearGradient>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Personnel</Text>
-          <View style={styles.menuContainer}>
-            {personalItems.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.menuItem,
-                  index === personalItems.length - 1 && styles.menuItemLast,
-                ]}
-                onPress={item.onPress}
-              >
-                <View style={styles.menuItemContent}>
-                  <View style={styles.menuItemLeft}>
-                    <View style={[styles.iconContainer, { backgroundColor: `${theme.colors.primary}15` }]}>
-                      <item.icon color={theme.colors.primary} size={20} />
-                    </View>
-                    <Text style={styles.menuItemText}>{item.label}</Text>
-                  </View>
-                  <ChevronRight color={theme.colors.textLight} size={20} />
-                </View>
               </TouchableOpacity>
             ))}
           </View>
