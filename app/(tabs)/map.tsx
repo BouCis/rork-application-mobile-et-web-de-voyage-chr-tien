@@ -1,12 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MapPin, Locate, Layers } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
 import { useRouter } from 'expo-router';
 import { getDestinationsByContinent } from '@/data/destinations';
 import * as Location from 'expo-location';
-import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from 'react-native-maps';
 
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
@@ -19,22 +19,27 @@ export default function MapScreen() {
 
   const handleLocationPress = async () => {
     console.log('[Map] Location button pressed');
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission refusée', 'Impossible d\'accéder à votre position');
-      return;
-    }
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission refusée', 'Impossible d\'accéder à votre position');
+        return;
+      }
 
-    const location = await Location.getCurrentPositionAsync({});
-    console.log('[Map] Got location:', location.coords);
-    
-    if (mapRef.current) {
-      mapRef.current.animateToRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 10,
-        longitudeDelta: 10,
-      }, 1000);
+      const location = await Location.getCurrentPositionAsync({});
+      console.log('[Map] Got location:', location.coords);
+      
+      if (mapRef.current) {
+        mapRef.current.animateToRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 10,
+          longitudeDelta: 10,
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('[Map] Error getting location:', error);
+      Alert.alert('Erreur', 'Impossible d\'obtenir votre position');
     }
   };
 
@@ -68,7 +73,7 @@ export default function MapScreen() {
       <View style={styles.mapContainer}>
         <MapView
           ref={mapRef}
-          provider={PROVIDER_DEFAULT}
+          provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT}
           style={styles.map}
           initialRegion={{
             latitude: 0,
@@ -77,6 +82,12 @@ export default function MapScreen() {
             longitudeDelta: 60,
           }}
           mapType={mapType}
+          showsUserLocation
+          showsMyLocationButton={false}
+          showsCompass
+          showsScale
+          loadingEnabled
+          loadingIndicatorColor={theme.colors.primary}
         >
           {africanDestinations.map((dest) => (
             <Marker
