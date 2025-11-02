@@ -216,7 +216,12 @@ export default function MoreScreen() {
             <Heart color="#FF6B9D" size={20} />
             <Text style={styles.sectionTitleLarge}>Spiritualité</Text>
           </View>
-          <View style={styles.horizontalScroll}>
+          <ScrollView 
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalScroll}
+            style={styles.horizontalScrollView}
+          >
             {spiritualItems.map((item, index) => (
               <TouchableOpacity
                 key={index}
@@ -238,7 +243,7 @@ export default function MoreScreen() {
                 </LinearGradient>
               </TouchableOpacity>
             ))}
-          </View>
+          </ScrollView>
         </View>
 
         <View style={styles.section}>
@@ -365,6 +370,10 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700' as const,
     color: theme.colors.text,
+  },
+  horizontalScrollView: {
+    marginHorizontal: -theme.spacing.lg,
+    paddingHorizontal: theme.spacing.lg,
   },
   horizontalScroll: {
     flexDirection: 'row',
