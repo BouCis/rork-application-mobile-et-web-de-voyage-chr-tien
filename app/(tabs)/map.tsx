@@ -1,12 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import { MapPin, Search, Layers } from 'lucide-react-native';
+import { MapPin, Locate, Layers } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
 import { useRouter } from 'expo-router';
 import { getDestinationsByContinent } from '@/data/destinations';
 import * as Location from 'expo-location';
+import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
@@ -26,8 +26,15 @@ export default function MapScreen() {
     }
 
     const location = await Location.getCurrentPositionAsync({});
-    if (Platform.OS !== 'web' && mapRef.current) {
-      Alert.alert('Position', `Lat: ${location.coords.latitude.toFixed(4)}, Lng: ${location.coords.longitude.toFixed(4)}`);
+    console.log('[Map] Got location:', location.coords);
+    
+    if (mapRef.current) {
+      mapRef.current.animateToRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 10,
+        longitudeDelta: 10,
+      }, 1000);
     }
   };
 
@@ -35,34 +42,6 @@ export default function MapScreen() {
     console.log('[Map] Marker pressed:', destinationId);
     router.push(`/destination/${destinationId}`);
   };
-
-  const MapComponent = Platform.OS === 'web' ? (
-    <View style={styles.webMapContainer}>
-      <LinearGradient
-        colors={['#1a472a', '#2d5f3f', '#1a472a']}
-        style={StyleSheet.absoluteFillObject}
-      />
-      <View style={styles.destinationGrid}>
-        {africanDestinations.map((dest) => (
-          <TouchableOpacity
-            key={dest.id}
-            style={styles.webDestinationCard}
-            onPress={() => handleMarkerPress(dest.id)}
-            activeOpacity={0.7}
-          >
-            <View style={styles.pinIcon}>
-              <MapPin color={theme.colors.primary} size={20} />
-            </View>
-            <Text style={styles.destName} numberOfLines={1}>{dest.name}</Text>
-            <Text style={styles.destCountry} numberOfLines={1}>{dest.country}</Text>
-            <View style={styles.ratingContainer}>
-              <Text style={styles.rating}>★ {dest.rating}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </View>
-  ) : null;
 
   return (
     <View style={styles.container}>
@@ -87,18 +66,47 @@ export default function MapScreen() {
       </View>
 
       <View style={styles.mapContainer}>
-        {MapComponent ? MapComponent : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>Carte disponible sur web uniquement</Text>
-          </View>
-        )}
+        <MapView
+          ref={mapRef}
+          provider={PROVIDER_DEFAULT}
+          style={styles.map}
+          initialRegion={{
+            latitude: 0,
+            longitude: 20,
+            latitudeDelta: 60,
+            longitudeDelta: 60,
+          }}
+          mapType={mapType === 'standard' ? 'standard' : mapType === 'hybrid' ? 'hybrid' : 'terrain'}
+        >
+          {africanDestinations.map((dest) => (
+            <Marker
+              key={dest.id}
+              coordinate={{
+                latitude: dest.coordinates.latitude,
+                longitude: dest.coordinates.longitude,
+              }}
+              title={dest.name}
+              description={dest.country}
+              onPress={() => {
+                console.log('[Map] Marker pressed:', dest.id);
+              }}
+              onCalloutPress={() => handleMarkerPress(dest.id)}
+            >
+              <View style={styles.markerContainer}>
+                <View style={styles.markerPin}>
+                  <MapPin color="#fff" size={20} />
+                </View>
+              </View>
+            </Marker>
+          ))}
+        </MapView>
       </View>
 
       <TouchableOpacity
         style={[styles.myLocationButton, { bottom: insets.bottom + 100 }]}
         onPress={handleLocationPress}
       >
-        <Search color="#fff" size={20} />
+        <Locate color="#fff" size={20} />
       </TouchableOpacity>
     </View>
   );
@@ -147,58 +155,29 @@ const styles = StyleSheet.create({
   mapContainer: {
     flex: 1,
   },
-  webMapContainer: {
+  map: {
     flex: 1,
-    position: 'relative',
+    width: '100%',
+    height: '100%',
   },
-  destinationGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: theme.spacing.md,
-    gap: theme.spacing.md,
-  },
-  webDestinationCard: {
-    width: '47%',
-    backgroundColor: theme.colors.backgroundDark,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-  },
-  pinIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: `${theme.colors.primary}20`,
+  markerContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: theme.spacing.sm,
   },
-  destName: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.text,
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  destCountry: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: theme.spacing.xs,
-  },
-  ratingContainer: {
+  markerPin: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: theme.colors.primary,
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 4,
-    borderRadius: theme.borderRadius.sm,
-    marginTop: 4,
-  },
-  rating: {
-    fontSize: theme.fontSize.sm,
-    color: '#fff',
-    fontWeight: theme.fontWeight.bold as '700',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   myLocationButton: {
     position: 'absolute',
@@ -215,15 +194,5 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  emptyState: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: theme.spacing.xl,
-  },
-  emptyText: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-  },
+
 });
