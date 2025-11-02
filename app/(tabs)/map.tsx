@@ -11,7 +11,7 @@ import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const [mapType, setMapType] = useState<'standard' | 'hybrid' | 'terrain'>('standard');
+  const [mapType, setMapType] = useState<'standard' | 'hybrid' | 'satellite'>('standard');
 
   const mapRef = useRef<any>(null);
 
@@ -54,7 +54,7 @@ export default function MapScreen() {
           <TouchableOpacity
             style={styles.iconButton}
             onPress={() => {
-              const types = ['standard', 'hybrid', 'terrain'] as const;
+              const types = ['standard', 'hybrid', 'satellite'] as const;
               const currentIndex = types.indexOf(mapType);
               const nextType = types[(currentIndex + 1) % types.length];
               setMapType(nextType);
@@ -76,7 +76,7 @@ export default function MapScreen() {
             latitudeDelta: 60,
             longitudeDelta: 60,
           }}
-          mapType={mapType === 'standard' ? 'standard' : mapType === 'hybrid' ? 'hybrid' : 'terrain'}
+          mapType={mapType}
         >
           {africanDestinations.map((dest) => (
             <Marker
