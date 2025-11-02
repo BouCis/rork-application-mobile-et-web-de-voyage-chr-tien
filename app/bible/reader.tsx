@@ -1,45 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Platform, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, Search, BookOpen, ChevronDown, Volume2, Bookmark } from 'lucide-react-native';
+import { ArrowLeft, Search, BookOpen, ChevronDown, Volume2, Bookmark, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
 import { useRouter } from 'expo-router';
-
-const bibleBooks = [
-  { name: 'Genèse', chapters: 50, testament: 'Ancien Testament' },
-  { name: 'Exode', chapters: 40, testament: 'Ancien Testament' },
-  { name: 'Psaumes', chapters: 150, testament: 'Ancien Testament' },
-  { name: 'Proverbes', chapters: 31, testament: 'Ancien Testament' },
-  { name: 'Matthieu', chapters: 28, testament: 'Nouveau Testament' },
-  { name: 'Jean', chapters: 21, testament: 'Nouveau Testament' },
-  { name: 'Romains', chapters: 16, testament: 'Nouveau Testament' },
-  { name: 'Apocalypse', chapters: 22, testament: 'Nouveau Testament' },
-];
-
-const sampleVerses = [
-  {
-    id: '1',
-    book: 'Jean',
-    chapter: 3,
-    verse: 16,
-    text: 'Car Dieu a tant aimé le monde qu\'il a donné son Fils unique, afin que quiconque croit en lui ne périsse point, mais qu\'il ait la vie éternelle.',
-  },
-  {
-    id: '2',
-    book: 'Psaumes',
-    chapter: 23,
-    verse: 1,
-    text: 'L\'Éternel est mon berger: je ne manquerai de rien.',
-  },
-  {
-    id: '3',
-    book: 'Philippiens',
-    chapter: 4,
-    verse: 13,
-    text: 'Je puis tout par celui qui me fortifie.',
-  },
-];
+import { useQuery } from '@tanstack/react-query';
+import { BIBLE_BOOKS, fetchChapter, getBookInfoByFrName, loadBookmarks, saveBookmarks, toggleBookmark } from '@/data/bible';
+import type { Bookmark as BibleBookmark } from '@/data/bible';
 
 export default function BibleReaderScreen() {
   const insets = useSafeAreaInsets();
@@ -49,6 +17,18 @@ export default function BibleReaderScreen() {
   const [selectedChapter, setSelectedChapter] = useState<number>(3);
   const [showBookSelector, setShowBookSelector] = useState<boolean>(false);
   const [fontSize, setFontSize] = useState<number>(16);
+  const [bookmarks, setBookmarks] = useState<BibleBookmark[]>([]);
+
+  useEffect(() => {
+    loadBookmarks().then(setBookmarks);
+  }, []);
+
+  const bookInfo = useMemo(() => getBookInfoByFrName(selectedBook), [selectedBook]);
+
+  const { data: verses, isLoading, isError, error, refetch, isFetching } = useQuery({
+    queryKey: ['bible', 'chapter', selectedBook, selectedChapter],
+    queryFn: async () => fetchChapter(selectedBook, selectedChapter),
+  });
 
   const handleBack = () => {
     router.back();
@@ -67,6 +47,44 @@ export default function BibleReaderScreen() {
   const handleFontSizeDecrease = () => {
     if (fontSize > 12) setFontSize(fontSize - 2);
   };
+
+  const filteredVerses = useMemo(() => {
+    const list = verses ?? [];
+    if (!searchQuery.trim()) return list;
+    const q = searchQuery.trim().toLowerCase();
+    return list.filter(v => v.text.toLowerCase().includes(q));
+  }, [verses, searchQuery]);
+
+  const onToggleBookmark = useCallback(async (vId: string) => {
+    const v = (verses ?? []).find(vv => `${vv.book}-${vv.chapter}-${vv.verse}` === vId);
+    if (!v) return;
+    const updated = toggleBookmark(bookmarks, v);
+    setBookmarks(updated);
+    await saveBookmarks(updated);
+  }, [bookmarks, verses]);
+
+  const isBookmarked = useCallback((v: { book: string; chapter: number; verse: number }) => {
+    const id = `${v.book}-${v.chapter}-${v.verse}`;
+    return bookmarks.some(b => b.id === id);
+  }, [bookmarks]);
+
+  const onSpeak = useCallback(() => {
+    const text = (verses ?? []).map(v => `${v.verse}. ${v.text}`).join(' ');
+    if (!text) return;
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'fr-FR';
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utter);
+      } catch (e) {
+        console.log('[Bible] speech error', e);
+      }
+    } else {
+      Alert.alert('Audio', "La lecture vocale n'est pas disponible sur cet appareil.");
+    }
+  }, [verses]);
+
 
   return (
     <View style={styles.container}>
@@ -106,6 +124,7 @@ export default function BibleReaderScreen() {
 
       <View style={styles.controls}>
         <TouchableOpacity
+          testID="btn-select-book"
           style={styles.bookSelector}
           onPress={() => setShowBookSelector(!showBookSelector)}
         >
@@ -129,7 +148,7 @@ export default function BibleReaderScreen() {
           >
             <Text style={styles.fontButtonText}>A+</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.fontButton}>
+          <TouchableOpacity testID="btn-tts" style={styles.fontButton} onPress={onSpeak}>
             <Volume2 color={theme.colors.textLight} size={18} />
           </TouchableOpacity>
         </View>
@@ -143,46 +162,44 @@ export default function BibleReaderScreen() {
             showsVerticalScrollIndicator={false}
           >
             <Text style={styles.testamentTitle}>Ancien Testament</Text>
-            {bibleBooks
-              .filter(b => b.testament === 'Ancien Testament')
+            {BIBLE_BOOKS
+              .filter(b => b.testament === 'old')
               .map((book) => (
                 <TouchableOpacity
-                  key={book.name}
+                  key={book.fr}
                   style={[
                     styles.bookItem,
-                    selectedBook === book.name && styles.bookItemActive
+                    selectedBook === book.fr && styles.bookItemActive
                   ]}
-                  onPress={() => handleBookSelect(book.name)}
+                  onPress={() => handleBookSelect(book.fr)}
                 >
                   <Text style={[
                     styles.bookItemText,
-                    selectedBook === book.name && styles.bookItemTextActive
+                    selectedBook === book.fr && styles.bookItemTextActive
                   ]}>
-                    {book.name}
+                    {book.fr}
                   </Text>
                   <Text style={styles.bookItemChapters}>{book.chapters} ch.</Text>
                 </TouchableOpacity>
               ))}
 
-            <Text style={[styles.testamentTitle, { marginTop: theme.spacing.lg }]}>
-              Nouveau Testament
-            </Text>
-            {bibleBooks
-              .filter(b => b.testament === 'Nouveau Testament')
+            <Text style={[styles.testamentTitle, { marginTop: theme.spacing.lg }]}>Nouveau Testament</Text>
+            {BIBLE_BOOKS
+              .filter(b => b.testament === 'new')
               .map((book) => (
                 <TouchableOpacity
-                  key={book.name}
+                  key={book.fr}
                   style={[
                     styles.bookItem,
-                    selectedBook === book.name && styles.bookItemActive
+                    selectedBook === book.fr && styles.bookItemActive
                   ]}
-                  onPress={() => handleBookSelect(book.name)}
+                  onPress={() => handleBookSelect(book.fr)}
                 >
                   <Text style={[
                     styles.bookItemText,
-                    selectedBook === book.name && styles.bookItemTextActive
+                    selectedBook === book.fr && styles.bookItemTextActive
                   ]}>
-                    {book.name}
+                    {book.fr}
                   </Text>
                   <Text style={styles.bookItemChapters}>{book.chapters} ch.</Text>
                 </TouchableOpacity>
@@ -206,37 +223,72 @@ export default function BibleReaderScreen() {
           <Text style={styles.chapterSubtitle}>Louis Segond 1910</Text>
         </View>
 
-        <View style={styles.versesContainer}>
-          {sampleVerses.map((verse) => (
-            <TouchableOpacity
-              key={verse.id}
-              style={styles.verseCard}
-            >
-              <View style={styles.verseNumber}>
-                <Text style={styles.verseNumberText}>{verse.verse}</Text>
-              </View>
-              <Text style={[styles.verseText, { fontSize }]}>
-                {verse.text}
-              </Text>
+        {isLoading || isFetching ? (
+          <View style={styles.loading}>
+            <ActivityIndicator size="small" color={theme.colors.primary} />
+            <Text style={styles.loadingText}>Chargement du chapitre…</Text>
+          </View>
+        ) : isError ? (
+          <View style={styles.errorBox}>
+            <Text style={styles.errorTitle}>Impossible de charger le chapitre</Text>
+            <Text style={styles.errorMessage}>{(error as Error)?.message ?? 'Erreur inconnue'}</Text>
+            <TouchableOpacity testID="btn-retry" style={styles.retryBtn} onPress={() => refetch()}>
+              <Text style={styles.retryText}>Réessayer</Text>
             </TouchableOpacity>
-          ))}
-        </View>
+          </View>
+        ) : (
+          <View style={styles.versesContainer}>
+            {filteredVerses.map((verse) => {
+              const id = `${verse.book}-${verse.chapter}-${verse.verse}`;
+              const bookmarked = isBookmarked(verse);
+              return (
+                <TouchableOpacity
+                  key={id}
+                  testID={`verse-${id}`}
+                  style={styles.verseCard}
+                  onLongPress={() => onToggleBookmark(id)}
+                  accessible
+                  accessibilityRole="button"
+                  accessibilityLabel={`Verset ${verse.verse}. Appui long pour ${bookmarked ? 'retirer des favoris' : 'ajouter aux favoris'}`}
+                >
+                  <View style={styles.verseNumber}>
+                    <Text style={styles.verseNumberText}>{verse.verse}</Text>
+                  </View>
+                  <Text style={[styles.verseText, { fontSize }]}>
+                    {verse.text}
+                  </Text>
+                  {bookmarked && (
+                    <Bookmark color={theme.colors.warning} size={16} />
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+            {filteredVerses.length === 0 && (
+              <Text style={styles.emptyFilter}>Aucun verset ne correspond à votre recherche</Text>
+            )}
+          </View>
+        )}
 
         <View style={styles.navigationButtons}>
           <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => selectedChapter > 1 && setSelectedChapter(selectedChapter - 1)}
+            testID="btn-prev-chapter"
+            style={[styles.navButton, { opacity: selectedChapter <= 1 ? 0.5 : 1 }]}
+            disabled={selectedChapter <= 1}
+            onPress={() => setSelectedChapter(Math.max(1, selectedChapter - 1))}
           >
             <LinearGradient
               colors={[`${theme.colors.primary}20`, `${theme.colors.primary}10`]}
               style={styles.navGradient}
             >
+              <ChevronLeft color={theme.colors.text} />
               <Text style={styles.navButtonText}>Chapitre précédent</Text>
             </LinearGradient>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.navButton}
+            testID="btn-next-chapter"
+            style={[styles.navButton, { opacity: (bookInfo?.chapters ?? Infinity) <= selectedChapter ? 0.5 : 1 }]}
+            disabled={(bookInfo?.chapters ?? Infinity) <= selectedChapter}
             onPress={() => setSelectedChapter(selectedChapter + 1)}
           >
             <LinearGradient
@@ -244,6 +296,7 @@ export default function BibleReaderScreen() {
               style={styles.navGradient}
             >
               <Text style={styles.navButtonText}>Chapitre suivant</Text>
+              <ChevronRight color={theme.colors.text} />
             </LinearGradient>
           </TouchableOpacity>
         </View>
@@ -454,6 +507,7 @@ const styles = StyleSheet.create({
   verseCard: {
     flexDirection: 'row',
     gap: theme.spacing.md,
+    alignItems: 'flex-start',
   },
   verseNumber: {
     width: 32,
@@ -486,6 +540,9 @@ const styles = StyleSheet.create({
   navGradient: {
     paddingVertical: theme.spacing.md,
     alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
     borderWidth: 1,
     borderColor: theme.colors.border,
   },
@@ -496,6 +553,48 @@ const styles = StyleSheet.create({
   },
   infoSection: {
     marginTop: theme.spacing.xl,
+  },
+  loading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
+  },
+  loadingText: {
+    color: theme.colors.textSecondary,
+  },
+  errorBox: {
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.md,
+    gap: theme.spacing.xs,
+  },
+  errorTitle: {
+    color: theme.colors.text,
+    fontWeight: theme.fontWeight.bold,
+  },
+  errorMessage: {
+    color: theme.colors.textSecondary,
+  },
+  retryBtn: {
+    alignSelf: 'flex-start',
+    backgroundColor: `${theme.colors.primary}20`,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.md,
+    marginTop: theme.spacing.xs,
+  },
+  retryText: {
+    color: theme.colors.text,
+    fontWeight: theme.fontWeight.semibold,
+  },
+  emptyFilter: {
+    color: theme.colors.textSecondary,
+    fontStyle: 'italic',
   },
   infoTitle: {
     fontSize: theme.fontSize.xl,
