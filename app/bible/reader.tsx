@@ -208,6 +208,31 @@ export default function BibleReaderScreen() {
         </View>
       )}
 
+      {/* Chapter quick selector */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.chapterPills}
+        style={styles.chapterPillsScroll}
+     >
+        {Array.from({ length: bookInfo?.chapters ?? 0 }).map((_, i) => {
+          const ch = i + 1;
+          const isActive = ch === selectedChapter;
+          return (
+            <TouchableOpacity
+              key={`ch-${ch}`}
+              testID={`btn-chapter-${ch}`}
+              style={[styles.chapterPill, isActive && styles.chapterPillActive]}
+              onPress={() => setSelectedChapter(ch)}
+            >
+              <Text style={[styles.chapterPillText, isActive && styles.chapterPillTextActive]}>
+                {ch}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -388,7 +413,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
   },
   bookSelector: {
     flexDirection: 'row',
@@ -479,6 +504,34 @@ const styles = StyleSheet.create({
   bookItemChapters: {
     fontSize: theme.fontSize.sm,
     color: theme.colors.textLight,
+  },
+  chapterPillsScroll: {
+    maxHeight: 56,
+  },
+  chapterPills: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.md,
+    gap: theme.spacing.sm,
+  },
+  chapterPill: {
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.full,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  chapterPillActive: {
+    backgroundColor: `${theme.colors.primary}20`,
+    borderColor: theme.colors.primary,
+  },
+  chapterPillText: {
+    color: theme.colors.text,
+    fontSize: theme.fontSize.sm,
+    fontWeight: theme.fontWeight.semibold,
+  },
+  chapterPillTextActive: {
+    color: theme.colors.primary,
   },
   scrollView: {
     flex: 1,
