@@ -28,6 +28,7 @@ import {
   CreditCard,
   BookOpen,
   Heart,
+  Music,
 } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
 import { useApp } from '@/store/AppContext';
@@ -169,6 +170,13 @@ export default function MoreScreen() {
       description: 'Musique & inspiration',
       onPress: () => router.push('/(tabs)/spiritual'),
       color: theme.colors.accent,
+    },
+    {
+      icon: Music,
+      label: 'Musique',
+      description: 'Lecteur et playlists',
+      onPress: () => router.push('/music/player'),
+      color: theme.colors.primary,
     },
     {
       icon: BookOpen,
