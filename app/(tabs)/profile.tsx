@@ -14,6 +14,7 @@ import {
   Heart,
   ChevronRight,
   Edit3,
+  Trash2,
 } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
 import { useApp } from '@/store/AppContext';
@@ -21,7 +22,7 @@ import { router } from 'expo-router';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
-  const { user } = useApp();
+  const { user, logout, deleteAccount } = useApp();
 
   if (!user) {
     return (
@@ -176,10 +177,25 @@ export default function ProfileScreen() {
 
             <TouchableOpacity 
               style={styles.logoutButton}
-              onPress={() => Alert.alert('Déconnexion', 'Êtes-vous sûr de vouloir vous déconnecter ?', [
-                { text: 'Annuler', style: 'cancel' },
-                { text: 'Déconnexion', style: 'destructive', onPress: () => console.log('Logout') }
-              ])}
+              onPress={() => Alert.alert(
+                'Déconnexion', 
+                'Êtes-vous sûr de vouloir vous déconnecter ?', 
+                [
+                  { text: 'Annuler', style: 'cancel' },
+                  { 
+                    text: 'Déconnexion', 
+                    style: 'destructive', 
+                    onPress: async () => {
+                      try {
+                        await logout();
+                        Alert.alert('Succès', 'Vous êtes déconnecté');
+                      } catch (error) {
+                        Alert.alert('Erreur', 'Impossible de se déconnecter');
+                      }
+                    }
+                  }
+                ]
+              )}
             >
               <LinearGradient
                 colors={['rgba(239, 68, 68, 0.1)', 'rgba(239, 68, 68, 0.05)']}
@@ -188,6 +204,47 @@ export default function ProfileScreen() {
                 <LogOut color={theme.colors.error} size={20} />
                 <Text style={styles.logoutText}>Déconnexion</Text>
               </LinearGradient>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.deleteButton}
+              onPress={() => Alert.alert(
+                'Supprimer le compte', 
+                'Cette action est irréversible. Toutes vos données seront supprimées définitivement.', 
+                [
+                  { text: 'Annuler', style: 'cancel' },
+                  { 
+                    text: 'Supprimer', 
+                    style: 'destructive', 
+                    onPress: () => {
+                      Alert.alert(
+                        'Confirmation', 
+                        'Êtes-vous vraiment sûr ? Cette action ne peut pas être annulée.', 
+                        [
+                          { text: 'Annuler', style: 'cancel' },
+                          { 
+                            text: 'Supprimer définitivement', 
+                            style: 'destructive',
+                            onPress: async () => {
+                              try {
+                                await deleteAccount();
+                                Alert.alert('Compte supprimé', 'Votre compte a été supprimé avec succès');
+                              } catch (error) {
+                                Alert.alert('Erreur', 'Impossible de supprimer le compte');
+                              }
+                            }
+                          }
+                        ]
+                      );
+                    }
+                  }
+                ]
+              )}
+            >
+              <View style={styles.deleteGradient}>
+                <Trash2 color={theme.colors.error} size={20} />
+                <Text style={styles.deleteText}>Supprimer mon compte</Text>
+              </View>
             </TouchableOpacity>
 
             <Text style={styles.version}>Version 1.0.0</Text>
@@ -344,6 +401,26 @@ const styles = StyleSheet.create({
     borderColor: `${theme.colors.error}30`,
   },
   logoutText: {
+    fontSize: theme.fontSize.md,
+    fontWeight: theme.fontWeight.semibold,
+    color: theme.colors.error,
+  },
+  deleteButton: {
+    marginTop: theme.spacing.md,
+    borderRadius: theme.borderRadius.lg,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: `${theme.colors.error}40`,
+  },
+  deleteGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+    padding: theme.spacing.md,
+    backgroundColor: 'rgba(239, 68, 68, 0.05)',
+  },
+  deleteText: {
     fontSize: theme.fontSize.md,
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.error,

@@ -254,6 +254,48 @@ export const [AppProvider, useApp] = createContextHook(() => {
     }
   }, []);
 
+  const logout = useCallback(async () => {
+    try {
+      await AsyncStorage.removeItem(STORAGE_KEYS.USER);
+      setUser(null);
+      console.log('User logged out successfully');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      throw error;
+    }
+  }, []);
+
+  const deleteAccount = useCallback(async () => {
+    try {
+      await AsyncStorage.multiRemove([
+        STORAGE_KEYS.USER,
+        STORAGE_KEYS.TRIPS,
+        STORAGE_KEYS.MEDIA,
+        STORAGE_KEYS.PLACES,
+        STORAGE_KEYS.JOURNALS,
+        STORAGE_KEYS.CHECKLISTS,
+        STORAGE_KEYS.EXPENSES,
+        STORAGE_KEYS.PLAYLISTS,
+        STORAGE_KEYS.POSTS,
+        STORAGE_KEYS.NOTIFICATIONS,
+      ]);
+      setUser(null);
+      setTrips([]);
+      setMedia([]);
+      setSavedPlaces([]);
+      setJournals([]);
+      setChecklists([]);
+      setExpenses([]);
+      setPlaylists([]);
+      setPosts([]);
+      setNotifications([]);
+      console.log('Account deleted successfully');
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      throw error;
+    }
+  }, []);
+
   return useMemo(() => ({
     user,
     trips,
@@ -282,6 +324,8 @@ export const [AppProvider, useApp] = createContextHook(() => {
     addNotification,
     markNotificationAsRead,
     completeOnboarding,
+    logout,
+    deleteAccount,
   }), [
     user,
     trips,
@@ -310,5 +354,7 @@ export const [AppProvider, useApp] = createContextHook(() => {
     addNotification,
     markNotificationAsRead,
     completeOnboarding,
+    logout,
+    deleteAccount,
   ]);
 });
