@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable } from 'react-native';
 import { MapPin, Calendar, Heart } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { theme } from '@/constants/theme';
@@ -69,16 +69,18 @@ export function TripCard({ trip, onPress }: TripCardProps) {
               </View>
             </View>
             
-            <TouchableOpacity
+            <Pressable
               onPress={() => toggleFavoriteTrip(trip.id)}
               style={styles.favoriteButton}
+              accessibilityRole="button"
+              testID={`btn-favorite-${trip.id}`}
             >
               <Heart
                 size={20}
                 color={isFavorite ? theme.colors.error : theme.colors.textLight}
                 fill={isFavorite ? theme.colors.error : 'transparent'}
               />
-            </TouchableOpacity>
+            </Pressable>
           </View>
           
           <Text style={styles.description} numberOfLines={2}>

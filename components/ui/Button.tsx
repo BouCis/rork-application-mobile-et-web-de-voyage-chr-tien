@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import { Pressable, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
 import { theme } from '@/constants/theme';
 
 interface ButtonProps {
@@ -41,19 +41,19 @@ export function Button({
   ];
 
   return (
-    <TouchableOpacity
+    <Pressable
       style={buttonStyles}
       onPress={onPress}
       disabled={disabled || loading}
-      activeOpacity={0.7}
       testID={testID}
+      accessibilityRole="button"
     >
       {loading ? (
         <ActivityIndicator color={variant === 'primary' ? theme.colors.textInverse : theme.colors.primary} />
       ) : (
         <Text style={textStyles}>{title}</Text>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 

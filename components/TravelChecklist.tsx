@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Pressable,
 } from 'react-native';
 import {
   CheckCircle,
@@ -222,16 +223,18 @@ export function TravelChecklist({
         onPress={() => onItemToggle(item.id)}
       >
         <View style={styles.itemLeft}>
-          <TouchableOpacity
+          <Pressable
             style={styles.checkbox}
             onPress={() => onItemToggle(item.id)}
+            accessibilityRole="button"
+            testID={`checklist-toggle-${item.id}`}
           >
             {item.completed ? (
               <CheckCircle size={24} color={theme.colors.success} />
             ) : (
               <Circle size={24} color={theme.colors.border} />
             )}
-          </TouchableOpacity>
+          </Pressable>
           
           <View style={styles.itemContent}>
             <View style={styles.itemHeader}>
@@ -272,12 +275,14 @@ export function TravelChecklist({
         </View>
         
         {onItemDelete && (
-          <TouchableOpacity
+          <Pressable
             style={styles.deleteButton}
             onPress={() => handleItemDelete(item.id)}
+            accessibilityRole="button"
+            testID={`checklist-delete-${item.id}`}
           >
             <Trash2 size={16} color={theme.colors.textSecondary} />
-          </TouchableOpacity>
+          </Pressable>
         )}
       </TouchableOpacity>
     );
