@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Edit3,
   Trash2,
+  ArrowLeft,
 } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
 import { useApp } from '@/store/AppContext';
@@ -77,11 +78,22 @@ export default function ProfileScreen() {
         style={StyleSheet.absoluteFillObject}
       />
 
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <ArrowLeft color={theme.colors.text} size={24} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Profil</Text>
+        <View style={styles.headerPlaceholder} />
+      </View>
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 90 }
+          { paddingBottom: insets.bottom + 90 }
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -257,6 +269,29 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.md,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: theme.borderRadius.md,
+    backgroundColor: theme.colors.surface,
+  },
+  headerTitle: {
+    fontSize: theme.fontSize.xl,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.text,
+  },
+  headerPlaceholder: {
+    width: 40,
   },
   scrollView: {
     flex: 1,
