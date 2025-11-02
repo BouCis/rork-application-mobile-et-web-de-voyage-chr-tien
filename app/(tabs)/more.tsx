@@ -15,7 +15,6 @@ import {
   Plane,
   Car,
   MessageSquare,
-  MapPin,
   Settings,
   HelpCircle,
   Info,
@@ -149,13 +148,6 @@ export default function MoreScreen() {
       description: 'Louer une voiture',
       onPress: handleRentalsPress,
       color: '#10B981',
-    },
-    {
-      icon: MapPin,
-      label: 'Carte',
-      description: 'Explorer les lieux',
-      onPress: () => router.push('/(tabs)/map'),
-      color: '#EF4444',
     },
     {
       icon: MessageSquare,
