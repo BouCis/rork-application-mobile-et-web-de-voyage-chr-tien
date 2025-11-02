@@ -4,6 +4,9 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
+  emailVerified: boolean;
+  verificationCode?: string;
+  verificationCodeExpiresAt?: string;
   phone?: string;
   dateOfBirth?: string;
   age?: number;

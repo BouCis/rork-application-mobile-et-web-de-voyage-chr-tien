@@ -154,10 +154,18 @@ export default function SignUpScreen() {
     }
   };
 
-  const sendConfirmationEmail = async (email: string, firstName: string): Promise<boolean> => {
+  const generateVerificationCode = (): string => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  };
+
+  const sendVerificationEmail = async (email: string, firstName: string, verificationCode: string): Promise<boolean> => {
     try {
-      console.log(`Envoi d'email de confirmation à ${email}`);
+      console.log(`📧 Email de vérification envoyé à ${email}`);
+      console.log(`📋 Code de vérification: ${verificationCode}`);
+      console.log(`⏰ Expiration: 15 minutes`);
+      
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
       return true;
     } catch (error) {
       console.error('Erreur lors de l\'envoi de l\'email:', error);
@@ -171,11 +179,18 @@ export default function SignUpScreen() {
     try {
       setLoading(true);
 
+      const verificationCode = generateVerificationCode();
+      const expiresAt = new Date();
+      expiresAt.setMinutes(expiresAt.getMinutes() + 15);
+
       const newUser: User = {
         id: Date.now().toString(),
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
+        emailVerified: false,
+        verificationCode: verificationCode,
+        verificationCodeExpiresAt: expiresAt.toISOString(),
         phone: formData.phone || undefined,
         dateOfBirth: formData.dateOfBirth || undefined,
         gender: formData.gender,
@@ -194,26 +209,30 @@ export default function SignUpScreen() {
 
       await saveUser(newUser);
 
-      const emailSuccess = await sendConfirmationEmail(formData.email, formData.firstName);
+      const emailSuccess = await sendVerificationEmail(formData.email, formData.firstName, verificationCode);
 
       if (emailSuccess) {
         Alert.alert(
           'Compte créé ! 🎉',
-          `Un email de confirmation a été envoyé à ${formData.email}. Veuillez vérifier votre boîte de réception.`,
+          `Un code de vérification a été envoyé à ${formData.email}. Veuillez vérifier votre boîte de réception pour confirmer votre email.`,
           [
             {
-              text: 'OK',
-              onPress: () => router.replace('/(tabs)/planner'),
+              text: 'Vérifier maintenant',
+              onPress: () => router.push({ pathname: '/auth/verify-email', params: { email: formData.email } }),
             },
           ]
         );
       } else {
         Alert.alert(
-          'Compte créé !',
-          'Votre compte a été créé avec succès.',
+          'Erreur',
+          'Impossible d\'envoyer l\'email de vérification. Veuillez réessayer.',
           [
             {
-              text: 'OK',
+              text: 'Réessayer',
+              onPress: handleSubmit,
+            },
+            {
+              text: 'Plus tard',
               onPress: () => router.replace('/(tabs)/planner'),
             },
           ]
