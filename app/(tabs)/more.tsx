@@ -26,6 +26,8 @@ import {
   Camera,
   Calendar,
   CreditCard,
+  BookOpen,
+  Heart,
 } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
 import { useApp } from '@/store/AppContext';
@@ -160,6 +162,20 @@ export default function MoreScreen() {
       description: 'Explorer les destinations',
       onPress: () => router.push('/(tabs)/map'),
       color: theme.colors.warning,
+    },
+    {
+      icon: Heart,
+      label: 'Spiritualité',
+      description: 'Musique & inspiration',
+      onPress: () => router.push('/(tabs)/spiritual'),
+      color: theme.colors.accent,
+    },
+    {
+      icon: BookOpen,
+      label: 'Bible',
+      description: 'Lire et rechercher',
+      onPress: () => router.push('/bible/reader'),
+      color: theme.colors.secondary,
     },
   ];
 
