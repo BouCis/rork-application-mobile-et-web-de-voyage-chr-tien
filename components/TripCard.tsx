@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { MapPin, Calendar, Heart } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { theme } from '@/constants/theme';
@@ -52,59 +52,61 @@ export function TripCard({ trip, onPress }: TripCardProps) {
   };
 
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
-      <Card style={styles.card}>
-        {trip.coverImage && (
-          <Image source={{ uri: trip.coverImage }} style={styles.coverImage} />
-        )}
-        
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <View style={styles.titleContainer}>
-              <Text style={styles.title} numberOfLines={2}>
-                {trip.title}
-              </Text>
-              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(trip.status) }]}>
-                <Text style={styles.statusText}>{getStatusText(trip.status)}</Text>
+    <Card style={styles.card}>
+      <View style={styles.cardInner}>
+        <Pressable onPress={onPress} style={styles.tappableArea} accessibilityRole="button" testID={`card-trip-${trip.id}`}>
+          {trip.coverImage && (
+            <Image source={{ uri: trip.coverImage }} style={styles.coverImage} />
+          )}
+
+          <View style={styles.content}>
+            <View style={styles.headerContent}>
+              <View style={styles.titleContainer}>
+                <Text style={styles.title} numberOfLines={2}>
+                  {trip.title}
+                </Text>
+                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(trip.status) }]}>
+                  <Text style={styles.statusText}>{getStatusText(trip.status)}</Text>
+                </View>
               </View>
             </View>
-            
-            <Pressable
-              onPress={() => toggleFavoriteTrip(trip.id)}
-              style={styles.favoriteButton}
-              accessibilityRole="button"
-              testID={`btn-favorite-${trip.id}`}
-            >
-              <Heart
-                size={20}
-                color={isFavorite ? theme.colors.error : theme.colors.textLight}
-                fill={isFavorite ? theme.colors.error : 'transparent'}
-              />
-            </Pressable>
-          </View>
-          
-          <Text style={styles.description} numberOfLines={2}>
-            {trip.description}
-          </Text>
-          
-          <View style={styles.footer}>
-            <View style={styles.dateContainer}>
-              <Calendar size={16} color={theme.colors.textSecondary} />
-              <Text style={styles.dateText}>
-                {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
-              </Text>
-            </View>
-            
-            <View style={styles.locationContainer}>
-              <MapPin size={16} color={theme.colors.textSecondary} />
-              <Text style={styles.locationText}>
-                {trip.locations.length} lieu{trip.locations.length > 1 ? 'x' : ''}
-              </Text>
+
+            <Text style={styles.description} numberOfLines={2}>
+              {trip.description}
+            </Text>
+
+            <View style={styles.footer}>
+              <View style={styles.dateContainer}>
+                <Calendar size={16} color={theme.colors.textSecondary} />
+                <Text style={styles.dateText}>
+                  {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
+                </Text>
+              </View>
+
+              <View style={styles.locationContainer}>
+                <MapPin size={16} color={theme.colors.textSecondary} />
+                <Text style={styles.locationText}>
+                  {trip.locations.length} lieu{trip.locations.length > 1 ? 'x' : ''}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-      </Card>
-    </TouchableOpacity>
+        </Pressable>
+
+        <Pressable
+          onPress={() => toggleFavoriteTrip(trip.id)}
+          style={styles.favoriteButton}
+          accessibilityRole="button"
+          testID={`btn-favorite-${trip.id}`}
+        >
+          <Heart
+            size={20}
+            color={isFavorite ? theme.colors.error : theme.colors.textLight}
+            fill={isFavorite ? theme.colors.error : 'transparent'}
+          />
+        </Pressable>
+      </View>
+    </Card>
   );
 }
 
@@ -121,7 +123,13 @@ const styles = StyleSheet.create({
   content: {
     gap: theme.spacing.sm,
   },
-  header: {
+  cardInner: {
+    position: 'relative',
+  },
+  tappableArea: {
+    borderRadius: theme.borderRadius.sm,
+  },
+  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
@@ -148,7 +156,13 @@ const styles = StyleSheet.create({
     color: theme.colors.white,
   },
   favoriteButton: {
+    position: 'absolute',
+    top: theme.spacing.sm,
+    right: theme.spacing.sm,
     padding: theme.spacing.xs,
+    zIndex: 2,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    borderRadius: 999,
   },
   description: {
     fontSize: theme.fontSize.sm,

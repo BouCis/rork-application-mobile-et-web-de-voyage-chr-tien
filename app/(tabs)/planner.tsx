@@ -325,16 +325,13 @@ export default function PlannerScreen() {
             contentContainerStyle={styles.destinationsScroll}
           >
             {trendingDestinations.map((destination) => (
-              <TouchableOpacity
+              <View
                 key={destination.id}
                 testID={`card-destination-${destination.id}`}
                 style={styles.destinationCard}
-                onPress={() => handleDestinationPress(destination)}
-                accessible
-                accessibilityRole="button"
-                accessibilityLabel={`Ouvrir ${destination.name}`}
               >
-                <View style={styles.destinationImageContainer}>
+                <Pressable onPress={() => handleDestinationPress(destination)} accessibilityRole="button" accessibilityLabel={`Ouvrir ${destination.name}`}>
+                  <View style={styles.destinationImageContainer}>
                   <LinearGradient
                     colors={['transparent', 'rgba(15, 23, 42, 0.9)']}
                     style={styles.destinationGradient}
@@ -350,6 +347,7 @@ export default function PlannerScreen() {
                     resizeMode="cover"
                   />
                 </View>
+                </Pressable>
                 <View style={styles.destinationInfo}>
                   <View style={styles.destinationHeader}>
                     <View>
@@ -376,7 +374,7 @@ export default function PlannerScreen() {
                     <ArrowRight color={theme.colors.primary} size={16} />
                   </Pressable>
                 </View>
-              </TouchableOpacity>
+              </View>
             ))}
           </ScrollView>
         </View>
