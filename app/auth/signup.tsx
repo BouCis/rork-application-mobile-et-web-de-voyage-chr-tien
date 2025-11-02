@@ -109,6 +109,11 @@ export default function SignUpScreen() {
   const handleDateChange = (event: any, date?: Date) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (date) {
+      const today = new Date();
+      if (date > today) {
+        Alert.alert('Date invalide', 'La date de naissance ne peut pas être dans le futur.');
+        return;
+      }
       setSelectedDate(date);
       updateField('dateOfBirth', formatDate(date));
     }
