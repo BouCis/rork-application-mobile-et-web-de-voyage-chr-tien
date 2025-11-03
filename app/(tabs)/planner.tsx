@@ -439,7 +439,7 @@ export default function PlannerScreen() {
               onPress={handleDiscoverInspiration}
               accessible
               accessibilityRole="button"
-              accessibilityLabel="Découvrir l\'inspiration"
+              accessibilityLabel="Découvrir l'inspiration"
             >
               <Text style={[styles.inspirationButtonText, { color: colors.gold }]}>Découvrir</Text>
             </TouchableOpacity>
