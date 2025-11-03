@@ -24,13 +24,229 @@ import { router } from 'expo-router';
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { user, logout, deleteAccount } = useApp();
-  const { colors } = useTheme();
+  const { colors, spacing, borderRadius, fontSize, fontWeight } = useTheme();
+
+  const styles = React.useMemo(() => StyleSheet.create({
+    container: { flex: 1 },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.md,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: borderRadius.md,
+      backgroundColor: colors.surface,
+    },
+    headerTitle: {
+      fontSize: fontSize.xl,
+      fontWeight: fontWeight.bold,
+      color: colors.text,
+    },
+    headerPlaceholder: { width: 40 },
+    scrollView: { flex: 1 },
+    scrollContent: { padding: spacing.lg },
+    profileHeader: { alignItems: 'center', marginBottom: spacing.xl },
+    avatarGradient: {
+      width: 96,
+      height: 96,
+      borderRadius: borderRadius.full,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.md,
+    },
+    userName: {
+      fontSize: fontSize.xxl,
+      fontWeight: fontWeight.bold,
+      color: colors.text,
+    },
+    userEmail: {
+      fontSize: fontSize.md,
+      color: colors.textSecondary,
+      marginTop: spacing.xs,
+    },
+    userBio: {
+      fontSize: fontSize.sm,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginTop: spacing.md,
+      paddingHorizontal: spacing.lg,
+      lineHeight: 20,
+    },
+    editButton: {
+      marginTop: spacing.lg,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.xl,
+      borderRadius: borderRadius.full,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    editButtonText: {
+      fontSize: fontSize.sm,
+      fontWeight: fontWeight.semibold,
+      color: colors.text,
+    },
+    statsContainer: {
+      flexDirection: 'row',
+      gap: spacing.md,
+      marginBottom: spacing.xl,
+    },
+    statCard: { flex: 1 },
+    statGradient: {
+      alignItems: 'center',
+      paddingVertical: spacing.lg,
+      borderRadius: borderRadius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    statValue: {
+      fontSize: fontSize.xxl,
+      fontWeight: fontWeight.bold,
+      color: colors.text,
+      marginTop: spacing.sm,
+    },
+    statLabel: {
+      fontSize: fontSize.xs,
+      color: colors.textSecondary,
+      marginTop: spacing.xs,
+    },
+    menuSection: { marginBottom: spacing.xl },
+    sectionTitle: {
+      fontSize: fontSize.sm,
+      fontWeight: fontWeight.bold,
+      color: colors.textLight,
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+      marginBottom: spacing.md,
+    },
+    menuContainer: {
+      backgroundColor: colors.surface,
+      borderRadius: borderRadius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: 'hidden',
+    },
+    menuItem: {
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    menuItemLast: { borderBottomWidth: 0 },
+    menuItemContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: spacing.md,
+    },
+    menuItemLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
+    },
+    iconContainer: {
+      width: 40,
+      height: 40,
+      borderRadius: borderRadius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    menuItemText: {
+      fontSize: fontSize.md,
+      fontWeight: fontWeight.medium,
+      color: colors.text,
+    },
+    logoutButton: {
+      marginTop: spacing.md,
+      borderRadius: borderRadius.lg,
+      overflow: 'hidden',
+    },
+    logoutGradient: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.sm,
+      padding: spacing.md,
+      borderWidth: 1,
+      borderColor: `${colors.error}30`,
+    },
+    logoutText: {
+      fontSize: fontSize.md,
+      fontWeight: fontWeight.semibold,
+      color: colors.error,
+    },
+    deleteButton: {
+      marginTop: spacing.md,
+      borderRadius: borderRadius.lg,
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: `${colors.error}40`,
+    },
+    deleteGradient: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.sm,
+      padding: spacing.md,
+      backgroundColor: 'rgba(239, 68, 68, 0.05)',
+    },
+    deleteText: {
+      fontSize: fontSize.md,
+      fontWeight: fontWeight.semibold,
+      color: colors.error,
+    },
+    version: {
+      fontSize: fontSize.sm,
+      color: colors.textLight,
+      textAlign: 'center',
+      marginTop: spacing.xl,
+    },
+    emptyState: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: spacing.xl,
+    },
+    emptyStateTitle: {
+      fontSize: fontSize.xxl,
+      fontWeight: fontWeight.bold,
+      color: colors.text,
+      marginTop: spacing.lg,
+    },
+    emptyStateText: {
+      fontSize: fontSize.md,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginTop: spacing.sm,
+    },
+    createProfileButton: {
+      marginTop: spacing.xl,
+      borderRadius: borderRadius.md,
+      overflow: 'hidden',
+    },
+    createProfileGradient: {
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.xl,
+    },
+    createProfileText: {
+      fontSize: fontSize.md,
+      fontWeight: fontWeight.bold,
+      color: colors.white,
+    },
+  }), [colors, spacing, borderRadius, fontSize, fontWeight]);
 
   if (!user) {
     return (
       <View style={styles.container}>
         <LinearGradient
-          colors={[colors.backgroundDark, colors.background]}
+          colors={[colors.backgroundSecondary, colors.background]}
           style={StyleSheet.absoluteFillObject}
         />
         <View style={styles.emptyState}>
@@ -75,11 +291,12 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[colors.backgroundDark, colors.background]}
+        colors={[colors.backgroundSecondary, colors.background]}
         style={StyleSheet.absoluteFillObject}
       />
 
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}
+      >
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
@@ -97,6 +314,7 @@ export default function ProfileScreen() {
           { paddingBottom: insets.bottom + 90 }
         ]}
         showsVerticalScrollIndicator={false}
+        testID="profile-scroll"
       >
         <View style={styles.profileHeader}>
           <LinearGradient
@@ -266,237 +484,3 @@ export default function ProfileScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24.lg,
-    paddingBottom: 24.md,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: {borderRadius: 16}.md,
-    backgroundColor: colors.surface,
-  },
-  headerTitle: {
-    fontSize: {fontSize: 15}.xl,
-    fontWeight: {fontWeight: '700'}.bold,
-    color: colors.text,
-  },
-  headerPlaceholder: {
-    width: 40,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 24.lg,
-  },
-  profileHeader: {
-    alignItems: 'center',
-    marginBottom: 24.xl,
-  },
-  avatarGradient: {
-    width: 96,
-    height: 96,
-    borderRadius: {borderRadius: 16}.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24.md,
-  },
-  userName: {
-    fontSize: {fontSize: 15}.xxl,
-    fontWeight: {fontWeight: '700'}.bold,
-    color: colors.text,
-  },
-  userEmail: {
-    fontSize: {fontSize: 15}.md,
-    color: colors.textSecondary,
-    marginTop: 24.xs,
-  },
-  userBio: {
-    fontSize: {fontSize: 15}.sm,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginTop: 24.md,
-    paddingHorizontal: 24.lg,
-    lineHeight: 20,
-  },
-  editButton: {
-    marginTop: 24.lg,
-    paddingVertical: 24.sm,
-    paddingHorizontal: 24.xl,
-    borderRadius: {borderRadius: 16}.full,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 24.sm,
-  },
-  editButtonText: {
-    fontSize: {fontSize: 15}.sm,
-    fontWeight: {fontWeight: '700'}.semibold,
-    color: colors.text,
-  },
-
-  statsContainer: {
-    flexDirection: 'row',
-    gap: 24.md,
-    marginBottom: 24.xl,
-  },
-  statCard: {
-    flex: 1,
-  },
-  statGradient: {
-    alignItems: 'center',
-    paddingVertical: 24.lg,
-    borderRadius: {borderRadius: 16}.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  statValue: {
-    fontSize: {fontSize: 15}.xxl,
-    fontWeight: {fontWeight: '700'}.bold,
-    color: colors.text,
-    marginTop: 24.sm,
-  },
-  statLabel: {
-    fontSize: {fontSize: 15}.xs,
-    color: colors.textSecondary,
-    marginTop: 24.xs,
-  },
-  menuSection: {
-    marginBottom: 24.xl,
-  },
-  sectionTitle: {
-    fontSize: {fontSize: 15}.sm,
-    fontWeight: {fontWeight: '700'}.bold,
-    color: colors.textLight,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 24.md,
-  },
-  menuContainer: {
-    backgroundColor: colors.surface,
-    borderRadius: {borderRadius: 16}.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
-  },
-  menuItem: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  menuItemLast: {
-    borderBottomWidth: 0,
-  },
-  menuItemContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 24.md,
-  },
-  menuItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 24.md,
-  },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: {borderRadius: 16}.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  menuItemText: {
-    fontSize: {fontSize: 15}.md,
-    fontWeight: {fontWeight: '700'}.medium,
-    color: colors.text,
-  },
-  logoutButton: {
-    marginTop: 24.md,
-    borderRadius: {borderRadius: 16}.lg,
-    overflow: 'hidden',
-  },
-  logoutGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 24.sm,
-    padding: 24.md,
-    borderWidth: 1,
-    borderColor: `${colors.error}30`,
-  },
-  logoutText: {
-    fontSize: {fontSize: 15}.md,
-    fontWeight: {fontWeight: '700'}.semibold,
-    color: colors.error,
-  },
-  deleteButton: {
-    marginTop: 24.md,
-    borderRadius: {borderRadius: 16}.lg,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: `${colors.error}40`,
-  },
-  deleteGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 24.sm,
-    padding: 24.md,
-    backgroundColor: 'rgba(239, 68, 68, 0.05)',
-  },
-  deleteText: {
-    fontSize: {fontSize: 15}.md,
-    fontWeight: {fontWeight: '700'}.semibold,
-    color: colors.error,
-  },
-  version: {
-    fontSize: {fontSize: 15}.sm,
-    color: colors.textLight,
-    textAlign: 'center',
-    marginTop: 24.xl,
-  },
-  emptyState: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24.xl,
-  },
-  emptyStateTitle: {
-    fontSize: {fontSize: 15}.xxl,
-    fontWeight: {fontWeight: '700'}.bold,
-    color: colors.text,
-    marginTop: 24.lg,
-  },
-  emptyStateText: {
-    fontSize: {fontSize: 15}.md,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginTop: 24.sm,
-  },
-  createProfileButton: {
-    marginTop: 24.xl,
-    borderRadius: {borderRadius: 16}.md,
-    overflow: 'hidden',
-  },
-  createProfileGradient: {
-    paddingVertical: 24.md,
-    paddingHorizontal: 24.xl,
-  },
-  createProfileText: {
-    fontSize: {fontSize: 15}.md,
-    fontWeight: {fontWeight: '700'}.bold,
-    color: colors.white,
-  },
-});
