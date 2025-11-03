@@ -222,7 +222,7 @@ export default function ThemeSettingsScreen() {
                   <Text style={[styles.colorLabel, { color: colors.white, fontSize: fontSize.xs }]}>Primary</Text>
                 </View>
                 <View style={[styles.colorSwatch, { backgroundColor: colors.secondary }, shadows.neon]}>
-                  <Text style={[styles.colorLabel, { color: colors.white, fontSize: fontSize.xs }]}>Neon</Text>
+                  <Text style={[styles.colorLabel, { color: colors.white, fontSize: fontSize.xs }]}>Secondaire</Text>
                 </View>
               </View>
               
