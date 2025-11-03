@@ -331,7 +331,7 @@ export default function PlannerScreen() {
               <View
                 key={destination.id}
                 testID={`card-destination-${destination.id}`}
-                style={[styles.destinationCard, { borderColor: `${colors.gold}33`, backgroundColor: colors.surface }]}
+                style={[styles.destinationCard, { borderColor: colors.gold + '33', backgroundColor: colors.surface }]}
               >
                 <Pressable onPress={() => handleDestinationPress(destination)} accessibilityRole="button" accessibilityLabel={`Ouvrir ${destination.name}`}>
                   <View style={styles.destinationImageContainer}>
@@ -403,7 +403,7 @@ export default function PlannerScreen() {
               >
                 <MapPin color={colors.textInverse} size={32} strokeWidth={2} />
                 <Text style={[styles.emptyTitle, { color: colors.text }]}>Commencez votre aventure</Text>
-                <Text style={[styles.emptyText, { color: colors.text }]>
+                <Text style={[styles.emptyText, { color: colors.text }]}>
                   Créez votre premier voyage et découvrez le monde
                 </Text>
                 <View testID="btn-create-trip" style={styles.createButton}>
@@ -414,7 +414,7 @@ export default function PlannerScreen() {
             </TouchableOpacity>
           ) : (
             trips.map((trip) => (
-              <View key={trip.id} style={[styles.tripCard, { borderColor: `${colors.gold}33`, backgroundColor: colors.surface }]}>
+              <View key={trip.id} style={[styles.tripCard, { borderColor: colors.gold + '33', backgroundColor: colors.surface }]}>
                 <Text style={[styles.tripTitle, { color: colors.text }]>{trip.title}</Text>
               </View>
             ))
@@ -430,7 +430,7 @@ export default function PlannerScreen() {
           >
             <Sparkles color={colors.secondary} size={32} />
             <Text style={[styles.inspirationTitle, { color: colors.text }]}>Besoin d&apos;inspiration ?</Text>
-            <Text style={[styles.inspirationText, { color: colors.textSecondary }]>
+            <Text style={[styles.inspirationText, { color: colors.textSecondary }]}>
               Découvrez des destinations uniques sélectionnées pour vous
             </Text>
             <TouchableOpacity
