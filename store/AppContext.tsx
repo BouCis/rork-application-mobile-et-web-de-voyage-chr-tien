@@ -40,10 +40,14 @@ export const [AppProvider, useApp] = createContextHook(() => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    console.log('[AppContext] Initialized');
   }, []);
 
   const loadData = async () => {

@@ -9,7 +9,7 @@ const THEME_STORAGE_KEY = '@app_theme';
 export const [ThemeProvider, useTheme] = createContextHook(() => {
   const systemColorScheme = useColorScheme();
   const [selectedTheme, setSelectedTheme] = useState<ThemeType>('neo-travel-dark');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const loadTheme = useCallback(async () => {
     try {
