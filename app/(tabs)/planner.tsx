@@ -429,7 +429,7 @@ export default function PlannerScreen() {
             style={styles.inspirationCard}
           >
             <Sparkles color={colors.secondary} size={32} />
-            <Text style={[styles.inspirationTitle, { color: colors.text }]>Besoin d&apos;inspiration ?</Text>
+            <Text style={[styles.inspirationTitle, { color: colors.text }]}>Besoin d&apos;inspiration ?</Text>
             <Text style={[styles.inspirationText, { color: colors.textSecondary }]>
               Découvrez des destinations uniques sélectionnées pour vous
             </Text>
