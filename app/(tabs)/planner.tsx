@@ -221,13 +221,13 @@ export default function PlannerScreen() {
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <View style={styles.headerContent}>
           <View>
-            <Text style={styles.greeting}>
+            <Text style={[styles.greeting, { color: colors.text }]}>
               {new Date().getHours() < 12 ? 'Bonjour' : new Date().getHours() < 18 ? 'Bon après-midi' : 'Bonsoir'} {user?.firstName || 'Voyageur'} 👋
             </Text>
-            <Text style={styles.title}>Où partons-nous ?</Text>
+            <Text style={[styles.title, { color: colors.text }]}>Où partons-nous ?</Text>
           </View>
           <TouchableOpacity testID="btn-notifications" style={styles.notificationButton} onPress={handleNotifyPress} accessible accessibilityRole="button" accessibilityLabel="Notifications">
-            <View style={styles.notificationDot} />
+            <View style={[styles.notificationDot, { backgroundColor: colors.gold }]} />
             <Sparkles color={colors.primary} size={24} />
           </TouchableOpacity>
         </View>
@@ -287,7 +287,7 @@ export default function PlannerScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.quickActionsContainer}>
-          <Text style={styles.sectionTitle}>Réservez votre prochaine aventure</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Réservez votre prochaine aventure</Text>
           <View style={styles.quickActions}>
             {quickActions.map((action, index) => (
               <TouchableOpacity
@@ -304,7 +304,7 @@ export default function PlannerScreen() {
                   style={styles.quickActionGradient}
                 >
                   <action.icon color={action.color} size={24} strokeWidth={2} />
-                  <Text style={styles.quickActionLabel}>{action.label}</Text>
+                  <Text style={[styles.quickActionLabel, { color: colors.text }]}>{action.label}</Text>
                 </LinearGradient>
               </TouchableOpacity>
             ))}
@@ -315,10 +315,10 @@ export default function PlannerScreen() {
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleContainer}>
               <TrendingUp color={colors.primary} size={20} />
-              <Text style={styles.sectionTitle}>Destinations populaires</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Destinations populaires</Text>
             </View>
             <TouchableOpacity testID="btn-see-all" onPress={handleSeeAllPress} accessible accessibilityRole="button" accessibilityLabel="Voir tout">
-              <Text style={styles.seeAllText}>Voir tout</Text>
+              <Text style={[styles.seeAllText, { color: colors.primary }]}>Voir tout</Text>
             </TouchableOpacity>
           </View>
 
@@ -331,7 +331,7 @@ export default function PlannerScreen() {
               <View
                 key={destination.id}
                 testID={`card-destination-${destination.id}`}
-                style={styles.destinationCard}
+                style={[styles.destinationCard, { borderColor: `${colors.gold}33`, backgroundColor: colors.surface }]}
               >
                 <Pressable onPress={() => handleDestinationPress(destination)} accessibilityRole="button" accessibilityLabel={`Ouvrir ${destination.name}`}>
                   <View style={styles.destinationImageContainer}>
@@ -341,7 +341,7 @@ export default function PlannerScreen() {
                   >
                     <View style={styles.destinationBadge}>
                       <Star color={colors.warning} size={12} fill={colors.warning} />
-                      <Text style={styles.ratingText}>{destination.rating}</Text>
+                      <Text style={[styles.ratingText, { color: colors.text }]}>{destination.rating}</Text>
                     </View>
                   </LinearGradient>
                   <Image
@@ -354,15 +354,17 @@ export default function PlannerScreen() {
                 <View style={styles.destinationInfo}>
                   <View style={styles.destinationHeader}>
                     <View>
-                      <Text style={styles.destinationName}>{destination.name}</Text>
-                      <Text style={styles.destinationCountry}>{destination.country}</Text>
+                      <Text style={[styles.destinationName, { color: colors.text }]}>{destination.name}</Text>
+                      <Text style={[styles.destinationCountry, { color: colors.textSecondary }]}>{destination.country}</Text>
                     </View>
                     <View style={styles.priceContainer}>
-                      <Text style={styles.priceLabel}>À partir de</Text>
-                      <Text style={styles.priceValue}>{destination.price}</Text>
+                      <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>
+	                      À partir de
+	                    </Text>
+                      <Text style={[styles.priceValue, { color: colors.gold }]}>{destination.price}</Text>
                     </View>
                   </View>
-                  <Text style={styles.destinationDescription} numberOfLines={2}>
+                  <Text style={[styles.destinationDescription, { color: colors.textSecondary }]} numberOfLines={2}>
                     {destination.description}
                   </Text>
                   <Pressable
@@ -373,7 +375,7 @@ export default function PlannerScreen() {
                     accessibilityRole="button"
                     accessibilityLabel={`Explorer ${destination.name}`}
                   >
-                    <Text style={styles.exploreButtonText}>Explorer</Text>
+                    <Text style={[styles.exploreButtonText, { color: colors.primary }]}>Explorer</Text>
                     <ArrowRight color={colors.primary} size={16} />
                   </Pressable>
                 </View>
@@ -383,7 +385,7 @@ export default function PlannerScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Mes voyages</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Mes voyages</Text>
           {trips.length === 0 ? (
             <TouchableOpacity
               testID="card-create-trip"
@@ -400,20 +402,20 @@ export default function PlannerScreen() {
                 style={styles.emptyGradient}
               >
                 <MapPin color={colors.textInverse} size={32} strokeWidth={2} />
-                <Text style={styles.emptyTitle}>Commencez votre aventure</Text>
-                <Text style={styles.emptyText}>
+                <Text style={[styles.emptyTitle, { color: colors.text }]}>Commencez votre aventure</Text>
+                <Text style={[styles.emptyText, { color: colors.text }]>
                   Créez votre premier voyage et découvrez le monde
                 </Text>
                 <View testID="btn-create-trip" style={styles.createButton}>
-                  <Text style={styles.createButtonText}>Créer un voyage</Text>
+                  <Text style={[styles.createButtonText, { color: colors.text }]}>Créer un voyage</Text>
                   <ArrowRight color={colors.textInverse} size={18} />
                 </View>
               </LinearGradient>
             </TouchableOpacity>
           ) : (
             trips.map((trip) => (
-              <View key={trip.id} style={styles.tripCard}>
-                <Text style={styles.tripTitle}>{trip.title}</Text>
+              <View key={trip.id} style={[styles.tripCard, { borderColor: `${colors.gold}33`, backgroundColor: colors.surface }]}>
+                <Text style={[styles.tripTitle, { color: colors.text }]>{trip.title}</Text>
               </View>
             ))
           )}
@@ -427,8 +429,8 @@ export default function PlannerScreen() {
             style={styles.inspirationCard}
           >
             <Sparkles color={colors.secondary} size={32} />
-            <Text style={styles.inspirationTitle}>Besoin d&apos;inspiration ?</Text>
-            <Text style={styles.inspirationText}>
+            <Text style={[styles.inspirationTitle, { color: colors.text }]>Besoin d&apos;inspiration ?</Text>
+            <Text style={[styles.inspirationText, { color: colors.textSecondary }]>
               Découvrez des destinations uniques sélectionnées pour vous
             </Text>
             <TouchableOpacity
@@ -439,7 +441,7 @@ export default function PlannerScreen() {
               accessibilityRole="button"
               accessibilityLabel="Découvrir l\'inspiration"
             >
-              <Text style={styles.inspirationButtonText}>Découvrir</Text>
+              <Text style={[styles.inspirationButtonText, { color: colors.gold }]}>Découvrir</Text>
             </TouchableOpacity>
           </LinearGradient>
         </View>
