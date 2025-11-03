@@ -16,7 +16,6 @@ function RootLayoutNav() {
   return (
     <Stack screenOptions={{ headerBackTitle: "Retour" }}>
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="signup" options={{ title: 'Créer votre profil' }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen 
         name="modal" 
@@ -27,6 +26,13 @@ function RootLayoutNav() {
       />
       <Stack.Screen 
         name="trip/create" 
+        options={{ 
+          presentation: "modal",
+          headerShown: false
+        }} 
+      />
+      <Stack.Screen 
+        name="trip/budget-admin" 
         options={{ 
           presentation: "modal",
           headerShown: false
@@ -52,6 +58,12 @@ function RootLayoutNav() {
       />
       <Stack.Screen 
         name="auth/signup" 
+        options={{ 
+          headerShown: false
+        }} 
+      />
+      <Stack.Screen 
+        name="auth/verify-email" 
         options={{ 
           headerShown: false
         }} 
