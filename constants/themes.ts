@@ -21,6 +21,7 @@ export interface ThemeColors {
   background: string;
   backgroundSecondary: string;
   backgroundTertiary: string;
+  backgroundLight: string;
   surface: string;
   surfaceSecondary: string;
   surfaceElevated: string;
@@ -30,6 +31,7 @@ export interface ThemeColors {
   textTertiary: string;
   textMuted: string;
   textInverse: string;
+  textLight: string;
   white: string;
   
   border: string;
@@ -86,6 +88,7 @@ const heavenLuxLight: Theme = {
     background: '#FAFAFA',
     backgroundSecondary: '#FFFFFF',
     backgroundTertiary: '#F5F5F5',
+    backgroundLight: 'rgba(230, 201, 122, 0.08)',
     surface: '#FFFFFF',
     surfaceSecondary: '#FAFAFA',
     surfaceElevated: '#FFFFFF',
@@ -95,6 +98,7 @@ const heavenLuxLight: Theme = {
     textTertiary: '#8E8E93',
     textMuted: 'rgba(27, 27, 27, 0.4)',
     textInverse: '#FFFFFF',
+    textLight: '#8E8E93',
     white: '#FFFFFF',
     
     border: 'rgba(230, 201, 122, 0.15)',
@@ -146,6 +150,7 @@ const heavenLuxDark: Theme = {
     background: '#2C2C2C',
     backgroundSecondary: '#3A3A3A',
     backgroundTertiary: '#484848',
+    backgroundLight: 'rgba(230, 201, 122, 0.12)',
     surface: '#3A3A3A',
     surfaceSecondary: '#484848',
     surfaceElevated: '#525252',
@@ -155,6 +160,7 @@ const heavenLuxDark: Theme = {
     textTertiary: '#8E8E93',
     textMuted: 'rgba(255, 255, 255, 0.4)',
     textInverse: '#2C2C2C',
+    textLight: '#AEAEB2',
     white: '#FFFFFF',
     
     border: 'rgba(230, 201, 122, 0.2)',
@@ -206,6 +212,7 @@ const neonLuxLight: Theme = {
     background: '#F9F9F9',
     backgroundSecondary: '#FFFFFF',
     backgroundTertiary: '#F2F2F7',
+    backgroundLight: 'rgba(192, 175, 255, 0.06)',
     surface: '#FFFFFF',
     surfaceSecondary: '#F9F9F9',
     surfaceElevated: '#FFFFFF',
@@ -215,6 +222,7 @@ const neonLuxLight: Theme = {
     textTertiary: '#8E8E93',
     textMuted: 'rgba(27, 27, 27, 0.35)',
     textInverse: '#FFFFFF',
+    textLight: '#8E8E93',
     white: '#FFFFFF',
     
     border: 'rgba(0, 0, 0, 0.08)',
@@ -266,6 +274,7 @@ const neonLuxDark: Theme = {
     background: '#0C0C0E',
     backgroundSecondary: '#1C1C1E',
     backgroundTertiary: '#2C2C2E',
+    backgroundLight: 'rgba(192, 175, 255, 0.1)',
     surface: '#1C1C1E',
     surfaceSecondary: '#2C2C2E',
     surfaceElevated: '#3A3A3C',
@@ -275,6 +284,7 @@ const neonLuxDark: Theme = {
     textTertiary: '#8E8E93',
     textMuted: 'rgba(255, 255, 255, 0.3)',
     textInverse: '#0C0C0E',
+    textLight: '#AEAEB2',
     white: '#FFFFFF',
     
     border: 'rgba(255, 255, 255, 0.1)',
@@ -326,6 +336,7 @@ const crystalMinimalLight: Theme = {
     background: '#FFFFFF',
     backgroundSecondary: '#FAFAFA',
     backgroundTertiary: '#F5F5F5',
+    backgroundLight: 'rgba(0, 0, 0, 0.03)',
     surface: '#FAFAFA',
     surfaceSecondary: '#FFFFFF',
     surfaceElevated: '#FFFFFF',
@@ -335,6 +346,7 @@ const crystalMinimalLight: Theme = {
     textTertiary: '#8E8E93',
     textMuted: 'rgba(27, 27, 27, 0.3)',
     textInverse: '#FFFFFF',
+    textLight: '#8E8E93',
     white: '#FFFFFF',
     
     border: 'rgba(0, 0, 0, 0.06)',
@@ -386,6 +398,7 @@ const crystalMinimalDark: Theme = {
     background: '#000000',
     backgroundSecondary: '#1C1C1E',
     backgroundTertiary: '#2C2C2E',
+    backgroundLight: 'rgba(255, 255, 255, 0.05)',
     surface: '#1C1C1E',
     surfaceSecondary: '#2C2C2E',
     surfaceElevated: '#3A3A3C',
@@ -395,6 +408,7 @@ const crystalMinimalDark: Theme = {
     textTertiary: '#8E8E93',
     textMuted: 'rgba(255, 255, 255, 0.3)',
     textInverse: '#000000',
+    textLight: '#AEAEB2',
     white: '#FFFFFF',
     
     border: 'rgba(255, 255, 255, 0.08)',
