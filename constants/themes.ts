@@ -1,4 +1,5 @@
 export type ColorSchemeType = 'light' | 'dark' | 'system';
+export type ThemeType = 'heavenLux' | 'neonLux' | 'crystalMinimal';
 
 export interface ThemeColors {
   primary: string;
@@ -61,6 +62,126 @@ export interface Theme {
   colors: ThemeColors;
   isDark: boolean;
 }
+
+const heavenLuxLight: Theme = {
+  name: 'Heaven Lux - Light',
+  isDark: false,
+  colors: {
+    primary: '#AFCBFF',
+    primaryLight: '#C4D7FF',
+    primaryDark: '#96B8F0',
+    
+    secondary: '#E6C97A',
+    secondaryLight: '#F0D99A',
+    secondaryDark: '#D4B665',
+    
+    accent: '#AFCBFF',
+    accentLight: '#C4D7FF',
+    accentDark: '#96B8F0',
+    
+    gold: '#E6C97A',
+    goldLight: '#F0D99A',
+    goldDark: '#D4B665',
+    
+    background: '#FAFAFA',
+    backgroundSecondary: '#FFFFFF',
+    backgroundTertiary: '#F5F5F5',
+    surface: '#FFFFFF',
+    surfaceSecondary: '#FAFAFA',
+    surfaceElevated: '#FFFFFF',
+    
+    text: '#1B1B1B',
+    textSecondary: '#6E6E73',
+    textTertiary: '#8E8E93',
+    textMuted: 'rgba(27, 27, 27, 0.4)',
+    textInverse: '#FFFFFF',
+    white: '#FFFFFF',
+    
+    border: 'rgba(230, 201, 122, 0.15)',
+    borderLight: 'rgba(230, 201, 122, 0.1)',
+    borderSubtle: 'rgba(230, 201, 122, 0.05)',
+    
+    success: '#34C759',
+    warning: '#FF9500',
+    error: '#FF3B30',
+    info: '#AFCBFF',
+    
+    dove: '#1B1B1B',
+    spiritual: '#E6C97A',
+    
+    primaryGradient: ['#AFCBFF', '#E6C97A'] as const,
+    secondaryGradient: ['#FAFAFA', '#FFFFFF'] as const,
+    goldGradient: ['#F0D99A', '#E6C97A'] as const,
+    spiritualGradient: ['#AFCBFF', '#FAFAFA', '#E6C97A'] as const,
+    glassGradient: ['rgba(255, 255, 255, 0.85)', 'rgba(250, 250, 250, 0.6)'] as const,
+    neonGradient: ['#AFCBFF', '#E6C97A'] as const,
+    
+    tabBarBackground: 'rgba(250, 250, 250, 0.9)',
+    tabBarBlur: true,
+    cardGlow: 'rgba(230, 201, 122, 0.1)',
+    glassEffect: true,
+  },
+};
+
+const heavenLuxDark: Theme = {
+  name: 'Heaven Lux - Dark',
+  isDark: true,
+  colors: {
+    primary: '#AFCBFF',
+    primaryLight: '#C4D7FF',
+    primaryDark: '#96B8F0',
+    
+    secondary: '#E6C97A',
+    secondaryLight: '#F0D99A',
+    secondaryDark: '#D4B665',
+    
+    accent: '#AFCBFF',
+    accentLight: '#C4D7FF',
+    accentDark: '#96B8F0',
+    
+    gold: '#E6C97A',
+    goldLight: '#F0D99A',
+    goldDark: '#D4B665',
+    
+    background: '#2C2C2C',
+    backgroundSecondary: '#3A3A3A',
+    backgroundTertiary: '#484848',
+    surface: '#3A3A3A',
+    surfaceSecondary: '#484848',
+    surfaceElevated: '#525252',
+    
+    text: '#FFFFFF',
+    textSecondary: '#AEAEB2',
+    textTertiary: '#8E8E93',
+    textMuted: 'rgba(255, 255, 255, 0.4)',
+    textInverse: '#2C2C2C',
+    white: '#FFFFFF',
+    
+    border: 'rgba(230, 201, 122, 0.2)',
+    borderLight: 'rgba(230, 201, 122, 0.15)',
+    borderSubtle: 'rgba(230, 201, 122, 0.08)',
+    
+    success: '#32D74B',
+    warning: '#FF9F0A',
+    error: '#FF453A',
+    info: '#AFCBFF',
+    
+    dove: '#FFFFFF',
+    spiritual: '#E6C97A',
+    
+    primaryGradient: ['#AFCBFF', '#E6C97A'] as const,
+    secondaryGradient: ['#3A3A3A', '#2C2C2C'] as const,
+    goldGradient: ['#F0D99A', '#E6C97A'] as const,
+    spiritualGradient: ['#AFCBFF', '#2C2C2C', '#E6C97A'] as const,
+    glassGradient: ['rgba(58, 58, 58, 0.85)', 'rgba(44, 44, 44, 0.6)'] as const,
+    neonGradient: ['#AFCBFF', '#E6C97A'] as const,
+    
+    tabBarBackground: 'rgba(44, 44, 44, 0.9)',
+    tabBarBlur: true,
+    cardGlow: 'rgba(230, 201, 122, 0.15)',
+    glassEffect: true,
+  },
+};
 
 const neonLuxLight: Theme = {
   name: 'NEON LUX Gold Whisper - Light',
@@ -182,9 +303,139 @@ const neonLuxDark: Theme = {
   },
 };
 
+const crystalMinimalLight: Theme = {
+  name: 'Crystal Minimal - Light',
+  isDark: false,
+  colors: {
+    primary: '#007AFF',
+    primaryLight: '#4DA3FF',
+    primaryDark: '#0055CC',
+    
+    secondary: '#E5E5E5',
+    secondaryLight: '#F5F5F5',
+    secondaryDark: '#D4D4D4',
+    
+    accent: '#1B1B1B',
+    accentLight: '#4A4A4A',
+    accentDark: '#000000',
+    
+    gold: '#E6C97A',
+    goldLight: '#F0D99A',
+    goldDark: '#D4B665',
+    
+    background: '#FFFFFF',
+    backgroundSecondary: '#FAFAFA',
+    backgroundTertiary: '#F5F5F5',
+    surface: '#FAFAFA',
+    surfaceSecondary: '#FFFFFF',
+    surfaceElevated: '#FFFFFF',
+    
+    text: '#1B1B1B',
+    textSecondary: '#6E6E73',
+    textTertiary: '#8E8E93',
+    textMuted: 'rgba(27, 27, 27, 0.3)',
+    textInverse: '#FFFFFF',
+    white: '#FFFFFF',
+    
+    border: 'rgba(0, 0, 0, 0.06)',
+    borderLight: 'rgba(0, 0, 0, 0.04)',
+    borderSubtle: 'rgba(0, 0, 0, 0.02)',
+    
+    success: '#34C759',
+    warning: '#FF9500',
+    error: '#FF3B30',
+    info: '#007AFF',
+    
+    dove: '#1B1B1B',
+    spiritual: '#8B7355',
+    
+    primaryGradient: ['#FFFFFF', '#F5F5F5'] as const,
+    secondaryGradient: ['#FAFAFA', '#FFFFFF'] as const,
+    goldGradient: ['#F0D99A', '#E6C97A'] as const,
+    spiritualGradient: ['#FFFFFF', '#FAFAFA', '#F5F5F5'] as const,
+    glassGradient: ['rgba(255, 255, 255, 0.95)', 'rgba(250, 250, 250, 0.8)'] as const,
+    neonGradient: ['#E5E5E5', '#FFFFFF'] as const,
+    
+    tabBarBackground: 'rgba(255, 255, 255, 0.95)',
+    tabBarBlur: true,
+    cardGlow: 'rgba(0, 0, 0, 0.03)',
+    glassEffect: true,
+  },
+};
+
+const crystalMinimalDark: Theme = {
+  name: 'Crystal Minimal - Dark',
+  isDark: true,
+  colors: {
+    primary: '#0A84FF',
+    primaryLight: '#409CFF',
+    primaryDark: '#006BD6',
+    
+    secondary: '#3A3A3C',
+    secondaryLight: '#4A4A4C',
+    secondaryDark: '#2C2C2E',
+    
+    accent: '#FFFFFF',
+    accentLight: '#FFFFFF',
+    accentDark: '#E5E5E5',
+    
+    gold: '#E6C97A',
+    goldLight: '#F0D99A',
+    goldDark: '#D4B665',
+    
+    background: '#000000',
+    backgroundSecondary: '#1C1C1E',
+    backgroundTertiary: '#2C2C2E',
+    surface: '#1C1C1E',
+    surfaceSecondary: '#2C2C2E',
+    surfaceElevated: '#3A3A3C',
+    
+    text: '#FFFFFF',
+    textSecondary: '#AEAEB2',
+    textTertiary: '#8E8E93',
+    textMuted: 'rgba(255, 255, 255, 0.3)',
+    textInverse: '#000000',
+    white: '#FFFFFF',
+    
+    border: 'rgba(255, 255, 255, 0.08)',
+    borderLight: 'rgba(255, 255, 255, 0.05)',
+    borderSubtle: 'rgba(255, 255, 255, 0.03)',
+    
+    success: '#32D74B',
+    warning: '#FF9F0A',
+    error: '#FF453A',
+    info: '#0A84FF',
+    
+    dove: '#FFFFFF',
+    spiritual: '#C4B5A0',
+    
+    primaryGradient: ['#1C1C1E', '#000000'] as const,
+    secondaryGradient: ['#2C2C2E', '#1C1C1E'] as const,
+    goldGradient: ['#F0D99A', '#E6C97A'] as const,
+    spiritualGradient: ['#000000', '#1C1C1E', '#2C2C2E'] as const,
+    glassGradient: ['rgba(28, 28, 30, 0.95)', 'rgba(0, 0, 0, 0.8)'] as const,
+    neonGradient: ['#3A3A3C', '#1C1C1E'] as const,
+    
+    tabBarBackground: 'rgba(0, 0, 0, 0.95)',
+    tabBarBlur: true,
+    cardGlow: 'rgba(255, 255, 255, 0.05)',
+    glassEffect: true,
+  },
+};
+
 export const themes = {
-  light: neonLuxLight,
-  dark: neonLuxDark,
+  heavenLux: {
+    light: heavenLuxLight,
+    dark: heavenLuxDark,
+  },
+  neonLux: {
+    light: neonLuxLight,
+    dark: neonLuxDark,
+  },
+  crystalMinimal: {
+    light: crystalMinimalLight,
+    dark: crystalMinimalDark,
+  },
 };
 
 export const spacing = {

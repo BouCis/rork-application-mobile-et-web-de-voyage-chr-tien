@@ -2,23 +2,31 @@ import createContextHook from '@nkzw/create-context-hook';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useColorScheme } from 'react-native';
-import { themes, ColorSchemeType, Theme, spacing, borderRadius, fontSize, fontWeight, shadows, animation } from '@/constants/themes';
+import { themes, ColorSchemeType, ThemeType, Theme, spacing, borderRadius, fontSize, fontWeight, shadows, animation } from '@/constants/themes';
 
 const COLOR_SCHEME_STORAGE_KEY = '@app_color_scheme';
+const THEME_TYPE_STORAGE_KEY = '@app_theme_type';
 
 export const [ThemeProvider, useTheme] = createContextHook(() => {
   const systemColorScheme = useColorScheme();
   const [selectedColorScheme, setSelectedColorScheme] = useState<ColorSchemeType>('system');
+  const [selectedThemeType, setSelectedThemeType] = useState<ThemeType>('heavenLux');
   const [isLoading, setIsLoading] = useState(true);
 
   const loadColorScheme = useCallback(async () => {
     try {
       const storedScheme = await AsyncStorage.getItem(COLOR_SCHEME_STORAGE_KEY);
+      const storedThemeType = await AsyncStorage.getItem(THEME_TYPE_STORAGE_KEY);
+      
       if (storedScheme && isValidColorScheme(storedScheme)) {
         setSelectedColorScheme(storedScheme as ColorSchemeType);
       }
+      
+      if (storedThemeType && isValidThemeType(storedThemeType)) {
+        setSelectedThemeType(storedThemeType as ThemeType);
+      }
     } catch (error) {
-      console.error('Error loading color scheme:', error);
+      console.error('Error loading theme preferences:', error);
     } finally {
       setIsLoading(false);
     }
@@ -32,12 +40,17 @@ export const [ThemeProvider, useTheme] = createContextHook(() => {
     return scheme === 'light' || scheme === 'dark' || scheme === 'system';
   };
 
+  const isValidThemeType = (themeType: string): boolean => {
+    return themeType === 'heavenLux' || themeType === 'neonLux' || themeType === 'crystalMinimal';
+  };
+
   const getActiveTheme = useCallback((): Theme => {
-    if (selectedColorScheme === 'system') {
-      return systemColorScheme === 'dark' ? themes.dark : themes.light;
-    }
-    return themes[selectedColorScheme];
-  }, [selectedColorScheme, systemColorScheme]);
+    const colorScheme = selectedColorScheme === 'system' 
+      ? (systemColorScheme === 'dark' ? 'dark' : 'light')
+      : selectedColorScheme;
+    
+    return themes[selectedThemeType][colorScheme];
+  }, [selectedColorScheme, selectedThemeType, systemColorScheme]);
 
   const changeColorScheme = useCallback(async (newScheme: ColorSchemeType) => {
     try {
@@ -46,6 +59,16 @@ export const [ThemeProvider, useTheme] = createContextHook(() => {
       console.log('Color scheme changed to:', newScheme);
     } catch (error) {
       console.error('Error saving color scheme:', error);
+    }
+  }, []);
+
+  const changeThemeType = useCallback(async (newThemeType: ThemeType) => {
+    try {
+      setSelectedThemeType(newThemeType);
+      await AsyncStorage.setItem(THEME_TYPE_STORAGE_KEY, newThemeType);
+      console.log('Theme type changed to:', newThemeType);
+    } catch (error) {
+      console.error('Error saving theme type:', error);
     }
   }, []);
 
@@ -59,8 +82,10 @@ export const [ThemeProvider, useTheme] = createContextHook(() => {
 
   return useMemo(() => ({
     selectedColorScheme,
+    selectedThemeType,
     activeTheme,
     changeColorScheme,
+    changeThemeType,
     toggleColorScheme,
     isLoading,
     colors: activeTheme.colors,
@@ -71,5 +96,5 @@ export const [ThemeProvider, useTheme] = createContextHook(() => {
     shadows,
     animation,
     isDark: activeTheme.isDark,
-  }), [selectedColorScheme, activeTheme, changeColorScheme, toggleColorScheme, isLoading]);
+  }), [selectedColorScheme, selectedThemeType, activeTheme, changeColorScheme, changeThemeType, toggleColorScheme, isLoading]);
 });

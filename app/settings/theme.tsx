@@ -5,8 +5,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Sun, Moon, Smartphone, Check, Sparkles } from 'lucide-react-native';
 import { Stack } from 'expo-router';
 import { useTheme } from '@/store/ThemeContext';
-import { ColorSchemeType } from '@/constants/themes';
+import { ColorSchemeType, ThemeType } from '@/constants/themes';
 import { BlurView } from 'expo-blur';
+
+const themeTypes: { id: ThemeType; name: string; description: string; gradient: readonly [string, string] }[] = [
+  { id: 'heavenLux', name: '🌤 Heaven Lux', description: 'Lumière apaisante et spirituelle', gradient: ['#AFCBFF', '#E6C97A'] as const },
+  { id: 'neonLux', name: '🪩 Neon Lux', description: 'Futuriste et chic', gradient: ['#C0AFFF', '#007AFF'] as const },
+  { id: 'crystalMinimal', name: '💎 Crystal Minimal', description: 'Verre pur et transparent', gradient: ['#E5E5E5', '#FFFFFF'] as const },
+];
 
 const colorSchemes: { id: ColorSchemeType; name: string; description: string; icon: any }[] = [
   { id: 'light', name: 'Clair', description: 'Mode lumineux pour la journée', icon: Sun },
@@ -16,10 +22,14 @@ const colorSchemes: { id: ColorSchemeType; name: string; description: string; ic
 
 export default function ThemeSettingsScreen() {
   const insets = useSafeAreaInsets();
-  const { selectedColorScheme, changeColorScheme, colors, spacing, borderRadius, fontSize, fontWeight, shadows } = useTheme();
+  const { selectedColorScheme, selectedThemeType, changeColorScheme, changeThemeType, colors, spacing, borderRadius, fontSize, fontWeight, shadows } = useTheme();
 
   const handleSchemeSelect = (schemeId: ColorSchemeType) => {
     changeColorScheme(schemeId);
+  };
+
+  const handleThemeSelect = (themeId: ThemeType) => {
+    changeThemeType(themeId);
   };
 
   return (
@@ -50,19 +60,71 @@ export default function ThemeSettingsScreen() {
         >
           <View style={[styles.header, { paddingTop: spacing.lg }]}>
             <LinearGradient
-              colors={colors.neonGradient as any}
+              colors={colors.primaryGradient as any}
               style={[styles.headerIcon, shadows.neon]}
             >
               <Sparkles color={colors.white} size={28} strokeWidth={2.5} />
             </LinearGradient>
             <Text style={[styles.headerTitle, { color: colors.text, fontSize: fontSize.xxxl, fontWeight: fontWeight.bold }]}>
-              NEON LUX
-            </Text>
-            <Text style={[styles.headerSubtitle, { color: colors.gold, fontSize: fontSize.lg, fontWeight: fontWeight.semibold }]}>
-              Gold Whisper
+              {themeTypes.find(t => t.id === selectedThemeType)?.name || 'Heaven Lux'}
             </Text>
             <Text style={[styles.headerDescription, { color: colors.textSecondary, fontSize: fontSize.md, marginTop: spacing.sm }]}>
-              Inspiré d&apos;iOS 26 & Vision Pro
+              {themeTypes.find(t => t.id === selectedThemeType)?.description}
+            </Text>
+          </View>
+
+          <View style={[styles.section, { marginBottom: spacing.xl }]}>
+            <Text style={[styles.sectionTitle, { color: colors.text, fontSize: fontSize.xl, fontWeight: fontWeight.semibold, marginBottom: spacing.md }]}>
+              Thème
+            </Text>
+            <View style={[styles.themesContainer, { gap: spacing.md }]}>
+              {themeTypes.map((themeType) => {
+                const isSelected = selectedThemeType === themeType.id;
+
+                return (
+                  <TouchableOpacity
+                    key={themeType.id}
+                    onPress={() => handleThemeSelect(themeType.id)}
+                    activeOpacity={0.7}
+                    style={styles.themeCard}
+                  >
+                    <LinearGradient
+                      colors={themeType.gradient as any}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={[
+                        styles.themeCardGradient,
+                        { 
+                          borderRadius: borderRadius.xl,
+                          borderWidth: isSelected ? 3 : 1,
+                          borderColor: isSelected ? colors.gold : colors.border,
+                        },
+                        isSelected && shadows.gold,
+                      ]}
+                    >
+                      <View style={styles.themeCardContent}>
+                        <Text style={[styles.themeName, { color: colors.white, fontSize: fontSize.lg, fontWeight: fontWeight.bold }]}>
+                          {themeType.name}
+                        </Text>
+                        <Text style={[styles.themeDescription, { color: 'rgba(255, 255, 255, 0.9)', fontSize: fontSize.sm }]}>
+                          {themeType.description}
+                        </Text>
+                      </View>
+                      {isSelected && (
+                        <View style={[styles.selectedBadge, { backgroundColor: colors.gold }, shadows.glow(colors.gold)]}>
+                          <Check color={colors.white} size={18} strokeWidth={3} />
+                        </View>
+                      )}
+                    </LinearGradient>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text, fontSize: fontSize.xl, fontWeight: fontWeight.semibold, marginBottom: spacing.md }]}>
+              Luminosité
             </Text>
           </View>
 
@@ -221,7 +283,7 @@ export default function ThemeSettingsScreen() {
                 marginTop: spacing.sm,
               }
             ]}>
-              Design Liquid Glass
+              Design Spirituel Premium
             </Text>
             <Text style={[
               styles.infoText, 
@@ -232,7 +294,7 @@ export default function ThemeSettingsScreen() {
                 lineHeight: 20,
               }
             ]}>
-              Un thème unique inspiré des interfaces iOS 26 et Vision Pro, avec des reflets &ldquo;liquid glass&rdquo; et des touches d&apos;or pâle subtilement placées pour une expérience premium.
+              Des thèmes uniques inspirés du calme spirituel et du luxe moderne, avec des effets de verre liquide et des touches dorées pour une expérience apaisante et élégante.
             </Text>
           </BlurView>
         </ScrollView>
@@ -267,13 +329,32 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: 2,
   },
-  headerSubtitle: {
-    textAlign: 'center',
-    letterSpacing: 1,
-    marginTop: 4,
-  },
+
   headerDescription: {
     textAlign: 'center',
+  },
+  section: {
+  },
+  sectionTitle: {
+  },
+  themesContainer: {
+  },
+  themeCard: {
+  },
+  themeCardGradient: {
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: 100,
+  },
+  themeCardContent: {
+    flex: 1,
+  },
+  themeName: {
+    marginBottom: 4,
+  },
+  themeDescription: {
   },
   schemesContainer: {
   },
