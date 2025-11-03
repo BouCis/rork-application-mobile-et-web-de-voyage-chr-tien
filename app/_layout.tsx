@@ -43,18 +43,8 @@ function RootLayoutNav() {
           headerShown: false
         }} 
       />
-      <Stack.Screen 
-        name="music/player" 
-        options={{ 
-          headerShown: false
-        }} 
-      />
-      <Stack.Screen 
-        name="bible/reader" 
-        options={{ 
-          headerShown: false
-        }} 
-      />
+
+
       <Stack.Screen 
         name="auth/signup" 
         options={{ 

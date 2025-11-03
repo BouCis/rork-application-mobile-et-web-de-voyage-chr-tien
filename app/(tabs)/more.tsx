@@ -20,9 +20,6 @@ import {
   Info,
   LogOut,
   ChevronRight,
-  BookOpen,
-  Heart,
-  Music,
   Sparkles,
 } from 'lucide-react-native';
 import { useApp } from '@/store/AppContext';
@@ -111,29 +108,7 @@ export default function MoreScreen() {
     );
   }, []);
 
-  const spiritualItems: MenuItem[] = [
-    {
-      icon: Heart,
-      label: 'Spiritualité',
-      description: 'Méditation & prières',
-      onPress: () => router.push('/(tabs)/spiritual'),
-      color: '#FF6B9D',
-    },
-    {
-      icon: Music,
-      label: 'Musique',
-      description: 'Playlists & sons',
-      onPress: () => router.push('/music/player'),
-      color: '#8B5CF6',
-    },
-    {
-      icon: BookOpen,
-      label: 'Bible',
-      description: 'Lire & découvrir',
-      onPress: () => router.push('/bible/reader'),
-      color: '#F59E0B',
-    },
-  ];
+
 
   const travelServices: MenuItem[] = [
     {
@@ -261,40 +236,7 @@ export default function MoreScreen() {
           <Text style={[styles.subtitle, dynamicStyles.subtitle]}>Explorez tous nos services</Text>
         </View>
 
-        <View style={styles.featuredSection}>
-          <View style={styles.sectionHeader}>
-            <Heart color="#FF6B9D" size={20} />
-            <Text style={[styles.sectionTitleLarge, dynamicStyles.sectionTitleLarge]}>Spiritualité</Text>
-          </View>
-          <ScrollView 
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalScroll}
-            style={styles.horizontalScrollView}
-          >
-            {spiritualItems.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.featuredCard}
-                onPress={item.onPress}
-                activeOpacity={0.7}
-              >
-                <LinearGradient
-                  colors={[item.color, `${item.color}CC`]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.featuredGradient}
-                >
-                  <View style={styles.featuredIcon}>
-                    <item.icon color="#FFFFFF" size={28} strokeWidth={2.5} />
-                  </View>
-                  <Text style={styles.featuredLabel}>{item.label}</Text>
-                  <Text style={styles.featuredDescription}>{item.description}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
+
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>

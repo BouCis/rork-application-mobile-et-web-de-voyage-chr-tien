@@ -129,12 +129,7 @@ export default function TabLayout() {
           href: null,
         }}
       />
-      <Tabs.Screen
-        name="spiritual"
-        options={{
-          href: null,
-        }}
-      />
+
       <Tabs.Screen
         name="profile"
         options={{
