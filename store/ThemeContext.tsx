@@ -34,18 +34,16 @@ export const [ThemeProvider, useTheme] = createContextHook(() => {
     }
   }, [systemColorScheme, selectedTheme]);
 
-
-
   const isValidTheme = (theme: string): boolean => {
     return theme === 'system' || theme in themes;
   };
 
-  const getActiveTheme = (): Theme => {
+  const getActiveTheme = useCallback((): Theme => {
     if (selectedTheme === 'system') {
       return systemColorScheme === 'dark' ? themes['neo-travel-dark'] : themes['minimal-light'];
     }
     return themes[selectedTheme];
-  };
+  }, [selectedTheme, systemColorScheme]);
 
   const changeTheme = useCallback(async (newTheme: ThemeType) => {
     try {
@@ -57,7 +55,7 @@ export const [ThemeProvider, useTheme] = createContextHook(() => {
     }
   }, []);
 
-  const activeTheme = getActiveTheme();
+  const activeTheme = useMemo(() => getActiveTheme(), [getActiveTheme]);
 
   return useMemo(() => ({
     selectedTheme,
