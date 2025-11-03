@@ -119,7 +119,7 @@ export default function HotelsScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[colors.backgroundDark, colors.background]}
+        colors={[colors.background, colors.backgroundSecondary]}
         style={StyleSheet.absoluteFillObject}
       />
 

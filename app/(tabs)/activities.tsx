@@ -24,7 +24,7 @@ import {
   Waves,
   Trees,
 } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
+import { useTheme } from '@/store/ThemeContext';
 
 interface Activity {
   id: string;
@@ -102,16 +102,19 @@ const activities: Activity[] = [
   },
 ];
 
-const categories = [
-  { icon: Landmark, label: 'Culture', color: theme.colors.primary },
-  { icon: Mountain, label: 'Aventure', color: theme.colors.secondary },
-  { icon: Trees, label: 'Nature', color: theme.colors.accent },
-  { icon: Camera, label: 'Visites', color: theme.colors.warning },
-  { icon: Waves, label: 'Plage', color: '#3b82f6' },
-];
+
 
 export default function ActivitiesScreen() {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+
+  const categories = [
+    { icon: Landmark, label: 'Culture', color: colors.primary },
+    { icon: Mountain, label: 'Aventure', color: colors.secondary },
+    { icon: Trees, label: 'Nature', color: colors.accent },
+    { icon: Camera, label: 'Visites', color: colors.warning },
+    { icon: Waves, label: 'Plage', color: '#3b82f6' },
+  ];
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
 
@@ -166,7 +169,7 @@ export default function ActivitiesScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[theme.colors.backgroundDark, theme.colors.background]}
+        colors={[colors.background, colors.backgroundSecondary]}
         style={StyleSheet.absoluteFillObject}
       />
 
@@ -175,11 +178,11 @@ export default function ActivitiesScreen() {
         <Text style={styles.subtitle}>Choses à faire</Text>
 
         <View style={styles.searchBar}>
-          <Search color={theme.colors.textLight} size={20} />
+          <Search color={colors.textSecondary} size={20} />
           <TextInput
             style={styles.searchInput}
             placeholder="Rechercher une activité..."
-            placeholderTextColor={theme.colors.textLight}
+            placeholderTextColor={colors.textSecondary}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -221,7 +224,7 @@ export default function ActivitiesScreen() {
                   <category.icon
                     color={
                       selectedCategory === category.label
-                        ? theme.colors.white
+                        ? colors.white
                         : category.color
                     }
                     size={24}
@@ -276,7 +279,7 @@ export default function ActivitiesScreen() {
                 </Text>
 
                 <View style={styles.locationContainer}>
-                  <MapPin color={theme.colors.textSecondary} size={14} />
+                  <MapPin color={colors.textSecondary} size={14} />
                   <Text style={styles.location}>{activity.location}</Text>
                 </View>
 
@@ -287,16 +290,16 @@ export default function ActivitiesScreen() {
                 <View style={styles.activityMeta}>
                   <View style={styles.ratingContainer}>
                     <Star
-                      color={theme.colors.warning}
+                      color={colors.warning}
                       size={14}
-                      fill={theme.colors.warning}
+                      fill={colors.warning}
                     />
                     <Text style={styles.ratingText}>{activity.rating}</Text>
                     <Text style={styles.reviewsText}>({activity.reviews})</Text>
                   </View>
 
                   <View style={styles.metaItem}>
-                    <Clock color={theme.colors.textLight} size={14} />
+                    <Clock color={colors.textSecondary} size={14} />
                     <Text style={styles.metaText}>{activity.duration}</Text>
                   </View>
                 </View>
@@ -328,59 +331,53 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.md,
+    paddingHorizontal: 24,
+    paddingBottom: 16,
   },
   title: {
-    fontSize: theme.fontSize.hero,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.text,
+    fontSize: 32,
+    fontWeight: '700' as '700',
     letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
-    marginTop: theme.spacing.xs,
-    marginBottom: theme.spacing.lg,
+    fontSize: 16,
+    marginTop: 4,
+    marginBottom: 24,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.lg,
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   searchInput: {
     flex: 1,
-    fontSize: theme.fontSize.md,
-    color: theme.colors.text,
+    fontSize: 16,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingTop: theme.spacing.md,
+    paddingTop: 16,
   },
   categoriesSection: {
-    marginBottom: theme.spacing.xl,
+    marginBottom: 32,
   },
   sectionTitle: {
-    fontSize: theme.fontSize.xl,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.text,
-    paddingHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
+    fontSize: 20,
+    fontWeight: '700' as '700',
+    paddingHorizontal: 24,
+    marginBottom: 16,
   },
   categoriesScroll: {
-    paddingHorizontal: theme.spacing.lg,
-    gap: theme.spacing.md,
+    paddingHorizontal: 24,
+    gap: 16,
   },
   categoryCard: {
-    borderRadius: theme.borderRadius.lg,
+    borderRadius: 16,
     overflow: 'hidden',
   },
   categoryCardActive: {
@@ -389,40 +386,34 @@ const styles = StyleSheet.create({
   categoryGradient: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
-    gap: theme.spacing.xs,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    gap: 4,
     borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   categoryLabel: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.semibold as '600',
-    color: theme.colors.text,
+    fontSize: 13,
+    fontWeight: '600' as '600',
   },
   categoryLabelActive: {
-    color: theme.colors.white,
   },
   activitiesSection: {
-    paddingHorizontal: theme.spacing.lg,
+    paddingHorizontal: 24,
   },
   activitiesHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: theme.spacing.md,
+    marginBottom: 16,
   },
   resultsCount: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    fontSize: 13,
   },
   activityCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.xl,
-    marginBottom: theme.spacing.md,
+    borderRadius: 20,
+    marginBottom: 16,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   activityImageContainer: {
     height: 180,
@@ -434,47 +425,44 @@ const styles = StyleSheet.create({
   },
   categoryBadge: {
     position: 'absolute' as const,
-    top: theme.spacing.md,
-    right: theme.spacing.md,
+    top: 16,
+    right: 16,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingHorizontal: theme.spacing.sm,
+    paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: 24,
   },
   categoryBadgeText: {
-    fontSize: theme.fontSize.xs,
-    fontWeight: theme.fontWeight.semibold as '600',
-    color: theme.colors.white,
+    fontSize: 11,
+    fontWeight: '600' as '600',
+    color: '#fff',
   },
   activityInfo: {
-    padding: theme.spacing.md,
+    padding: 16,
   },
   activityName: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.text,
-    marginBottom: theme.spacing.xs,
+    fontSize: 17,
+    fontWeight: '700' as '700',
+    marginBottom: 4,
   },
   locationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    marginBottom: theme.spacing.sm,
+    marginBottom: 8,
   },
   location: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    fontSize: 14,
   },
   description: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    fontSize: 14,
     lineHeight: 20,
-    marginBottom: theme.spacing.md,
+    marginBottom: 16,
   },
   activityMeta: {
     flexDirection: 'row',
-    gap: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
+    gap: 24,
+    marginBottom: 16,
   },
   ratingContainer: {
     flexDirection: 'row',
@@ -482,13 +470,11 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   ratingText: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.text,
+    fontSize: 13,
+    fontWeight: '700' as '700',
   },
   reviewsText: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    fontSize: 13,
   },
   metaItem: {
     flexDirection: 'row',
@@ -496,45 +482,38 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   metaText: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    fontSize: 13,
   },
   activityFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: theme.spacing.md,
+    paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
   },
   priceLabel: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.textLight,
+    fontSize: 11,
   },
   price: {
-    fontSize: theme.fontSize.xl,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.primary,
+    fontSize: 20,
+    fontWeight: '700' as '700',
   },
   bookButton: {
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.xl,
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.full,
+    paddingVertical: 8,
+    paddingHorizontal: 32,
+    borderRadius: 24,
   },
   bookButtonText: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.white,
+    fontSize: 13,
+    fontWeight: '700' as '700',
   },
   emptyState: {
-    padding: theme.spacing.xxxl,
+    padding: 64,
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
   },
   emptyStateText: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
+    fontSize: 15,
     textAlign: 'center' as const,
   },
 });

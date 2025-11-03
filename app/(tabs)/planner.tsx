@@ -480,11 +480,13 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 16,
     marginBottom: 4,
+    color: '#FFFFFF',
   },
   title: {
     fontSize: 32,
     fontWeight: '700' as '700',
     letterSpacing: -0.5,
+    color: '#FFFFFF',
   },
   notificationButton: {
     width: 48,
@@ -493,6 +495,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   notificationDot: {
     position: 'absolute',
@@ -501,6 +504,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
+    backgroundColor: '#E6C97A',
   },
   searchContainer: {
     marginTop: 16,
@@ -512,11 +516,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 20,
     borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   searchPlaceholder: {
     flex: 1,
     marginLeft: 12,
     fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.7)',
   },
   tabsScroll: {
     paddingTop: 16,
@@ -527,14 +533,20 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 24,
     borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
   tabChipActive: {
+    backgroundColor: 'rgba(175, 203, 255, 0.15)',
+    borderColor: 'rgba(175, 203, 255, 0.4)',
   },
   tabLabel: {
     fontSize: 14,
     fontWeight: '600' as '600',
+    color: 'rgba(255, 255, 255, 0.7)',
   },
   tabLabelActive: {
+    color: '#AFCBFF',
   },
   scrollView: {
     flex: 1,
@@ -563,6 +575,7 @@ const styles = StyleSheet.create({
   quickActionLabel: {
     fontSize: 14,
     fontWeight: '600' as '600',
+    color: '#FFFFFF',
   },
   section: {
     marginBottom: 32,
@@ -582,10 +595,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700' as '700',
+    color: '#FFFFFF',
   },
   seeAllText: {
     fontSize: 14,
     fontWeight: '600' as '600',
+    color: '#AFCBFF',
   },
   destinationsScroll: {
     paddingHorizontal: 24,
@@ -596,6 +611,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     borderWidth: 1,
+    borderColor: 'rgba(230, 201, 122, 0.2)',
+    backgroundColor: 'rgba(58, 58, 58, 0.5)',
   },
   destinationImageContainer: {
     height: 200,
@@ -638,6 +655,7 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 12,
     fontWeight: '700' as '700',
+    color: '#FFFFFF',
   },
   destinationInfo: {
     padding: 16,
@@ -651,25 +669,30 @@ const styles = StyleSheet.create({
   destinationName: {
     fontSize: 18,
     fontWeight: '700' as '700',
+    color: '#FFFFFF',
   },
   destinationCountry: {
     fontSize: 14,
     marginTop: 2,
+    color: '#AEAEB2',
   },
   priceContainer: {
     alignItems: 'flex-end',
   },
   priceLabel: {
     fontSize: 12,
+    color: '#8E8E93',
   },
   priceValue: {
     fontSize: 18,
     fontWeight: '700' as '700',
+    color: '#E6C97A',
   },
   destinationDescription: {
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 16,
+    color: '#AEAEB2',
   },
   exploreButton: {
     flexDirection: 'row',
@@ -679,10 +702,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 12,
+    backgroundColor: 'rgba(175, 203, 255, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(175, 203, 255, 0.3)',
   },
   exploreButtonText: {
     fontSize: 14,
     fontWeight: '600' as '600',
+    color: '#AFCBFF',
   },
   emptyCard: {
     marginHorizontal: 24,
@@ -698,12 +725,14 @@ const styles = StyleSheet.create({
     fontWeight: '700' as '700',
     marginTop: 16,
     textAlign: 'center',
+    color: '#FFFFFF',
   },
   emptyText: {
     fontSize: 16,
     textAlign: 'center',
     marginTop: 12,
     opacity: 0.9,
+    color: '#FFFFFF',
   },
   createButton: {
     flexDirection: 'row',
@@ -718,16 +747,20 @@ const styles = StyleSheet.create({
   createButtonText: {
     fontSize: 16,
     fontWeight: '700' as '700',
+    color: '#FFFFFF',
   },
   tripCard: {
     marginHorizontal: 24,
     padding: 24,
     borderRadius: 16,
     borderWidth: 1,
+    borderColor: 'rgba(230, 201, 122, 0.2)',
+    backgroundColor: 'rgba(58, 58, 58, 0.5)',
   },
   tripTitle: {
     fontSize: 18,
     fontWeight: '700' as '700',
+    color: '#FFFFFF',
   },
   inspirationSection: {
     paddingHorizontal: 24,
@@ -738,27 +771,34 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     borderWidth: 1,
+    borderColor: 'rgba(175, 203, 255, 0.2)',
   },
   inspirationTitle: {
     fontSize: 24,
     fontWeight: '700' as '700',
     marginTop: 16,
     textAlign: 'center',
+    color: '#FFFFFF',
   },
   inspirationText: {
     fontSize: 16,
     textAlign: 'center',
     marginTop: 12,
     lineHeight: 22,
+    color: '#AEAEB2',
   },
   inspirationButton: {
     marginTop: 24,
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 24,
+    backgroundColor: 'rgba(230, 201, 122, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(230, 201, 122, 0.4)',
   },
   inspirationButtonText: {
     fontSize: 16,
     fontWeight: '700' as '700',
+    color: '#E6C97A',
   },
 });
