@@ -142,7 +142,7 @@ export default function SettingsScreen() {
     },
     menuItemDescription: {
       fontSize: fontSize.xs,
-      color: colors.textLight,
+      color: colors.textSecondary,
       marginTop: 2,
     },
     logoutButton: {
@@ -166,7 +166,7 @@ export default function SettingsScreen() {
     },
     version: {
       fontSize: fontSize.sm,
-      color: colors.textLight,
+      color: colors.textSecondary,
       textAlign: 'center',
       marginTop: spacing.xl,
     },
@@ -399,7 +399,7 @@ export default function SettingsScreen() {
       />
       <View style={styles.container}>
         <LinearGradient
-          colors={[colors.backgroundDark, colors.background]}
+          colors={[colors.background, colors.backgroundSecondary]}
           style={StyleSheet.absoluteFillObject}
         />
 
@@ -479,7 +479,7 @@ export default function SettingsScreen() {
                           )}
                         </View>
                       </View>
-                      <ChevronRight color={colors.textLight} size={20} />
+                      <ChevronRight color={colors.textSecondary} size={20} />
                     </View>
                   </TouchableOpacity>
                 ))}
