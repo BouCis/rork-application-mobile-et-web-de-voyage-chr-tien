@@ -1,29 +1,32 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Check, Sparkles } from 'lucide-react-native';
+import { Sun, Moon, Smartphone, Check, Sparkles } from 'lucide-react-native';
 import { Stack } from 'expo-router';
 import { useTheme } from '@/store/ThemeContext';
-import { themesList, ThemeType } from '@/constants/themes';
+import { ColorSchemeType } from '@/constants/themes';
 import { BlurView } from 'expo-blur';
 
-const { width } = Dimensions.get('window');
-const CARD_WIDTH = width - 48;
+const colorSchemes: { id: ColorSchemeType; name: string; description: string; icon: any }[] = [
+  { id: 'light', name: 'Clair', description: 'Mode lumineux pour la journée', icon: Sun },
+  { id: 'dark', name: 'Sombre', description: 'Mode sombre pour la nuit', icon: Moon },
+  { id: 'system', name: 'Automatique', description: 'Synchronise avec le système', icon: Smartphone },
+];
 
 export default function ThemeSettingsScreen() {
   const insets = useSafeAreaInsets();
-  const { selectedTheme, changeTheme, colors, spacing, borderRadius, fontSize, fontWeight } = useTheme();
+  const { selectedColorScheme, changeColorScheme, colors, spacing, borderRadius, fontSize, fontWeight, shadows } = useTheme();
 
-  const handleThemeSelect = (themeId: ThemeType) => {
-    changeTheme(themeId);
+  const handleSchemeSelect = (schemeId: ColorSchemeType) => {
+    changeColorScheme(schemeId);
   };
 
   return (
     <>
       <Stack.Screen 
         options={{ 
-          title: 'Thème visuel',
+          title: 'Apparence',
           headerStyle: {
             backgroundColor: colors.background,
           },
@@ -33,7 +36,7 @@ export default function ThemeSettingsScreen() {
       />
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <LinearGradient
-          colors={colors.darkGradient as any}
+          colors={colors.glassGradient as any}
           style={StyleSheet.absoluteFillObject}
         />
 
@@ -46,123 +49,192 @@ export default function ThemeSettingsScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={[styles.header, { paddingTop: spacing.lg }]}>
-            <View style={[styles.headerIcon, { backgroundColor: `${colors.primary}15` }]}>
-              <Sparkles color={colors.primary} size={28} />
-            </View>
-            <Text style={[styles.headerTitle, { color: colors.text, fontSize: fontSize.xxl, fontWeight: fontWeight.bold }]}>
-              Personnalisez votre expérience
-            </Text>
-            <Text style={[styles.headerSubtitle, { color: colors.textSecondary, fontSize: fontSize.md }]}>
-              Choisissez le thème qui correspond à votre style de voyage
-            </Text>
-          </View>
-
-          <View style={styles.themesContainer}>
-            <TouchableOpacity
-              onPress={() => handleThemeSelect('system')}
-              style={[styles.themeCard, { width: CARD_WIDTH }]}
+            <LinearGradient
+              colors={colors.neonGradient as any}
+              style={[styles.headerIcon, shadows.neon]}
             >
-              <LinearGradient
-                colors={['rgba(100, 100, 150, 0.15)', 'rgba(50, 50, 100, 0.05)']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={[
-                  styles.themeCardGradient,
-                  { 
-                    borderRadius: borderRadius.xl,
-                    borderWidth: selectedTheme === 'system' ? 3 : 1,
-                    borderColor: selectedTheme === 'system' ? colors.primary : colors.border,
-                  }
-                ]}
-              >
-                {selectedTheme === 'system' && (
-                  <View style={[styles.selectedBadge, { backgroundColor: colors.primary }]}>
-                    <Check color={colors.white} size={16} strokeWidth={3} />
-                  </View>
-                )}
-                <View style={styles.themeCardContent}>
-                  <Text style={[styles.themeIcon, { fontSize: fontSize.hero }]}>🔄</Text>
-                  <View style={styles.themeInfo}>
-                    <Text style={[styles.themeName, { color: colors.text, fontSize: fontSize.xl, fontWeight: fontWeight.bold }]}>
-                      Automatique
-                    </Text>
-                    <Text style={[styles.themeDescription, { color: colors.textSecondary, fontSize: fontSize.sm }]}>
-                      Synchroniser avec le système
-                    </Text>
-                  </View>
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
+              <Sparkles color={colors.white} size={28} strokeWidth={2.5} />
+            </LinearGradient>
+            <Text style={[styles.headerTitle, { color: colors.text, fontSize: fontSize.xxxl, fontWeight: fontWeight.bold }]}>
+              NEON LUX
+            </Text>
+            <Text style={[styles.headerSubtitle, { color: colors.gold, fontSize: fontSize.lg, fontWeight: fontWeight.semibold }]}>
+              Gold Whisper
+            </Text>
+            <Text style={[styles.headerDescription, { color: colors.textSecondary, fontSize: fontSize.md, marginTop: spacing.sm }]}>
+              Inspiré d&apos;iOS 26 & Vision Pro
+            </Text>
+          </View>
 
-            {themesList.map((theme) => (
-              <TouchableOpacity
-                key={theme.id}
-                onPress={() => handleThemeSelect(theme.id)}
-                style={[styles.themeCard, { width: CARD_WIDTH }]}
-              >
-                <LinearGradient
-                  colors={theme.colors.primaryGradient as any}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={[
-                    styles.themeCardGradient,
-                    { 
-                      borderRadius: borderRadius.xl,
-                      borderWidth: selectedTheme === theme.id ? 3 : 0,
-                      borderColor: selectedTheme === theme.id ? colors.white : 'transparent',
-                    }
-                  ]}
+          <View style={[styles.schemesContainer, { gap: spacing.md }]}>
+            {colorSchemes.map((scheme) => {
+              const Icon = scheme.icon;
+              const isSelected = selectedColorScheme === scheme.id;
+
+              return (
+                <TouchableOpacity
+                  key={scheme.id}
+                  onPress={() => handleSchemeSelect(scheme.id)}
+                  activeOpacity={0.7}
+                  style={styles.schemeCard}
                 >
-                  {selectedTheme === theme.id && (
-                    <View style={[styles.selectedBadge, { backgroundColor: colors.white }]}>
-                      <Check color={theme.colors.primary} size={16} strokeWidth={3} />
-                    </View>
-                  )}
-                  
-                  <View style={styles.themePreview}>
-                    {theme.colors.glassEffect ? (
-                      <BlurView
-                        intensity={30}
-                        tint={theme.isDark ? 'dark' : 'light'}
-                        style={[styles.previewSurface, { borderRadius: borderRadius.md }]}
-                      >
-                        <View style={[styles.previewBar, { backgroundColor: theme.colors.text }]} />
-                        <View style={[styles.previewBar, { backgroundColor: theme.colors.textSecondary, width: '70%' }]} />
-                        <View style={[styles.previewBar, { backgroundColor: theme.colors.textLight, width: '50%' }]} />
-                      </BlurView>
-                    ) : (
-                      <View style={[styles.previewSurface, { backgroundColor: theme.colors.surface, borderRadius: borderRadius.md }]}>
-                        <View style={[styles.previewBar, { backgroundColor: theme.colors.text }]} />
-                        <View style={[styles.previewBar, { backgroundColor: theme.colors.textSecondary, width: '70%' }]} />
-                        <View style={[styles.previewBar, { backgroundColor: theme.colors.textLight, width: '50%' }]} />
+                  <BlurView
+                    intensity={colors.glassEffect ? 30 : 0}
+                    tint={colors.glassEffect ? (colors.text === '#FFFFFF' ? 'dark' : 'light') : 'default'}
+                    style={[
+                      styles.schemeCardBlur,
+                      { 
+                        backgroundColor: colors.glassEffect ? 'transparent' : colors.surface,
+                        borderRadius: borderRadius.xl,
+                        borderWidth: isSelected ? 2 : 1,
+                        borderColor: isSelected ? colors.secondary : colors.border,
+                      },
+                      isSelected && shadows.neon,
+                    ]}
+                  >
+                    <View style={styles.schemeCardContent}>
+                      <View style={[
+                        styles.schemeIconContainer, 
+                        { 
+                          backgroundColor: isSelected ? `${colors.secondary}20` : `${colors.textMuted}`,
+                        }
+                      ]}>
+                        <Icon 
+                          color={isSelected ? colors.secondary : colors.textSecondary} 
+                          size={24} 
+                          strokeWidth={2.5}
+                        />
                       </View>
-                    )}
-                  </View>
-                  
-                  <View style={styles.themeCardContent}>
-                    <Text style={[styles.themeIcon, { fontSize: fontSize.hero }]}>{theme.icon}</Text>
-                    <View style={styles.themeInfo}>
-                      <Text style={[styles.themeName, { color: colors.white, fontSize: fontSize.xl, fontWeight: fontWeight.bold }]}>
-                        {theme.name}
-                      </Text>
-                      <Text style={[styles.themeDescription, { color: 'rgba(255, 255, 255, 0.8)', fontSize: fontSize.sm }]}>
-                        {theme.description}
-                      </Text>
+                      
+                      <View style={styles.schemeInfo}>
+                        <Text style={[
+                          styles.schemeName, 
+                          { 
+                            color: colors.text, 
+                            fontSize: fontSize.lg, 
+                            fontWeight: fontWeight.semibold 
+                          }
+                        ]}>
+                          {scheme.name}
+                        </Text>
+                        <Text style={[
+                          styles.schemeDescription, 
+                          { 
+                            color: colors.textSecondary, 
+                            fontSize: fontSize.sm 
+                          }
+                        ]}>
+                          {scheme.description}
+                        </Text>
+                      </View>
+
+                      {isSelected && (
+                        <View style={[
+                          styles.selectedBadge, 
+                          { backgroundColor: colors.secondary },
+                          shadows.glow(colors.secondary),
+                        ]}>
+                          <Check color={colors.white} size={18} strokeWidth={3} />
+                        </View>
+                      )}
                     </View>
-                  </View>
-                </LinearGradient>
-              </TouchableOpacity>
-            ))}
+                  </BlurView>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
-          <View style={[styles.infoCard, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: borderRadius.lg, padding: spacing.lg }]}>
-            <Text style={[styles.infoTitle, { color: colors.text, fontSize: fontSize.lg, fontWeight: fontWeight.semibold }]}>
-              💡 Le saviez-vous ?
+          <View style={[styles.previewSection, { marginTop: spacing.xxl, gap: spacing.md }]}>
+            <Text style={[
+              styles.previewTitle, 
+              { 
+                color: colors.text, 
+                fontSize: fontSize.xl, 
+                fontWeight: fontWeight.semibold 
+              }
+            ]}>
+              Aperçu des couleurs
             </Text>
-            <Text style={[styles.infoText, { color: colors.textSecondary, fontSize: fontSize.sm, marginTop: spacing.sm }]}>
-              Chaque thème a été soigneusement conçu pour offrir une expérience optimale selon votre moment de la journée et votre style personnel.
-            </Text>
+
+            <View style={[styles.colorGrid, { gap: spacing.sm }]}>
+              <View style={styles.colorRow}>
+                <View style={[styles.colorSwatch, { backgroundColor: colors.primary }, shadows.md]}>
+                  <Text style={[styles.colorLabel, { color: colors.white, fontSize: fontSize.xs }]}>Primary</Text>
+                </View>
+                <View style={[styles.colorSwatch, { backgroundColor: colors.secondary }, shadows.neon]}>
+                  <Text style={[styles.colorLabel, { color: colors.white, fontSize: fontSize.xs }]}>Neon</Text>
+                </View>
+              </View>
+              
+              <View style={styles.colorRow}>
+                <View style={[styles.colorSwatch, { backgroundColor: colors.gold }, shadows.gold]}>
+                  <Text style={[styles.colorLabel, { color: colors.textInverse, fontSize: fontSize.xs, fontWeight: fontWeight.semibold }]}>Gold</Text>
+                </View>
+                <View style={[styles.colorSwatch, { backgroundColor: colors.accent }, shadows.md]}>
+                  <Text style={[styles.colorLabel, { color: colors.white, fontSize: fontSize.xs }]}>Accent</Text>
+                </View>
+              </View>
+            </View>
+
+            <LinearGradient
+              colors={colors.goldGradient as any}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={[styles.gradientPreview, { borderRadius: borderRadius.lg }, shadows.gold]}
+            >
+              <Text style={[
+                styles.gradientLabel, 
+                { 
+                  color: colors.textInverse, 
+                  fontSize: fontSize.md, 
+                  fontWeight: fontWeight.bold 
+                }
+              ]}>
+                Gold Gradient
+              </Text>
+            </LinearGradient>
           </View>
+
+          <BlurView
+            intensity={20}
+            tint={colors.text === '#FFFFFF' ? 'dark' : 'light'}
+            style={[
+              styles.infoCard, 
+              { 
+                backgroundColor: colors.glassEffect ? 'transparent' : colors.surface,
+                borderColor: colors.borderLight,
+                borderRadius: borderRadius.lg, 
+                padding: spacing.lg,
+                marginTop: spacing.xl,
+              }
+            ]}
+          >
+            <View style={[styles.infoIconContainer, { backgroundColor: `${colors.gold}20` }]}>
+              <Sparkles color={colors.gold} size={20} strokeWidth={2.5} />
+            </View>
+            <Text style={[
+              styles.infoTitle, 
+              { 
+                color: colors.text, 
+                fontSize: fontSize.lg, 
+                fontWeight: fontWeight.semibold,
+                marginTop: spacing.sm,
+              }
+            ]}>
+              Design Liquid Glass
+            </Text>
+            <Text style={[
+              styles.infoText, 
+              { 
+                color: colors.textSecondary, 
+                fontSize: fontSize.sm, 
+                marginTop: spacing.xs,
+                lineHeight: 20,
+              }
+            ]}>
+              Un thème unique inspiré des interfaces iOS 26 et Vision Pro, avec des reflets &ldquo;liquid glass&rdquo; et des touches d&apos;or pâle subtilement placées pour une expérience premium.
+            </Text>
+          </BlurView>
         </ScrollView>
       </View>
     </>
@@ -184,81 +256,101 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   headerIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
   },
   headerTitle: {
     textAlign: 'center',
-    marginBottom: 8,
+    letterSpacing: 2,
   },
   headerSubtitle: {
     textAlign: 'center',
-    maxWidth: 300,
+    letterSpacing: 1,
+    marginTop: 4,
   },
-  themesContainer: {
-    gap: 20,
+  headerDescription: {
+    textAlign: 'center',
   },
-  themeCard: {
-    marginBottom: 4,
+  schemesContainer: {
   },
-  themeCardGradient: {
+  schemeCard: {
+  },
+  schemeCardBlur: {
     padding: 20,
-    position: 'relative',
     overflow: 'hidden',
   },
+  schemeCardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  schemeIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  schemeInfo: {
+    flex: 1,
+  },
+  schemeName: {
+    marginBottom: 2,
+  },
+  schemeDescription: {
+  },
   selectedBadge: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
     width: 32,
     height: 32,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 10,
   },
-  themePreview: {
-    marginBottom: 16,
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  previewSection: {
   },
-  previewSurface: {
-    padding: 12,
-    gap: 8,
-    overflow: 'hidden',
+  previewTitle: {
   },
-  previewBar: {
-    height: 8,
-    borderRadius: 4,
+  colorGrid: {
   },
-  themeCardContent: {
+  colorRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
+    gap: 12,
   },
-  themeIcon: {
-    lineHeight: 48,
-  },
-  themeInfo: {
+  colorSwatch: {
     flex: 1,
+    height: 80,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  themeName: {
-    marginBottom: 4,
+  colorLabel: {
   },
-  themeDescription: {
+  gradientPreview: {
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  gradientLabel: {
   },
   infoCard: {
-    marginTop: 32,
     borderWidth: 1,
+    alignItems: 'center',
+  },
+  infoIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   infoTitle: {
+    textAlign: 'center',
   },
   infoText: {
-    lineHeight: 20,
+    textAlign: 'center',
   },
 });

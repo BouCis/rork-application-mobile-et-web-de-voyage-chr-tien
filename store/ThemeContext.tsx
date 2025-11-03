@@ -2,65 +2,66 @@ import createContextHook from '@nkzw/create-context-hook';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useColorScheme } from 'react-native';
-import { themes, ThemeType, Theme, spacing, borderRadius, fontSize, fontWeight, shadows, animation } from '@/constants/themes';
+import { themes, ColorSchemeType, Theme, spacing, borderRadius, fontSize, fontWeight, shadows, animation } from '@/constants/themes';
 
-const THEME_STORAGE_KEY = '@app_theme';
+const COLOR_SCHEME_STORAGE_KEY = '@app_color_scheme';
 
 export const [ThemeProvider, useTheme] = createContextHook(() => {
   const systemColorScheme = useColorScheme();
-  const [selectedTheme, setSelectedTheme] = useState<ThemeType>('neo-travel-dark');
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedColorScheme, setSelectedColorScheme] = useState<ColorSchemeType>('system');
+  const [isLoading, setIsLoading] = useState(true);
 
-  const loadTheme = useCallback(async () => {
+  const loadColorScheme = useCallback(async () => {
     try {
-      const storedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
-      if (storedTheme && isValidTheme(storedTheme)) {
-        setSelectedTheme(storedTheme as ThemeType);
+      const storedScheme = await AsyncStorage.getItem(COLOR_SCHEME_STORAGE_KEY);
+      if (storedScheme && isValidColorScheme(storedScheme)) {
+        setSelectedColorScheme(storedScheme as ColorSchemeType);
       }
     } catch (error) {
-      console.error('Error loading theme:', error);
+      console.error('Error loading color scheme:', error);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    loadTheme();
-  }, [loadTheme]);
+    loadColorScheme();
+  }, [loadColorScheme]);
 
-  useEffect(() => {
-    if (selectedTheme === 'system') {
-      return;
-    }
-  }, [systemColorScheme, selectedTheme]);
-
-  const isValidTheme = (theme: string): boolean => {
-    return theme === 'system' || theme in themes;
+  const isValidColorScheme = (scheme: string): boolean => {
+    return scheme === 'light' || scheme === 'dark' || scheme === 'system';
   };
 
   const getActiveTheme = useCallback((): Theme => {
-    if (selectedTheme === 'system') {
-      return systemColorScheme === 'dark' ? themes['neo-travel-dark'] : themes['minimal-light'];
+    if (selectedColorScheme === 'system') {
+      return systemColorScheme === 'dark' ? themes.dark : themes.light;
     }
-    return themes[selectedTheme];
-  }, [selectedTheme, systemColorScheme]);
+    return themes[selectedColorScheme];
+  }, [selectedColorScheme, systemColorScheme]);
 
-  const changeTheme = useCallback(async (newTheme: ThemeType) => {
+  const changeColorScheme = useCallback(async (newScheme: ColorSchemeType) => {
     try {
-      setSelectedTheme(newTheme);
-      await AsyncStorage.setItem(THEME_STORAGE_KEY, newTheme);
-      console.log('Theme changed to:', newTheme);
+      setSelectedColorScheme(newScheme);
+      await AsyncStorage.setItem(COLOR_SCHEME_STORAGE_KEY, newScheme);
+      console.log('Color scheme changed to:', newScheme);
     } catch (error) {
-      console.error('Error saving theme:', error);
+      console.error('Error saving color scheme:', error);
     }
   }, []);
+
+  const toggleColorScheme = useCallback(() => {
+    const current = selectedColorScheme === 'system' ? systemColorScheme : selectedColorScheme;
+    const next = current === 'dark' ? 'light' : 'dark';
+    changeColorScheme(next as ColorSchemeType);
+  }, [selectedColorScheme, systemColorScheme, changeColorScheme]);
 
   const activeTheme = useMemo(() => getActiveTheme(), [getActiveTheme]);
 
   return useMemo(() => ({
-    selectedTheme,
+    selectedColorScheme,
     activeTheme,
-    changeTheme,
+    changeColorScheme,
+    toggleColorScheme,
     isLoading,
     colors: activeTheme.colors,
     spacing,
@@ -70,5 +71,5 @@ export const [ThemeProvider, useTheme] = createContextHook(() => {
     shadows,
     animation,
     isDark: activeTheme.isDark,
-  }), [selectedTheme, activeTheme, changeTheme, isLoading]);
+  }), [selectedColorScheme, activeTheme, changeColorScheme, toggleColorScheme, isLoading]);
 });
