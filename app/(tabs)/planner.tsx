@@ -331,7 +331,7 @@ export default function PlannerScreen() {
               <View
                 key={destination.id}
                 testID={`card-destination-${destination.id}`}
-                style={[styles.destinationCard, { borderColor: colors.gold + '33', backgroundColor: colors.surface }]}
+                style={[styles.destinationCard, { borderColor: `${colors.gold}33`, backgroundColor: colors.surface }]}
               >
                 <Pressable onPress={() => handleDestinationPress(destination)} accessibilityRole="button" accessibilityLabel={`Ouvrir ${destination.name}`}>
                   <View style={styles.destinationImageContainer}>
@@ -413,7 +413,7 @@ export default function PlannerScreen() {
               </LinearGradient>
             </TouchableOpacity>
           ) : (
-            {trips.map((trip) => (
+            trips.map((trip) => (
   <View
     key={trip.id}
     style={[
@@ -428,7 +428,7 @@ export default function PlannerScreen() {
       {trip.title}
     </Text>
   </View>
-))}
+))
           )}
         </View>
 
