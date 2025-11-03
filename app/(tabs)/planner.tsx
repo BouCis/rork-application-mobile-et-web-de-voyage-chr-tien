@@ -200,7 +200,7 @@ export default function PlannerScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[colors.backgroundDark, colors.background]}
+        colors={[colors.background, colors.backgroundSecondary]}
         style={StyleSheet.absoluteFillObject}
       />
 
@@ -246,7 +246,7 @@ export default function PlannerScreen() {
             end={{ x: 1, y: 1 }}
             style={styles.searchGradient}
           >
-            <Search color={colors.textLight} size={20} />
+            <Search color={colors.textSecondary} size={20} />
             <Text style={styles.searchPlaceholder}>Où allez-vous ?</Text>
           </LinearGradient>
         </TouchableOpacity>

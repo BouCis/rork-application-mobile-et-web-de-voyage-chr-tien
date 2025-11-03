@@ -63,7 +63,7 @@ export default function TabLayout() {
           title: "Accueil",
           tabBarIcon: ({ color, focused }) => (
             <Home
-              color={focused ? colors.primary : colors.textLight}
+              color={focused ? colors.primary : colors.textSecondary}
               size={24}
               strokeWidth={focused ? 2.5 : 2}
             />
@@ -76,7 +76,7 @@ export default function TabLayout() {
           title: "Hôtels",
           tabBarIcon: ({ color, focused }) => (
             <Hotel
-              color={focused ? colors.primary : colors.textLight}
+              color={focused ? colors.primary : colors.textSecondary}
               size={24}
               strokeWidth={focused ? 2.5 : 2}
             />
@@ -89,7 +89,7 @@ export default function TabLayout() {
           title: "Activités",
           tabBarIcon: ({ color, focused }) => (
             <MapPin
-              color={focused ? colors.primary : colors.textLight}
+              color={focused ? colors.primary : colors.textSecondary}
               size={24}
               strokeWidth={focused ? 2.5 : 2}
             />
@@ -102,7 +102,7 @@ export default function TabLayout() {
           title: "Restos",
           tabBarIcon: ({ color, focused }) => (
             <UtensilsCrossed
-              color={focused ? colors.primary : colors.textLight}
+              color={focused ? colors.primary : colors.textSecondary}
               size={24}
               strokeWidth={focused ? 2.5 : 2}
             />
@@ -115,7 +115,7 @@ export default function TabLayout() {
           title: "Plus",
           tabBarIcon: ({ color, focused }) => (
             <MoreHorizontal
-              color={focused ? colors.primary : colors.textLight}
+              color={focused ? colors.primary : colors.textSecondary}
               size={24}
               strokeWidth={focused ? 2.5 : 2}
             />
