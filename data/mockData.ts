@@ -1,7 +1,6 @@
 import { 
   Trip, 
   Photo, 
-  SpiritualContent, 
   User,
   TransportOption, 
   Accommodation, 
@@ -19,10 +18,11 @@ export const mockUser: User = {
   firstName: 'Marie',
   lastName: 'Dubois',
   email: 'marie.dubois@example.com',
+  emailVerified: false,
   avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
-  bio: 'Passionnée de voyages et de découvertes spirituelles. Photographe amateur et pilote de drone.',
+  bio: 'Passionnée de voyages et de découvertes. Photographe amateur et pilote de drone.',
   preferences: {
-    travelStyle: 'spiritual',
+    travelStyle: 'mixed',
     budgetRange: 'moderate',
     notifications: true,
     inspirations: true,
@@ -33,8 +33,8 @@ export const mockUser: User = {
 export const mockTrips: Trip[] = [
   {
     id: '1',
-    title: 'Pèlerinage en Terre Sainte',
-    description: 'Un voyage spirituel à travers les lieux saints de Jérusalem et de Bethléem.',
+    title: 'Découverte de la Terre Sainte',
+    description: 'Un voyage à travers les lieux emblématiques de Jérusalem et de Bethléem.',
     startDate: '2024-03-15',
     endDate: '2024-03-25',
     coverImage: 'https://images.unsplash.com/photo-1544967882-6abec37be2b4?w=400&h=250&fit=crop',
@@ -49,7 +49,7 @@ export const mockTrips: Trip[] = [
         address: 'Western Wall Plaza, Jerusalem',
         country: 'Israël',
         city: 'Jérusalem',
-        type: 'spiritual',
+        type: 'historical',
       },
       {
         id: '2',
@@ -59,7 +59,7 @@ export const mockTrips: Trip[] = [
         address: 'Manger Square, Bethlehem',
         country: 'Palestine',
         city: 'Bethléem',
-        type: 'spiritual',
+        type: 'historical',
       },
     ],
     budget: {
@@ -99,7 +99,7 @@ export const mockTrips: Trip[] = [
         address: 'Praza do Obradoiro, Santiago de Compostela',
         country: 'Espagne',
         city: 'Saint-Jacques-de-Compostelle',
-        type: 'spiritual',
+        type: 'historical',
       },
     ],
     budget: {
@@ -139,7 +139,7 @@ export const mockTrips: Trip[] = [
         address: 'Meteora, Kalabaka',
         country: 'Grèce',
         city: 'Kalabaka',
-        type: 'spiritual',
+        type: 'historical',
       },
     ],
     budget: {
@@ -193,23 +193,7 @@ export const mockPhotos: Photo[] = [
   },
 ];
 
-export const mockSpiritualContent: SpiritualContent[] = [
-  {
-    id: '1',
-    type: 'verse',
-    title: 'Verset du jour',
-    content: 'Heureux ceux qui ont le cœur pur, car ils verront Dieu.',
-    reference: 'Matthieu 5:8',
-    date: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    type: 'meditation',
-    title: 'Méditation du voyageur',
-    content: 'Chaque voyage est une opportunité de découvrir non seulement de nouveaux lieux, mais aussi de nouvelles facettes de nous-mêmes et de notre relation avec Dieu. Prenons le temps de contempler Sa création et de Lui rendre grâce pour toutes ces merveilles.',
-    date: new Date().toISOString(),
-  },
-];
+
 
 // Options de transport multimodales
 export const mockTransportOptions: TransportOption[] = [
@@ -416,24 +400,7 @@ export const mockActivities: Activity[] = [
     bestTimeToVisit: 'Matin ou fin d\'après-midi',
     bookingRequired: true,
   },
-  {
-    id: '3',
-    name: 'Visite de la Grande Mosquée de Dakar',
-    description: 'Admirez l\'architecture de cette magnifique mosquée',
-    category: 'religious',
-    price: 0,
-    currency: 'EUR',
-    duration: '1h 00m',
-    rating: 4.7,
-    location: {
-      address: 'Allées du Centenaire, Dakar',
-      latitude: 14.6937,
-      longitude: -17.4441,
-    },
-    images: ['https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=400'],
-    openingHours: '9h00 - 17h00',
-    bookingRequired: false,
-  },
+
   {
     id: '4',
     name: 'Marché Sandaga',
@@ -737,7 +704,7 @@ export const mockDestinations = [
     id: '1',
     name: 'Dakar',
     country: 'Sénégal',
-    description: 'Capitale vibrante de l\'Afrique de l\'Ouest, mélange de culture, plages et spiritualité',
+    description: 'Capitale vibrante de l\'Afrique de l\'Ouest, mélange de culture et plages',
     image: 'https://images.unsplash.com/photo-1609198092357-c7c2b7e5e8e8?w=400',
     rating: 4.5,
     averageBudget: { budget: 45, economy: 75, luxury: 150 },
@@ -749,7 +716,7 @@ export const mockDestinations = [
     id: '2',
     name: 'Rome',
     country: 'Italie',
-    description: 'Capitale spirituelle du christianisme',
+    description: 'Capitale historique et culturelle',
     image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400',
     rating: 4.7,
     averageBudget: { budget: 70, economy: 110, luxury: 200 },
@@ -761,7 +728,7 @@ export const mockDestinations = [
     id: '3',
     name: 'Jérusalem',
     country: 'Israël',
-    description: 'Ville sainte aux trois religions monothéistes',
+    description: 'Ville historique majeure du Proche-Orient',
     image: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=400',
     rating: 4.8,
     averageBudget: { budget: 80, economy: 120, luxury: 250 },
@@ -773,7 +740,7 @@ export const mockDestinations = [
     id: '4',
     name: 'Saint-Jacques-de-Compostelle',
     country: 'Espagne',
-    description: 'Destination finale du pèlerinage de Compostelle',
+    description: 'Destination emblématique de Compostelle',
     image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
     rating: 4.6,
     averageBudget: { budget: 50, economy: 85, luxury: 150 },
