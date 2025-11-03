@@ -17,23 +17,24 @@ import {
   Trash2,
   ArrowLeft,
 } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
+import { useTheme } from '@/store/ThemeContext';
 import { useApp } from '@/store/AppContext';
 import { router } from 'expo-router';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { user, logout, deleteAccount } = useApp();
+  const { colors } = useTheme();
 
   if (!user) {
     return (
       <View style={styles.container}>
         <LinearGradient
-          colors={[theme.colors.backgroundDark, theme.colors.background]}
+          colors={[colors.backgroundDark, colors.background]}
           style={StyleSheet.absoluteFillObject}
         />
         <View style={styles.emptyState}>
-          <UserIcon color={theme.colors.textLight} size={64} />
+          <UserIcon color={colors.textLight} size={64} />
           <Text style={styles.emptyStateTitle}>Aucun profil</Text>
           <Text style={styles.emptyStateText}>Créez votre profil pour commencer</Text>
           <TouchableOpacity
@@ -41,7 +42,7 @@ export default function ProfileScreen() {
             onPress={() => router.push('/auth/signup')}
           >
             <LinearGradient
-              colors={theme.colors.primaryGradient}
+              colors={colors.primaryGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.createProfileGradient}
@@ -74,7 +75,7 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[theme.colors.backgroundDark, theme.colors.background]}
+        colors={[colors.backgroundDark, colors.background]}
         style={StyleSheet.absoluteFillObject}
       />
 
@@ -83,7 +84,7 @@ export default function ProfileScreen() {
           onPress={() => router.back()}
           style={styles.backButton}
         >
-          <ArrowLeft color={theme.colors.text} size={24} />
+          <ArrowLeft color={colors.text} size={24} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Profil</Text>
         <View style={styles.headerPlaceholder} />
@@ -99,12 +100,12 @@ export default function ProfileScreen() {
       >
         <View style={styles.profileHeader}>
           <LinearGradient
-            colors={theme.colors.primaryGradient}
+            colors={colors.primaryGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.avatarGradient}
           >
-            <UserIcon color={theme.colors.textInverse} size={48} strokeWidth={2} />
+            <UserIcon color={colors.textInverse} size={48} strokeWidth={2} />
           </LinearGradient>
           <Text style={styles.userName}>
             {user?.firstName && user?.lastName 
@@ -118,7 +119,7 @@ export default function ProfileScreen() {
             style={styles.editButton}
             onPress={() => router.push('/settings/account')}
           >
-            <Edit3 color={theme.colors.primary} size={18} />
+            <Edit3 color={colors.primary} size={18} />
             <Text style={styles.editButtonText}>Modifier le profil</Text>
           </TouchableOpacity>
         </View>
@@ -127,10 +128,10 @@ export default function ProfileScreen() {
             <View style={styles.statsContainer}>
               <View style={styles.statCard}>
                 <LinearGradient
-                  colors={[`${theme.colors.primary}20`, `${theme.colors.primary}10`]}
+                  colors={[`${colors.primary}20`, `${colors.primary}10`]}
                   style={styles.statGradient}
                 >
-                  <MapPin color={theme.colors.primary} size={24} />
+                  <MapPin color={colors.primary} size={24} />
                   <Text style={styles.statValue}>0</Text>
                   <Text style={styles.statLabel}>Voyages</Text>
                 </LinearGradient>
@@ -138,10 +139,10 @@ export default function ProfileScreen() {
 
               <View style={styles.statCard}>
                 <LinearGradient
-                  colors={[`${theme.colors.secondary}20`, `${theme.colors.secondary}10`]}
+                  colors={[`${colors.secondary}20`, `${colors.secondary}10`]}
                   style={styles.statGradient}
                 >
-                  <Camera color={theme.colors.secondary} size={24} />
+                  <Camera color={colors.secondary} size={24} />
                   <Text style={styles.statValue}>0</Text>
                   <Text style={styles.statLabel}>Photos</Text>
                 </LinearGradient>
@@ -149,10 +150,10 @@ export default function ProfileScreen() {
 
               <View style={styles.statCard}>
                 <LinearGradient
-                  colors={[`${theme.colors.accent}20`, `${theme.colors.accent}10`]}
+                  colors={[`${colors.accent}20`, `${colors.accent}10`]}
                   style={styles.statGradient}
                 >
-                  <Heart color={theme.colors.accent} size={24} />
+                  <Heart color={colors.accent} size={24} />
                   <Text style={styles.statValue}>0</Text>
                   <Text style={styles.statLabel}>Favoris</Text>
                 </LinearGradient>
@@ -174,12 +175,12 @@ export default function ProfileScreen() {
                     >
                       <View style={styles.menuItemContent}>
                         <View style={styles.menuItemLeft}>
-                          <View style={[styles.iconContainer, { backgroundColor: `${theme.colors.primary}15` }]}>
-                            <item.icon color={theme.colors.primary} size={20} />
+                          <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
+                            <item.icon color={colors.primary} size={20} />
                           </View>
                           <Text style={styles.menuItemText}>{item.label}</Text>
                         </View>
-                        <ChevronRight color={theme.colors.textLight} size={20} />
+                        <ChevronRight color={colors.textLight} size={20} />
                       </View>
                     </TouchableOpacity>
                   ))}
@@ -213,7 +214,7 @@ export default function ProfileScreen() {
                 colors={['rgba(239, 68, 68, 0.1)', 'rgba(239, 68, 68, 0.05)']}
                 style={styles.logoutGradient}
               >
-                <LogOut color={theme.colors.error} size={20} />
+                <LogOut color={colors.error} size={20} />
                 <Text style={styles.logoutText}>Déconnexion</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -254,7 +255,7 @@ export default function ProfileScreen() {
               )}
             >
               <View style={styles.deleteGradient}>
-                <Trash2 color={theme.colors.error} size={20} />
+                <Trash2 color={colors.error} size={20} />
                 <Text style={styles.deleteText}>Supprimer mon compte</Text>
               </View>
             </TouchableOpacity>
@@ -274,21 +275,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.md,
+    paddingHorizontal: 24.lg,
+    paddingBottom: 24.md,
   },
   backButton: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.surface,
+    borderRadius: {borderRadius: 16}.md,
+    backgroundColor: colors.surface,
   },
   headerTitle: {
-    fontSize: theme.fontSize.xl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: {fontSize: 15}.xl,
+    fontWeight: {fontWeight: '700'}.bold,
+    color: colors.text,
   },
   headerPlaceholder: {
     width: 40,
@@ -297,103 +298,103 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: theme.spacing.lg,
+    padding: 24.lg,
   },
   profileHeader: {
     alignItems: 'center',
-    marginBottom: theme.spacing.xl,
+    marginBottom: 24.xl,
   },
   avatarGradient: {
     width: 96,
     height: 96,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: {borderRadius: 16}.full,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: theme.spacing.md,
+    marginBottom: 24.md,
   },
   userName: {
-    fontSize: theme.fontSize.xxl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: {fontSize: 15}.xxl,
+    fontWeight: {fontWeight: '700'}.bold,
+    color: colors.text,
   },
   userEmail: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
-    marginTop: theme.spacing.xs,
+    fontSize: {fontSize: 15}.md,
+    color: colors.textSecondary,
+    marginTop: 24.xs,
   },
   userBio: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    fontSize: {fontSize: 15}.sm,
+    color: colors.textSecondary,
     textAlign: 'center',
-    marginTop: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
+    marginTop: 24.md,
+    paddingHorizontal: 24.lg,
     lineHeight: 20,
   },
   editButton: {
-    marginTop: theme.spacing.lg,
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.xl,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.surface,
+    marginTop: 24.lg,
+    paddingVertical: 24.sm,
+    paddingHorizontal: 24.xl,
+    borderRadius: {borderRadius: 16}.full,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: colors.border,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
+    gap: 24.sm,
   },
   editButtonText: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
+    fontSize: {fontSize: 15}.sm,
+    fontWeight: {fontWeight: '700'}.semibold,
+    color: colors.text,
   },
 
   statsContainer: {
     flexDirection: 'row',
-    gap: theme.spacing.md,
-    marginBottom: theme.spacing.xl,
+    gap: 24.md,
+    marginBottom: 24.xl,
   },
   statCard: {
     flex: 1,
   },
   statGradient: {
     alignItems: 'center',
-    paddingVertical: theme.spacing.lg,
-    borderRadius: theme.borderRadius.lg,
+    paddingVertical: 24.lg,
+    borderRadius: {borderRadius: 16}.lg,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: colors.border,
   },
   statValue: {
-    fontSize: theme.fontSize.xxl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
-    marginTop: theme.spacing.sm,
+    fontSize: {fontSize: 15}.xxl,
+    fontWeight: {fontWeight: '700'}.bold,
+    color: colors.text,
+    marginTop: 24.sm,
   },
   statLabel: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.textSecondary,
-    marginTop: theme.spacing.xs,
+    fontSize: {fontSize: 15}.xs,
+    color: colors.textSecondary,
+    marginTop: 24.xs,
   },
   menuSection: {
-    marginBottom: theme.spacing.xl,
+    marginBottom: 24.xl,
   },
   sectionTitle: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textLight,
+    fontSize: {fontSize: 15}.sm,
+    fontWeight: {fontWeight: '700'}.bold,
+    color: colors.textLight,
     textTransform: 'uppercase',
     letterSpacing: 1,
-    marginBottom: theme.spacing.md,
+    marginBottom: 24.md,
   },
   menuContainer: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.lg,
+    backgroundColor: colors.surface,
+    borderRadius: {borderRadius: 16}.lg,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: colors.border,
     overflow: 'hidden',
   },
   menuItem: {
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    borderBottomColor: colors.border,
   },
   menuItemLast: {
     borderBottomWidth: 0,
@@ -402,100 +403,100 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: theme.spacing.md,
+    padding: 24.md,
   },
   menuItemLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.md,
+    gap: 24.md,
   },
   iconContainer: {
     width: 40,
     height: 40,
-    borderRadius: theme.borderRadius.md,
+    borderRadius: {borderRadius: 16}.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   menuItemText: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.medium,
-    color: theme.colors.text,
+    fontSize: {fontSize: 15}.md,
+    fontWeight: {fontWeight: '700'}.medium,
+    color: colors.text,
   },
   logoutButton: {
-    marginTop: theme.spacing.md,
-    borderRadius: theme.borderRadius.lg,
+    marginTop: 24.md,
+    borderRadius: {borderRadius: 16}.lg,
     overflow: 'hidden',
   },
   logoutGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: theme.spacing.sm,
-    padding: theme.spacing.md,
+    gap: 24.sm,
+    padding: 24.md,
     borderWidth: 1,
-    borderColor: `${theme.colors.error}30`,
+    borderColor: `${colors.error}30`,
   },
   logoutText: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.error,
+    fontSize: {fontSize: 15}.md,
+    fontWeight: {fontWeight: '700'}.semibold,
+    color: colors.error,
   },
   deleteButton: {
-    marginTop: theme.spacing.md,
-    borderRadius: theme.borderRadius.lg,
+    marginTop: 24.md,
+    borderRadius: {borderRadius: 16}.lg,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: `${theme.colors.error}40`,
+    borderColor: `${colors.error}40`,
   },
   deleteGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: theme.spacing.sm,
-    padding: theme.spacing.md,
+    gap: 24.sm,
+    padding: 24.md,
     backgroundColor: 'rgba(239, 68, 68, 0.05)',
   },
   deleteText: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.error,
+    fontSize: {fontSize: 15}.md,
+    fontWeight: {fontWeight: '700'}.semibold,
+    color: colors.error,
   },
   version: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textLight,
+    fontSize: {fontSize: 15}.sm,
+    color: colors.textLight,
     textAlign: 'center',
-    marginTop: theme.spacing.xl,
+    marginTop: 24.xl,
   },
   emptyState: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: theme.spacing.xl,
+    padding: 24.xl,
   },
   emptyStateTitle: {
-    fontSize: theme.fontSize.xxl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
-    marginTop: theme.spacing.lg,
+    fontSize: {fontSize: 15}.xxl,
+    fontWeight: {fontWeight: '700'}.bold,
+    color: colors.text,
+    marginTop: 24.lg,
   },
   emptyStateText: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
+    fontSize: {fontSize: 15}.md,
+    color: colors.textSecondary,
     textAlign: 'center',
-    marginTop: theme.spacing.sm,
+    marginTop: 24.sm,
   },
   createProfileButton: {
-    marginTop: theme.spacing.xl,
-    borderRadius: theme.borderRadius.md,
+    marginTop: 24.xl,
+    borderRadius: {borderRadius: 16}.md,
     overflow: 'hidden',
   },
   createProfileGradient: {
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.xl,
+    paddingVertical: 24.md,
+    paddingHorizontal: 24.xl,
   },
   createProfileText: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.white,
+    fontSize: {fontSize: 15}.md,
+    fontWeight: {fontWeight: '700'}.bold,
+    color: colors.white,
   },
 });

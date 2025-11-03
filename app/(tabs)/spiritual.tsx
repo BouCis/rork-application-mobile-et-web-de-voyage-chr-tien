@@ -3,20 +3,21 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Music, BookOpen, Play, Heart, Volume2, Headphones } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
+import { useTheme } from '@/store/ThemeContext';
 import { useRouter } from 'expo-router';
-
-const musicCategories = [
-  { id: '1', name: 'Louange', icon: Music, color: theme.colors.primary },
-  { id: '2', name: 'Méditation', icon: Headphones, color: theme.colors.secondary },
-  { id: '3', name: 'Gospel', icon: Volume2, color: theme.colors.accent },
-];
 
 export default function SpiritualScreen() {
   const insets = useSafeAreaInsets();
-const router = useRouter();
+  const router = useRouter();
+  const { colors } = useTheme();
 
-const onPlayNow = React.useCallback(() => {
+  const musicCategories = [
+    { id: '1', name: 'Louange', icon: Music, color: colors.primary },
+    { id: '2', name: 'Méditation', icon: Headphones, color: colors.secondary },
+    { id: '3', name: 'Gospel', icon: Volume2, color: colors.accent },
+  ];
+
+  const onPlayNow = React.useCallback(() => {
   console.log('[Spiritual] Play now');
   router.push('/music/player');
 }, [router]);
@@ -34,7 +35,7 @@ const onOpenBible = React.useCallback(() => {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[theme.colors.backgroundDark, theme.colors.background]}
+        colors={[colors.background, colors.backgroundSecondary]}
         style={StyleSheet.absoluteFillObject}
       />
 
@@ -55,25 +56,25 @@ const onOpenBible = React.useCallback(() => {
       >
         <View style={styles.featuredCard}>
           <LinearGradient
-            colors={theme.colors.primaryGradient}
+            colors={colors.primaryGradient as any}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.featuredGradient}
           >
-            <Heart color={theme.colors.textInverse} size={48} strokeWidth={1.5} />
-            <Text style={styles.featuredTitle}>Musique Chrétienne</Text>
-            <Text style={styles.featuredText}>
+            <Heart color={colors.textInverse} size={48} strokeWidth={1.5} />
+            <Text style={[styles.featuredTitle, { color: colors.textInverse }]}>Musique Chrétienne</Text>
+            <Text style={[styles.featuredText, { color: colors.textInverse }]}>
               Écoutez des chants de louange et de méditation
             </Text>
             <TouchableOpacity testID="btn-play-now" style={styles.playButton} onPress={onPlayNow} accessible accessibilityRole="button" accessibilityLabel="Écouter maintenant">
-              <Play color={theme.colors.primary} size={20} fill={theme.colors.primary} />
-              <Text style={styles.playButtonText}>Écouter maintenant</Text>
+              <Play color={colors.primary} size={20} fill={colors.primary} />
+              <Text style={[styles.playButtonText, { color: colors.primary, backgroundColor: colors.textInverse }]}>Écouter maintenant</Text>
             </TouchableOpacity>
           </LinearGradient>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Catégories</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Catégories</Text>
           <View style={styles.categoriesGrid}>
             {musicCategories.map((category) => (
               <TouchableOpacity key={category.id} testID={`category-${category.id}`} style={styles.categoryCard} onPress={() => onCategoryPress(category.name)} accessible accessibilityRole="button" accessibilityLabel={`Ouvrir catégorie ${category.name}`}>
@@ -82,7 +83,7 @@ const onOpenBible = React.useCallback(() => {
                   style={styles.categoryGradient}
                 >
                   <category.icon color={category.color} size={32} />
-                  <Text style={styles.categoryName}>{category.name}</Text>
+                  <Text style={[styles.categoryName, { color: colors.text }]}>{category.name}</Text>
                 </LinearGradient>
               </TouchableOpacity>
             ))}
@@ -91,8 +92,8 @@ const onOpenBible = React.useCallback(() => {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <BookOpen color={theme.colors.accent} size={24} />
-            <Text style={styles.sectionTitle}>Bible Numérique</Text>
+            <BookOpen color={colors.accent} size={24} />
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Bible Numérique</Text>
           </View>
           <TouchableOpacity testID="card-bible" style={styles.bibleCard} onPress={onOpenBible} accessible accessibilityRole="button" accessibilityLabel="Ouvrir la Bible">
             <LinearGradient
@@ -101,29 +102,29 @@ const onOpenBible = React.useCallback(() => {
               end={{ x: 1, y: 1 }}
               style={styles.bibleGradient}
             >
-              <BookOpen color={theme.colors.accent} size={48} strokeWidth={1.5} />
-              <Text style={styles.bibleTitle}>Lire la Bible</Text>
-              <Text style={styles.bibleText}>
+              <BookOpen color={colors.accent} size={48} strokeWidth={1.5} />
+              <Text style={[styles.bibleTitle, { color: colors.text }]}>Lire la Bible</Text>
+              <Text style={[styles.bibleText, { color: colors.textSecondary }]}>
                 Accédez à la Bible numérique avec recherche par verset
               </Text>
-              <View style={styles.bibleButton}>
-                <Text style={styles.bibleButtonText}>Ouvrir</Text>
+              <View style={[styles.bibleButton, { backgroundColor: colors.accent }]}>
+                <Text style={[styles.bibleButtonText, { color: colors.textInverse }]}>Ouvrir</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Fonctionnalités</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Fonctionnalités</Text>
           <View style={styles.featuresGrid}>
             <View style={styles.featureCard}>
               <LinearGradient
-                colors={[`${theme.colors.primary}20`, `${theme.colors.primary}10`]}
+                colors={[`${colors.primary}20`, `${colors.primary}10`]}
                 style={styles.featureGradient}
               >
-                <Music color={theme.colors.primary} size={24} />
-                <Text style={styles.featureTitle}>Streaming</Text>
-                <Text style={styles.featureDescription}>
+                <Music color={colors.primary} size={24} />
+                <Text style={[styles.featureTitle, { color: colors.text }]}>Streaming</Text>
+                <Text style={[styles.featureDescription, { color: colors.textSecondary }]}>
                   Musique en ligne et hors ligne
                 </Text>
               </LinearGradient>
@@ -131,12 +132,12 @@ const onOpenBible = React.useCallback(() => {
 
             <View style={styles.featureCard}>
               <LinearGradient
-                colors={[`${theme.colors.secondary}20`, `${theme.colors.secondary}10`]}
+                colors={[`${colors.secondary}20`, `${colors.secondary}10`]}
                 style={styles.featureGradient}
               >
-                <Heart color={theme.colors.secondary} size={24} />
-                <Text style={styles.featureTitle}>Favoris</Text>
-                <Text style={styles.featureDescription}>
+                <Heart color={colors.secondary} size={24} />
+                <Text style={[styles.featureTitle, { color: colors.text }]}>Favoris</Text>
+                <Text style={[styles.featureDescription, { color: colors.textSecondary }]}>
                   Sauvegardez vos chants préférés
                 </Text>
               </LinearGradient>
@@ -144,12 +145,12 @@ const onOpenBible = React.useCallback(() => {
 
             <View style={styles.featureCard}>
               <LinearGradient
-                colors={[`${theme.colors.accent}20`, `${theme.colors.accent}10`]}
+                colors={[`${colors.accent}20`, `${colors.accent}10`]}
                 style={styles.featureGradient}
               >
-                <BookOpen color={theme.colors.accent} size={24} />
-                <Text style={styles.featureTitle}>Lecture</Text>
-                <Text style={styles.featureDescription}>
+                <BookOpen color={colors.accent} size={24} />
+                <Text style={[styles.featureTitle, { color: colors.text }]}>Lecture</Text>
+                <Text style={[styles.featureDescription, { color: colors.textSecondary }]}>
                   Bible audio disponible
                 </Text>
               </LinearGradient>
@@ -157,12 +158,12 @@ const onOpenBible = React.useCallback(() => {
 
             <View style={styles.featureCard}>
               <LinearGradient
-                colors={[`${theme.colors.warning}20`, `${theme.colors.warning}10`]}
+                colors={[`${colors.warning}20`, `${colors.warning}10`]}
                 style={styles.featureGradient}
               >
-                <Volume2 color={theme.colors.warning} size={24} />
-                <Text style={styles.featureTitle}>Playlists</Text>
-                <Text style={styles.featureDescription}>
+                <Volume2 color={colors.warning} size={24} />
+                <Text style={[styles.featureTitle, { color: colors.text }]}>Playlists</Text>
+                <Text style={[styles.featureDescription, { color: colors.textSecondary }]}>
                   Créez vos propres listes
                 </Text>
               </LinearGradient>
@@ -179,160 +180,143 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.lg,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
   },
   title: {
-    fontSize: theme.fontSize.hero,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: 40,
+    fontWeight: '700' as const,
     letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
-    marginTop: theme.spacing.xs,
+    fontSize: 15,
+    marginTop: 4,
+  },
+  categoryGradient: {
+    padding: 24,
+    borderRadius: 16,
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 1,
+  },
+  bibleGradient: {
+    padding: 32,
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  featureGradient: {
+    padding: 24,
+    borderRadius: 16,
+    alignItems: 'center',
+    borderWidth: 1,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: theme.spacing.lg,
+    padding: 24,
   },
   featuredCard: {
-    marginBottom: theme.spacing.xl,
-    borderRadius: theme.borderRadius.xl,
+    marginBottom: 32,
+    borderRadius: 20,
     overflow: 'hidden',
   },
   featuredGradient: {
-    padding: theme.spacing.xxxl,
+    padding: 64,
     alignItems: 'center',
   },
   featuredTitle: {
-    fontSize: theme.fontSize.xxl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textInverse,
-    marginTop: theme.spacing.md,
+    fontSize: 24,
+    fontWeight: '700' as const,
+    marginTop: 16,
     textAlign: 'center',
   },
   featuredText: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textInverse,
+    fontSize: 15,
     textAlign: 'center',
-    marginTop: theme.spacing.sm,
+    marginTop: 8,
     opacity: 0.9,
   },
   playButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    marginTop: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.xl,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.textInverse,
+    gap: 8,
+    marginTop: 24,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 9999,
   },
   playButtonText: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.primary,
+    fontSize: 15,
+    fontWeight: '700' as const,
   },
   section: {
-    marginBottom: theme.spacing.xl,
+    marginBottom: 32,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.md,
+    gap: 8,
+    marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: theme.fontSize.xl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: 20,
+    fontWeight: '700' as const,
   },
   categoriesGrid: {
     flexDirection: 'row',
-    gap: theme.spacing.md,
+    gap: 16,
   },
   categoryCard: {
     flex: 1,
   },
-  categoryGradient: {
-    padding: theme.spacing.lg,
-    borderRadius: theme.borderRadius.lg,
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
   categoryName: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
+    fontSize: 13,
+    fontWeight: '600' as const,
   },
   bibleCard: {
-    borderRadius: theme.borderRadius.xl,
+    borderRadius: 20,
     overflow: 'hidden',
   },
-  bibleGradient: {
-    padding: theme.spacing.xl,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
   bibleTitle: {
-    fontSize: theme.fontSize.xxl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
-    marginTop: theme.spacing.md,
+    fontSize: 24,
+    fontWeight: '700' as const,
+    marginTop: 16,
     textAlign: 'center',
   },
   bibleText: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
+    fontSize: 15,
     textAlign: 'center',
-    marginTop: theme.spacing.sm,
+    marginTop: 8,
     lineHeight: 22,
   },
   bibleButton: {
-    marginTop: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.xl,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.accent,
+    marginTop: 24,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 9999,
   },
   bibleButtonText: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textInverse,
+    fontSize: 15,
+    fontWeight: '700' as const,
   },
   featuresGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: theme.spacing.md,
+    gap: 16,
   },
   featureCard: {
     width: '48%',
   },
-  featureGradient: {
-    padding: theme.spacing.lg,
-    borderRadius: theme.borderRadius.lg,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
   featureTitle: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
-    marginTop: theme.spacing.md,
+    fontSize: 15,
+    fontWeight: '700' as const,
+    marginTop: 16,
     textAlign: 'center',
   },
   featureDescription: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    fontSize: 13,
     textAlign: 'center',
-    marginTop: theme.spacing.xs,
+    marginTop: 4,
   },
 });
