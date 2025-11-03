@@ -17,7 +17,7 @@ export interface User {
   avatar?: string;
   bio?: string;
   preferences: {
-    travelStyle: 'cultural' | 'adventure' | 'relaxation' | 'spiritual' | 'mixed';
+    travelStyle: 'cultural' | 'adventure' | 'relaxation' | 'mixed';
     budgetRange: 'budget' | 'moderate' | 'luxury';
     notifications: boolean;
     inspirations: boolean;
@@ -33,7 +33,7 @@ export interface Location {
   address: string;
   country: string;
   city: string;
-  type: 'tourist' | 'historical' | 'natural' | 'spiritual' | 'other';
+  type: 'tourist' | 'historical' | 'natural' | 'other';
 }
 
 export interface Trip {
@@ -161,7 +161,7 @@ export interface Activity {
   id: string;
   name: string;
   description: string;
-  category: 'cultural' | 'spiritual' | 'adventure' | 'food' | 'nature' | 'shopping' | 'entertainment' | 'religious';
+  category: 'cultural' | 'adventure' | 'food' | 'nature' | 'shopping' | 'entertainment';
   price: number;
   currency: string;
   duration: string;
@@ -177,42 +177,7 @@ export interface Activity {
   bestTimeToVisit?: string;
 }
 
-export interface BibleVerse {
-  id: string;
-  book: string;
-  chapter: number;
-  verse: number;
-  text: string;
-  version: 'LSG' | 'NBS' | 'TOB' | 'BDS';
-}
 
-export interface BibleBook {
-  name: string;
-  chapters: number;
-  testament: 'old' | 'new';
-}
-
-export interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  album?: string;
-  duration: number;
-  coverArt?: string;
-  audioUrl: string;
-  category: 'worship' | 'gospel' | 'contemporary' | 'traditional' | 'instrumental';
-  isDownloaded: boolean;
-}
-
-export interface Playlist {
-  id: string;
-  name: string;
-  description?: string;
-  coverArt?: string;
-  tracks: MusicTrack[];
-  isPublic: boolean;
-  createdAt: string;
-}
 
 export interface Post {
   id: string;
@@ -277,14 +242,7 @@ export interface Photo {
   isDronePhoto: boolean;
 }
 
-export interface SpiritualContent {
-  id: string;
-  type: 'verse' | 'meditation' | 'prayer';
-  title: string;
-  content: string;
-  reference?: string;
-  date: string;
-}
+
 
 export interface VisaRequirement {
   country: string;
