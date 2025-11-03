@@ -35,12 +35,10 @@ export const theme = {
     info: '#3B82F6',
     
     dove: '#E8E8E8',
-    spiritual: '#8B7355',
     
     primaryGradient: ['#6366F1', '#EC4899'] as const,
     secondaryGradient: ['#14B8A6', '#6366F1'] as const,
     goldenGradient: ['#F59E0B', '#EC4899'] as const,
-    spiritualGradient: ['#6366F1', '#8B7355', '#D4AF37'] as const,
     darkGradient: ['#0F172A', '#1E293B'] as const,
   },
   

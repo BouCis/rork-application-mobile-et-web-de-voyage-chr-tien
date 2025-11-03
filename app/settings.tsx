@@ -379,7 +379,7 @@ export default function SettingsScreen() {
           icon: SettingsIcon, 
           label: 'À propos de l\'application', 
           description: 'Version 1.0.0',
-          onPress: () => Alert.alert('À propos', 'Version 1.0.0\n\nVoyage Chrétien - Votre compagnon de voyage spirituel') 
+          onPress: () => Alert.alert('À propos', 'Version 1.0.0\n\nSacàdos - Votre compagnon de voyage') 
         },
       ],
     },

@@ -47,7 +47,7 @@ interface FormData {
   nationality: string;
   departureCity: string;
   avatar?: string;
-  travelStyle: 'cultural' | 'adventure' | 'relaxation' | 'spiritual' | 'mixed';
+  travelStyle: 'cultural' | 'adventure' | 'relaxation' | 'mixed';
   budgetRange: 'budget' | 'moderate' | 'luxury';
   notifications: boolean;
   inspirations: boolean;
@@ -477,7 +477,6 @@ export default function SignUpScreen() {
             { value: 'cultural', label: 'Culturel', icon: '🏛️' },
             { value: 'adventure', label: 'Aventure', icon: '🏔️' },
             { value: 'relaxation', label: 'Détente', icon: '🏖️' },
-            { value: 'spiritual', label: 'Spirituel', icon: '🙏' },
             { value: 'mixed', label: 'Mixte', icon: '🌍' },
           ].map((style) => (
             <TouchableOpacity

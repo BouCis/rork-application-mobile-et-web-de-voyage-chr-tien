@@ -37,7 +37,7 @@ const destinationsData: Record<string, DestinationInfo> = {
   'Bali': {
     name: 'Bali',
     country: 'Indonésie',
-    description: 'Paradis tropical avec temples anciens, rizières en terrasses et plages magnifiques. Une destination spirituelle et relaxante.',
+    description: 'Paradis tropical avec temples anciens, rizières en terrasses et plages magnifiques. Une destination relaxante.',
     rating: 4.9,
     bestTime: 'Avril - Octobre',
     duration: '7-14 jours',

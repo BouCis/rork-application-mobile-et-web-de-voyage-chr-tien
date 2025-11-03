@@ -9,7 +9,7 @@ import { ColorSchemeType, ThemeType } from '@/constants/themes';
 import { BlurView } from 'expo-blur';
 
 const themeTypes: { id: ThemeType; name: string; description: string; gradient: readonly [string, string] }[] = [
-  { id: 'heavenLux', name: '🌤 Heaven Lux', description: 'Lumière apaisante et spirituelle', gradient: ['#AFCBFF', '#E6C97A'] as const },
+  { id: 'heavenLux', name: '🌤 Heaven Lux', description: 'Lumière apaisante et élégante', gradient: ['#AFCBFF', '#E6C97A'] as const },
 ];
 
 const colorSchemes: { id: ColorSchemeType; name: string; description: string; icon: any }[] = [
@@ -281,7 +281,7 @@ export default function ThemeSettingsScreen() {
                 marginTop: spacing.sm,
               }
             ]}>
-              Design Spirituel Premium
+              Design Premium
             </Text>
             <Text style={[
               styles.infoText, 
@@ -292,7 +292,7 @@ export default function ThemeSettingsScreen() {
                 lineHeight: 20,
               }
             ]}>
-              Des thèmes uniques inspirés du calme spirituel et du luxe moderne, avec des effets de verre liquide et des touches dorées pour une expérience apaisante et élégante.
+              Des thèmes uniques inspirés du calme et du luxe moderne, avec des effets de verre liquide et des touches dorées pour une expérience apaisante et élégante.
             </Text>
           </BlurView>
         </ScrollView>

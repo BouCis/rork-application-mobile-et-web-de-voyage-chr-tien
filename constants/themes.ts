@@ -44,12 +44,10 @@ export interface ThemeColors {
   info: string;
   
   dove: string;
-  spiritual: string;
   
   primaryGradient: readonly [string, string];
   secondaryGradient: readonly [string, string];
   goldGradient: readonly [string, string];
-  spiritualGradient: readonly [string, string, string];
   glassGradient: readonly [string, string];
   neonGradient: readonly [string, string];
   
@@ -111,12 +109,10 @@ const heavenLuxLight: Theme = {
     info: '#AFCBFF',
     
     dove: '#1B1B1B',
-    spiritual: '#E6C97A',
     
     primaryGradient: ['#AFCBFF', '#E6C97A'] as const,
     secondaryGradient: ['#FAFAFA', '#FFFFFF'] as const,
     goldGradient: ['#F0D99A', '#E6C97A'] as const,
-    spiritualGradient: ['#AFCBFF', '#FAFAFA', '#E6C97A'] as const,
     glassGradient: ['rgba(255, 255, 255, 0.85)', 'rgba(250, 250, 250, 0.6)'] as const,
     neonGradient: ['#AFCBFF', '#E6C97A'] as const,
     
@@ -173,12 +169,10 @@ const heavenLuxDark: Theme = {
     info: '#AFCBFF',
     
     dove: '#FFFFFF',
-    spiritual: '#E6C97A',
     
     primaryGradient: ['#AFCBFF', '#E6C97A'] as const,
     secondaryGradient: ['#3A3A3A', '#2C2C2C'] as const,
     goldGradient: ['#F0D99A', '#E6C97A'] as const,
-    spiritualGradient: ['#AFCBFF', '#2C2C2C', '#E6C97A'] as const,
     glassGradient: ['rgba(58, 58, 58, 0.85)', 'rgba(44, 44, 44, 0.6)'] as const,
     neonGradient: ['#AFCBFF', '#E6C97A'] as const,
     

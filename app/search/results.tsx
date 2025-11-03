@@ -37,7 +37,7 @@ export default function SearchResultsScreen() {
   const [priceRange, setPriceRange] = useState<string>('all');
 
   const continents = ['all', 'Europe', 'Asie', 'Afrique', 'Amérique du Nord', 'Amérique du Sud'];
-  const categories = ['all', 'cultural', 'spiritual', 'adventure', 'nature', 'beach', 'historical'];
+  const categories = ['all', 'cultural', 'adventure', 'nature', 'beach', 'historical'];
   const priceRanges = [
     { label: 'Tous', value: 'all' },
     { label: 'Économique (< 100€)', value: 'budget' },
@@ -212,7 +212,6 @@ export default function SearchResultsScreen() {
                     >
                       {category === 'all' ? 'Toutes' : 
                        category === 'cultural' ? 'Culturel' :
-                       category === 'spiritual' ? 'Spirituel' :
                        category === 'adventure' ? 'Aventure' :
                        category === 'nature' ? 'Nature' :
                        category === 'beach' ? 'Plage' :
@@ -339,7 +338,6 @@ export default function SearchResultsScreen() {
                       <View key={index} style={styles.tag}>
                         <Text style={styles.tagText}>
                           {category === 'cultural' ? 'Culturel' :
-                           category === 'spiritual' ? 'Spirituel' :
                            category === 'adventure' ? 'Aventure' :
                            category === 'nature' ? 'Nature' :
                            category === 'beach' ? 'Plage' :
