@@ -10,8 +10,6 @@ import { BlurView } from 'expo-blur';
 
 const themeTypes: { id: ThemeType; name: string; description: string; gradient: readonly [string, string] }[] = [
   { id: 'heavenLux', name: '🌤 Heaven Lux', description: 'Lumière apaisante et spirituelle', gradient: ['#AFCBFF', '#E6C97A'] as const },
-  { id: 'neonLux', name: '🪩 Neon Lux', description: 'Futuriste et chic', gradient: ['#C0AFFF', '#007AFF'] as const },
-  { id: 'crystalMinimal', name: '💎 Crystal Minimal', description: 'Verre pur et transparent', gradient: ['#E5E5E5', '#FFFFFF'] as const },
 ];
 
 const colorSchemes: { id: ColorSchemeType; name: string; description: string; icon: any }[] = [

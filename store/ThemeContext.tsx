@@ -41,7 +41,7 @@ export const [ThemeProvider, useTheme] = createContextHook(() => {
   };
 
   const isValidThemeType = (themeType: string): boolean => {
-    return themeType === 'heavenLux' || themeType === 'neonLux' || themeType === 'crystalMinimal';
+    return themeType === 'heavenLux';
   };
 
   const getActiveTheme = useCallback((): Theme => {

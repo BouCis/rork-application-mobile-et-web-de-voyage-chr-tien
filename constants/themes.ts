@@ -1,5 +1,5 @@
 export type ColorSchemeType = 'light' | 'dark' | 'system';
-export type ThemeType = 'heavenLux' | 'neonLux' | 'crystalMinimal';
+export type ThemeType = 'heavenLux';
 
 export interface ThemeColors {
   primary: string;
@@ -442,15 +442,7 @@ export const themes = {
     light: heavenLuxLight,
     dark: heavenLuxDark,
   },
-  neonLux: {
-    light: neonLuxLight,
-    dark: neonLuxDark,
-  },
-  crystalMinimal: {
-    light: crystalMinimalLight,
-    dark: crystalMinimalDark,
-  },
-};
+} as const;
 
 export const spacing = {
   xs: 4,
