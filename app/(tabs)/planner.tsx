@@ -221,6 +221,7 @@ export default function PlannerScreen() {
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <View style={styles.headerContent}>
           <View>
+            <Text testID="brand-name" style={[styles.brand, { color: colors.gold }]}>Sacàdos</Text>
             <Text style={[styles.greeting, { color: colors.text }]}>
               {new Date().getHours() < 12 ? 'Bonjour' : new Date().getHours() < 18 ? 'Bon après-midi' : 'Bonsoir'} {user?.firstName || 'Voyageur'} 👋
             </Text>
@@ -489,6 +490,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 24,
+  },
+  brand: {
+    fontSize: 20,
+    fontWeight: '700' as '700',
+    letterSpacing: 0.5,
+    marginBottom: 2,
+    color: '#E6C97A',
   },
   greeting: {
     fontSize: 16,
