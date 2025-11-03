@@ -7,27 +7,22 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
-  Dimensions,
-  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
   Search,
   MapPin,
-  Calendar,
-  Users,
   Star,
-  Filter,
-  SlidersHorizontal,
   Wifi,
   UtensilsCrossed,
   Dumbbell,
   Car,
 } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
+import BookingModal from '@/components/BookingModal';
 
-const { width } = Dimensions.get('window');
+
 
 interface Hotel {
   id: string;
@@ -98,11 +93,8 @@ const amenityIcons: Record<string, React.ElementType> = {
 export default function HotelsScreen() {
   const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [showFilters, setShowFilters] = useState<boolean>(false);
-  const [selectedDestination, setSelectedDestination] = useState<string>('');
-  const [checkInDate, setCheckInDate] = useState<string>('');
-  const [checkOutDate, setCheckOutDate] = useState<string>('');
-  const [guests, setGuests] = useState<string>('2');
+  const [bookingModalVisible, setBookingModalVisible] = useState<boolean>(false);
+  const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
 
   const filteredHotels = useMemo(() => {
     if (!searchQuery.trim()) return hotels;
@@ -117,62 +109,11 @@ export default function HotelsScreen() {
 
   const handleHotelPress = useCallback((hotel: Hotel) => {
     console.log('[Hotels] Hotel pressed:', hotel.name);
-    Alert.alert(
-      hotel.name,
-      `${hotel.location}\n\n⭐ ${hotel.rating} (${hotel.reviews} avis)\n${hotel.type}\n€${hotel.price}/nuit\n\nEquipements: ${hotel.amenities.map(a => {
-        const icons: Record<string, string> = { wifi: '📶', restaurant: '🍴', gym: '🏋️', parking: '🅿️' };
-        return icons[a] || a;
-      }).join(' ')}`,
-      [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Réserver', onPress: () => {
-          Alert.alert(
-            'Réservation',
-            `Voulez-vous réserver ${hotel.name} ?\n\nPrix: €${hotel.price}/nuit\nVoyageurs: ${guests || '2'}`,
-            [
-              { text: 'Annuler', style: 'cancel' },
-              { text: 'Confirmer', onPress: () => {
-                Alert.alert('Succès', `Réservation confirmée pour ${hotel.name} !`);
-              }}
-            ]
-          );
-        }}
-      ]
-    );
-  }, [guests]);
-
-  const handleFilterPress = useCallback(() => {
-    console.log('[Hotels] Filter pressed');
-    setShowFilters(!showFilters);
-  }, [showFilters]);
-
-  const handleDestinationFilterPress = useCallback(() => {
-    Alert.prompt(
-      'Destination',
-      'Entrez une destination',
-      (text) => setSelectedDestination(text),
-      'plain-text',
-      selectedDestination
-    );
-  }, [selectedDestination]);
-
-  const handleDatesFilterPress = useCallback(() => {
-    Alert.alert(
-      'Sélection des dates',
-      'Fonctionnalité de sélecteur de dates à venir.\n\nVous pouvez filtrer par dates d’arrivée et de départ.',
-      [{ text: 'OK' }]
-    );
+    setSelectedHotel(hotel);
+    setBookingModalVisible(true);
   }, []);
 
-  const handleGuestsFilterPress = useCallback(() => {
-    Alert.prompt(
-      'Nombre de voyageurs',
-      'Combien de personnes ?',
-      (text) => setGuests(text),
-      'plain-text',
-      guests
-    );
-  }, [guests]);
+
 
   return (
     <View style={styles.container}>
@@ -185,49 +126,15 @@ export default function HotelsScreen() {
         <Text style={styles.title}>Hôtels</Text>
         <Text style={styles.subtitle}>Trouvez votre hébergement idéal</Text>
 
-        <View style={styles.searchContainer}>
-          <View style={styles.searchBar}>
-            <Search color={theme.colors.textLight} size={20} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Destination, hôtel..."
-              placeholderTextColor={theme.colors.textLight}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
-          <TouchableOpacity
-            style={styles.filterButton}
-            onPress={handleFilterPress}
-          >
-            <SlidersHorizontal color={theme.colors.text} size={20} />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.quickFilters}>
-          <TouchableOpacity 
-            style={styles.quickFilterChip}
-            onPress={handleDestinationFilterPress}
-          >
-            <MapPin color={theme.colors.primary} size={16} />
-            <Text style={styles.quickFilterText}>
-              {selectedDestination || 'Destination'}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.quickFilterChip}
-            onPress={handleDatesFilterPress}
-          >
-            <Calendar color={theme.colors.primary} size={16} />
-            <Text style={styles.quickFilterText}>Dates</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.quickFilterChip}
-            onPress={handleGuestsFilterPress}
-          >
-            <Users color={theme.colors.primary} size={16} />
-            <Text style={styles.quickFilterText}>{guests || '2'} pers.</Text>
-          </TouchableOpacity>
+        <View style={styles.searchBar}>
+          <Search color={theme.colors.textLight} size={20} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Rechercher un hôtel..."
+            placeholderTextColor={theme.colors.textLight}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
         </View>
       </View>
 
@@ -239,13 +146,7 @@ export default function HotelsScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.resultsHeader}>
-          <Text style={styles.resultsCount}>{filteredHotels.length} hôtel{filteredHotels.length > 1 ? 's' : ''} trouvé{filteredHotels.length > 1 ? 's' : ''}</Text>
-          <TouchableOpacity style={styles.sortButton}>
-            <Filter color={theme.colors.primary} size={18} />
-            <Text style={styles.sortText}>Trier</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.resultsCount}>{filteredHotels.length} hôtel{filteredHotels.length > 1 ? 's' : ''} trouvé{filteredHotels.length > 1 ? 's' : ''}</Text>
 
         {filteredHotels.map((hotel) => (
           <TouchableOpacity
@@ -303,10 +204,30 @@ export default function HotelsScreen() {
                   ) : null;
                 })}
               </View>
+
+              <TouchableOpacity
+                style={styles.bookButton}
+                onPress={() => handleHotelPress(hotel)}
+              >
+                <Text style={styles.bookButtonText}>Réserver maintenant</Text>
+              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
+
+      {selectedHotel && (
+        <BookingModal
+          visible={bookingModalVisible}
+          onClose={() => {
+            setBookingModalVisible(false);
+            setSelectedHotel(null);
+          }}
+          itemName={selectedHotel.name}
+          itemPrice={`€${selectedHotel.price}/nuit`}
+          itemType="hotel"
+        />
+      )}
     </View>
   );
 }
@@ -331,13 +252,7 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xs,
     marginBottom: theme.spacing.lg,
   },
-  searchContainer: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.md,
-  },
   searchBar: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
@@ -347,40 +262,11 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.lg,
     borderWidth: 1,
     borderColor: theme.colors.border,
+    marginBottom: theme.spacing.lg,
   },
   searchInput: {
     flex: 1,
     fontSize: theme.fontSize.md,
-    color: theme.colors.text,
-  },
-  filterButton: {
-    width: 48,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  quickFilters: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm,
-  },
-  quickFilterChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.xs,
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.full,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  quickFilterText: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.medium as '500',
     color: theme.colors.text,
   },
   scrollView: {
@@ -389,26 +275,11 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: theme.spacing.lg,
   },
-  resultsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.md,
-  },
   resultsCount: {
     fontSize: theme.fontSize.md,
     fontWeight: theme.fontWeight.semibold as '600',
     color: theme.colors.text,
-  },
-  sortButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.xs,
-  },
-  sortText: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.medium as '500',
-    color: theme.colors.primary,
+    marginBottom: theme.spacing.md,
   },
   hotelCard: {
     backgroundColor: theme.colors.surface,
@@ -517,5 +388,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: theme.colors.backgroundLight,
     borderRadius: theme.borderRadius.sm,
+  },
+  bookButton: {
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.full,
+    alignItems: 'center' as const,
+    marginTop: theme.spacing.md,
+  },
+  bookButtonText: {
+    fontSize: theme.fontSize.sm,
+    fontWeight: theme.fontWeight.bold as '700',
+    color: theme.colors.white,
   },
 });

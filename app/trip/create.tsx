@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert,
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { X, MapPin, Calendar, Users, DollarSign, FileText } from 'lucide-react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { theme } from '@/constants/theme';
 import { useRouter } from 'expo-router';
 import { useApp } from '@/store/AppContext';
@@ -17,8 +18,10 @@ export default function CreateTripScreen() {
   const [description, setDescription] = useState<string>('');
   const [destination, setDestination] = useState<string>('');
   const [country, setCountry] = useState<string>('');
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+  const [showStartDatePicker, setShowStartDatePicker] = useState<boolean>(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState<boolean>(false);
   const [budget, setBudget] = useState<string>('');
   const [travelers, setTravelers] = useState<string>('1');
   const [notes, setNotes] = useState<string>('');
@@ -28,9 +31,48 @@ export default function CreateTripScreen() {
     router.back();
   };
 
+  const formatDate = (date: Date): string => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const handleStartDateChange = (_event: any, selectedDate?: Date) => {
+    setShowStartDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      setStartDate(selectedDate);
+      if (selectedDate > endDate) {
+        setEndDate(new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000));
+      }
+    }
+  };
+
+  const handleEndDateChange = (_event: any, selectedDate?: Date) => {
+    setShowEndDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      if (selectedDate >= startDate) {
+        setEndDate(selectedDate);
+      } else {
+        Alert.alert('Date invalide', 'La date de fin doit être après la date de début.');
+      }
+    }
+  };
+
   const handleSave = async () => {
-    if (!title || !destination || !country || !startDate || !endDate) {
+    if (!title || !destination || !country) {
       Alert.alert('Champs requis', 'Veuillez remplir tous les champs obligatoires.');
+      return;
+    }
+
+    if (endDate < startDate) {
+      Alert.alert('Dates invalides', 'La date de fin doit être après la date de début.');
+      return;
+    }
+
+    const travelerCount = parseInt(travelers);
+    if (isNaN(travelerCount) || travelerCount < 1) {
+      Alert.alert('Nombre de voyageurs', 'Veuillez entrer un nombre valide de voyageurs.');
       return;
     }
 
@@ -43,8 +85,8 @@ export default function CreateTripScreen() {
         description,
         destination,
         country,
-        startDate,
-        endDate,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
         locations: [],
         budget: {
           total: parseFloat(budget) || 0,
@@ -60,7 +102,7 @@ export default function CreateTripScreen() {
         },
         status: 'planning',
         isPublic: false,
-        travelers: parseInt(travelers) || 1,
+        travelers: travelerCount,
         notes,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -169,30 +211,42 @@ export default function CreateTripScreen() {
           <View style={styles.formRow}>
             <View style={styles.formFieldHalf}>
               <Text style={styles.label}>Date de début *</Text>
-              <View style={styles.inputContainer}>
+              <TouchableOpacity
+                style={styles.dateButton}
+                onPress={() => setShowStartDatePicker(true)}
+              >
                 <Calendar color={theme.colors.textLight} size={20} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="JJ/MM/AAAA"
-                  placeholderTextColor={theme.colors.textLight}
+                <Text style={styles.dateText}>{formatDate(startDate)}</Text>
+              </TouchableOpacity>
+              {showStartDatePicker && (
+                <DateTimePicker
                   value={startDate}
-                  onChangeText={setStartDate}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={handleStartDateChange}
+                  minimumDate={new Date()}
                 />
-              </View>
+              )}
             </View>
 
             <View style={styles.formFieldHalf}>
               <Text style={styles.label}>Date de fin *</Text>
-              <View style={styles.inputContainer}>
+              <TouchableOpacity
+                style={styles.dateButton}
+                onPress={() => setShowEndDatePicker(true)}
+              >
                 <Calendar color={theme.colors.textLight} size={20} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="JJ/MM/AAAA"
-                  placeholderTextColor={theme.colors.textLight}
+                <Text style={styles.dateText}>{formatDate(endDate)}</Text>
+              </TouchableOpacity>
+              {showEndDatePicker && (
+                <DateTimePicker
                   value={endDate}
-                  onChangeText={setEndDate}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={handleEndDateChange}
+                  minimumDate={startDate}
                 />
-              </View>
+              )}
             </View>
           </View>
 
@@ -337,6 +391,22 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   input: {
+    flex: 1,
+    fontSize: theme.fontSize.md,
+    color: theme.colors.text,
+  },
+  dateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.md,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+  },
+  dateText: {
     flex: 1,
     fontSize: theme.fontSize.md,
     color: theme.colors.text,
