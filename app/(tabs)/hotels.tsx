@@ -19,7 +19,7 @@ import {
   Dumbbell,
   Car,
 } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
+import { useTheme } from '@/store/ThemeContext';
 import BookingModal from '@/components/BookingModal';
 
 
@@ -92,6 +92,7 @@ const amenityIcons: Record<string, React.ElementType> = {
 
 export default function HotelsScreen() {
   const insets = useSafeAreaInsets();
+  const { colors, spacing, fontSize, fontWeight, borderRadius } = useTheme();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [bookingModalVisible, setBookingModalVisible] = useState<boolean>(false);
   const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
@@ -118,20 +119,20 @@ export default function HotelsScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[theme.colors.backgroundDark, theme.colors.background]}
+        colors={[colors.backgroundDark, colors.background]}
         style={StyleSheet.absoluteFillObject}
       />
 
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={styles.title}>Hôtels</Text>
-        <Text style={styles.subtitle}>Trouvez votre hébergement idéal</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Hôtels</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Trouvez votre hébergement idéal</Text>
 
-        <View style={styles.searchBar}>
-          <Search color={theme.colors.textLight} size={20} />
+        <View style={[styles.searchBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Search color={colors.textLight} size={20} />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colors.text }]}
             placeholder="Rechercher un hôtel..."
-            placeholderTextColor={theme.colors.textLight}
+            placeholderTextColor={colors.textLight}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -146,12 +147,12 @@ export default function HotelsScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.resultsCount}>{filteredHotels.length} hôtel{filteredHotels.length > 1 ? 's' : ''} trouvé{filteredHotels.length > 1 ? 's' : ''}</Text>
+        <Text style={[styles.resultsCount, { color: colors.text }]}>{filteredHotels.length} hôtel{filteredHotels.length > 1 ? 's' : ''} trouvé{filteredHotels.length > 1 ? 's' : ''}</Text>
 
         {filteredHotels.map((hotel) => (
           <TouchableOpacity
             key={hotel.id}
-            style={styles.hotelCard}
+            style={[styles.hotelCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
             onPress={() => handleHotelPress(hotel)}
           >
             <View style={styles.hotelImageContainer}>
@@ -167,49 +168,49 @@ export default function HotelsScreen() {
 
             <View style={styles.hotelInfo}>
               <View style={styles.hotelHeader}>
-                <Text style={styles.hotelName} numberOfLines={1}>
+                <Text style={[styles.hotelName, { color: colors.text }]} numberOfLines={1}>
                   {hotel.name}
                 </Text>
                 <View style={styles.priceContainer}>
-                  <Text style={styles.priceFrom}>à partir de</Text>
-                  <Text style={styles.price}>€{hotel.price}</Text>
-                  <Text style={styles.priceNight}>/nuit</Text>
+                  <Text style={[styles.priceFrom, { color: colors.textLight }]}>à partir de</Text>
+                  <Text style={[styles.price, { color: colors.primary }]}>€{hotel.price}</Text>
+                  <Text style={[styles.priceNight, { color: colors.textLight }]}>/nuit</Text>
                 </View>
               </View>
 
               <View style={styles.locationContainer}>
-                <MapPin color={theme.colors.textSecondary} size={14} />
-                <Text style={styles.location}>{hotel.location}</Text>
+                <MapPin color={colors.textSecondary} size={14} />
+                <Text style={[styles.location, { color: colors.textSecondary }]}>{hotel.location}</Text>
               </View>
 
               <View style={styles.ratingContainer}>
-                <View style={styles.ratingBadge}>
+                <View style={[styles.ratingBadge, { backgroundColor: `${colors.warning}20` }]}>
                   <Star
-                    color={theme.colors.warning}
+                    color={colors.warning}
                     size={14}
-                    fill={theme.colors.warning}
+                    fill={colors.warning}
                   />
-                  <Text style={styles.ratingText}>{hotel.rating}</Text>
+                  <Text style={[styles.ratingText, { color: colors.text }]}>{hotel.rating}</Text>
                 </View>
-                <Text style={styles.reviewsText}>({hotel.reviews} avis)</Text>
+                <Text style={[styles.reviewsText, { color: colors.textSecondary }]}>({hotel.reviews} avis)</Text>
               </View>
 
               <View style={styles.amenitiesContainer}>
                 {hotel.amenities.slice(0, 4).map((amenity, index) => {
                   const Icon = amenityIcons[amenity];
                   return Icon ? (
-                    <View key={index} style={styles.amenityIcon}>
-                      <Icon color={theme.colors.textLight} size={16} />
+                    <View key={index} style={[styles.amenityIcon, { backgroundColor: colors.backgroundLight }]}>
+                      <Icon color={colors.textLight} size={16} />
                     </View>
                   ) : null;
                 })}
               </View>
 
               <TouchableOpacity
-                style={styles.bookButton}
+                style={[styles.bookButton, { backgroundColor: colors.primary }]}
                 onPress={() => handleHotelPress(hotel)}
               >
-                <Text style={styles.bookButtonText}>Réserver maintenant</Text>
+                <Text style={[styles.bookButtonText, { color: colors.white }]}>Réserver maintenant</Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
@@ -237,57 +238,49 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.md,
+    paddingHorizontal: 24,
+    paddingBottom: 16,
   },
   title: {
-    fontSize: theme.fontSize.hero,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.text,
+    fontSize: 32,
+    fontWeight: '700' as '700',
     letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
-    marginTop: theme.spacing.xs,
-    marginBottom: theme.spacing.lg,
+    fontSize: 16,
+    marginTop: 4,
+    marginBottom: 24,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.lg,
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginBottom: theme.spacing.lg,
+    marginBottom: 24,
   },
   searchInput: {
     flex: 1,
-    fontSize: theme.fontSize.md,
-    color: theme.colors.text,
+    fontSize: 16,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: theme.spacing.lg,
+    padding: 24,
   },
   resultsCount: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.semibold as '600',
-    color: theme.colors.text,
-    marginBottom: theme.spacing.md,
+    fontSize: 16,
+    fontWeight: '600' as '600',
+    marginBottom: 16,
   },
   hotelCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.xl,
-    marginBottom: theme.spacing.md,
+    borderRadius: 20,
+    marginBottom: 16,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   hotelImageContainer: {
     height: 200,
@@ -299,107 +292,96 @@ const styles = StyleSheet.create({
   },
   hotelBadge: {
     position: 'absolute' as const,
-    top: theme.spacing.md,
-    left: theme.spacing.md,
+    top: 16,
+    left: 16,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingHorizontal: theme.spacing.sm,
+    paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: theme.borderRadius.sm,
+    borderRadius: 8,
   },
   hotelType: {
-    fontSize: theme.fontSize.xs,
-    fontWeight: theme.fontWeight.semibold as '600',
-    color: theme.colors.white,
+    fontSize: 12,
+    fontWeight: '600' as '600',
+    color: '#fff',
   },
   hotelInfo: {
-    padding: theme.spacing.md,
+    padding: 16,
   },
   hotelHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: theme.spacing.sm,
+    marginBottom: 12,
   },
   hotelName: {
     flex: 1,
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.text,
-    marginRight: theme.spacing.sm,
+    fontSize: 18,
+    fontWeight: '700' as '700',
+    marginRight: 12,
   },
   priceContainer: {
     alignItems: 'flex-end',
   },
   priceFrom: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.textLight,
+    fontSize: 12,
   },
   price: {
-    fontSize: theme.fontSize.xl,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.primary,
+    fontSize: 20,
+    fontWeight: '700' as '700',
   },
   priceNight: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.textLight,
+    fontSize: 12,
   },
   locationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    marginBottom: theme.spacing.sm,
+    marginBottom: 12,
   },
   location: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    fontSize: 14,
   },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.md,
+    gap: 12,
+    marginBottom: 16,
   },
   ratingBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: `${theme.colors.warning}20`,
-    paddingHorizontal: theme.spacing.sm,
+    paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: theme.borderRadius.sm,
+    borderRadius: 8,
   },
   ratingText: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.text,
+    fontSize: 14,
+    fontWeight: '700' as '700',
   },
   reviewsText: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    fontSize: 14,
   },
   amenitiesContainer: {
     flexDirection: 'row',
-    gap: theme.spacing.sm,
+    gap: 12,
   },
   amenityIcon: {
     width: 32,
     height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.backgroundLight,
-    borderRadius: theme.borderRadius.sm,
+    borderRadius: 8,
   },
   bookButton: {
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.lg,
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.full,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 24,
     alignItems: 'center' as const,
-    marginTop: theme.spacing.md,
+    marginTop: 16,
   },
   bookButtonText: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.white,
+    fontSize: 14,
+    fontWeight: '700' as '700',
   },
 });

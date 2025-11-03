@@ -27,8 +27,8 @@ import {
   Globe,
   Star,
 } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
 import { useApp } from '@/store/AppContext';
+import { useTheme } from '@/store/ThemeContext';
 import DestinationSearch from '@/components/DestinationSearch';
 import type { Destination as DestinationType } from '@/data/destinations';
 
@@ -74,12 +74,7 @@ const trendingDestinations: LocalDestination[] = [
   },
 ];
 
-const quickActions = [
-  { icon: Hotel, label: 'Hôtels', route: '/(tabs)/hotels', color: theme.colors.primary },
-  { icon: MapPin, label: 'Activités', route: '/(tabs)/activities', color: theme.colors.secondary },
-  { icon: Globe, label: 'Restaurants', route: '/(tabs)/restaurants', color: theme.colors.accent },
-  { icon: Plane, label: 'Plus', route: '/(tabs)/more', color: theme.colors.warning },
-];
+
 
 const topTabs = [
   { label: 'Destinations', value: 'destinations' },
@@ -92,9 +87,17 @@ export default function PlannerScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { trips, user } = useApp();
+  const { colors, spacing, fontSize, fontWeight, borderRadius } = useTheme();
   const [searchModalVisible, setSearchModalVisible] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<string>('destinations');
   const [scrollY] = useState<Animated.Value>(new Animated.Value(0));
+
+  const quickActions = [
+    { icon: Hotel, label: 'Hôtels', route: '/(tabs)/hotels', color: colors.primary },
+    { icon: MapPin, label: 'Activités', route: '/(tabs)/activities', color: colors.secondary },
+    { icon: Globe, label: 'Restaurants', route: '/(tabs)/restaurants', color: colors.accent },
+    { icon: Plane, label: 'Plus', route: '/(tabs)/more', color: colors.warning },
+  ];
 
   const headerOpacity = Platform.OS === 'web' ? 0 : scrollY.interpolate({
     inputRange: [0, 100],
@@ -197,7 +200,7 @@ export default function PlannerScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[theme.colors.backgroundDark, theme.colors.background]}
+        colors={[colors.backgroundDark, colors.background]}
         style={StyleSheet.absoluteFillObject}
       />
 
@@ -225,7 +228,7 @@ export default function PlannerScreen() {
           </View>
           <TouchableOpacity testID="btn-notifications" style={styles.notificationButton} onPress={handleNotifyPress} accessible accessibilityRole="button" accessibilityLabel="Notifications">
             <View style={styles.notificationDot} />
-            <Sparkles color={theme.colors.primary} size={24} />
+            <Sparkles color={colors.primary} size={24} />
           </TouchableOpacity>
         </View>
 
@@ -243,7 +246,7 @@ export default function PlannerScreen() {
             end={{ x: 1, y: 1 }}
             style={styles.searchGradient}
           >
-            <Search color={theme.colors.textLight} size={20} />
+            <Search color={colors.textLight} size={20} />
             <Text style={styles.searchPlaceholder}>Où allez-vous ?</Text>
           </LinearGradient>
         </TouchableOpacity>
@@ -311,7 +314,7 @@ export default function PlannerScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleContainer}>
-              <TrendingUp color={theme.colors.primary} size={20} />
+              <TrendingUp color={colors.primary} size={20} />
               <Text style={styles.sectionTitle}>Destinations populaires</Text>
             </View>
             <TouchableOpacity testID="btn-see-all" onPress={handleSeeAllPress} accessible accessibilityRole="button" accessibilityLabel="Voir tout">
@@ -337,7 +340,7 @@ export default function PlannerScreen() {
                     style={styles.destinationGradient}
                   >
                     <View style={styles.destinationBadge}>
-                      <Star color={theme.colors.warning} size={12} fill={theme.colors.warning} />
+                      <Star color={colors.warning} size={12} fill={colors.warning} />
                       <Text style={styles.ratingText}>{destination.rating}</Text>
                     </View>
                   </LinearGradient>
@@ -371,7 +374,7 @@ export default function PlannerScreen() {
                     accessibilityLabel={`Explorer ${destination.name}`}
                   >
                     <Text style={styles.exploreButtonText}>Explorer</Text>
-                    <ArrowRight color={theme.colors.primary} size={16} />
+                    <ArrowRight color={colors.primary} size={16} />
                   </Pressable>
                 </View>
               </View>
@@ -391,19 +394,19 @@ export default function PlannerScreen() {
               accessibilityLabel="Créer un voyage"
             >
               <LinearGradient
-                colors={theme.colors.primaryGradient}
+                colors={colors.primaryGradient as any}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.emptyGradient}
               >
-                <MapPin color={theme.colors.textInverse} size={32} strokeWidth={2} />
+                <MapPin color={colors.textInverse} size={32} strokeWidth={2} />
                 <Text style={styles.emptyTitle}>Commencez votre aventure</Text>
                 <Text style={styles.emptyText}>
                   Créez votre premier voyage et découvrez le monde
                 </Text>
                 <View testID="btn-create-trip" style={styles.createButton}>
                   <Text style={styles.createButtonText}>Créer un voyage</Text>
-                  <ArrowRight color={theme.colors.textInverse} size={18} />
+                  <ArrowRight color={colors.textInverse} size={18} />
                 </View>
               </LinearGradient>
             </TouchableOpacity>
@@ -423,7 +426,7 @@ export default function PlannerScreen() {
             end={{ x: 1, y: 1 }}
             style={styles.inspirationCard}
           >
-            <Sparkles color={theme.colors.secondary} size={32} />
+            <Sparkles color={colors.secondary} size={32} />
             <Text style={styles.inspirationTitle}>Besoin d&apos;inspiration ?</Text>
             <Text style={styles.inspirationText}>
               Découvrez des destinations uniques sélectionnées pour vous
@@ -464,32 +467,29 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   header: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.md,
+    paddingHorizontal: 24,
+    paddingBottom: 16,
     zIndex: 2,
   },
   headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: theme.spacing.lg,
+    marginBottom: 24,
   },
   greeting: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.xs,
+    fontSize: 16,
+    marginBottom: 4,
   },
   title: {
-    fontSize: theme.fontSize.hero,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: 32,
+    fontWeight: '700' as '700',
     letterSpacing: -0.5,
   },
   notificationButton: {
     width: 48,
     height: 48,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.surface,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -501,116 +501,101 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: theme.colors.secondary,
   },
   searchContainer: {
-    marginTop: theme.spacing.md,
+    marginTop: 16,
   },
   searchGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.xl,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
   },
   searchPlaceholder: {
     flex: 1,
-    marginLeft: theme.spacing.sm,
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textLight,
+    marginLeft: 12,
+    fontSize: 16,
   },
   tabsScroll: {
-    paddingTop: theme.spacing.md,
-    gap: theme.spacing.sm,
+    paddingTop: 16,
+    gap: 12,
   },
   tabChip: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.sm,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.full,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
     borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   tabChipActive: {
-    backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
   },
   tabLabel: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
+    fontSize: 14,
+    fontWeight: '600' as '600',
   },
   tabLabelActive: {
-    color: theme.colors.white,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingTop: theme.spacing.md,
+    paddingTop: 16,
   },
   quickActionsContainer: {
-    paddingHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.xl,
+    paddingHorizontal: 24,
+    marginBottom: 32,
   },
   quickActions: {
     flexDirection: 'row',
-    gap: theme.spacing.md,
-    marginTop: theme.spacing.md,
+    gap: 16,
+    marginTop: 16,
   },
   quickActionCard: {
     flex: 1,
   },
   quickActionGradient: {
     alignItems: 'center',
-    paddingVertical: theme.spacing.lg,
-    borderRadius: theme.borderRadius.lg,
-    gap: theme.spacing.sm,
+    paddingVertical: 24,
+    borderRadius: 16,
+    gap: 12,
   },
   quickActionLabel: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
+    fontSize: 14,
+    fontWeight: '600' as '600',
   },
   section: {
-    marginBottom: theme.spacing.xl,
+    marginBottom: 32,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
+    paddingHorizontal: 24,
+    marginBottom: 16,
   },
   sectionTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
+    gap: 12,
   },
   sectionTitle: {
-    fontSize: theme.fontSize.xl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: 20,
+    fontWeight: '700' as '700',
   },
   seeAllText: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.primary,
+    fontSize: 14,
+    fontWeight: '600' as '600',
   },
   destinationsScroll: {
-    paddingHorizontal: theme.spacing.lg,
-    gap: theme.spacing.md,
+    paddingHorizontal: 24,
+    gap: 16,
   },
   destinationCard: {
     width: width * 0.75,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.xl,
+    borderRadius: 20,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   destinationImageContainer: {
     height: 200,
@@ -618,7 +603,6 @@ const styles = StyleSheet.create({
   },
   imagePlaceholder: {
     flex: 1,
-    backgroundColor: theme.colors.backgroundLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -639,161 +623,142 @@ const styles = StyleSheet.create({
     height: 100,
     zIndex: 1,
     justifyContent: 'flex-end',
-    padding: theme.spacing.md,
+    padding: 16,
   },
   destinationBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     backgroundColor: 'rgba(15, 23, 42, 0.8)',
-    paddingHorizontal: theme.spacing.sm,
+    paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: 24,
     alignSelf: 'flex-start',
   },
   ratingText: {
-    fontSize: theme.fontSize.xs,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: 12,
+    fontWeight: '700' as '700',
   },
   destinationInfo: {
-    padding: theme.spacing.md,
+    padding: 16,
   },
   destinationHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: theme.spacing.sm,
+    marginBottom: 12,
   },
   destinationName: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: 18,
+    fontWeight: '700' as '700',
   },
   destinationCountry: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    fontSize: 14,
     marginTop: 2,
   },
   priceContainer: {
     alignItems: 'flex-end',
   },
   priceLabel: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.textLight,
+    fontSize: 12,
   },
   priceValue: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.primary,
+    fontSize: 18,
+    fontWeight: '700' as '700',
   },
   destinationDescription: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    fontSize: 14,
     lineHeight: 20,
-    marginBottom: theme.spacing.md,
+    marginBottom: 16,
   },
   exploreButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: theme.spacing.xs,
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: `${theme.colors.primary}15`,
+    gap: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
   },
   exploreButtonText: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.primary,
+    fontSize: 14,
+    fontWeight: '600' as '600',
   },
   emptyCard: {
-    marginHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.xl,
+    marginHorizontal: 24,
+    borderRadius: 20,
     overflow: 'hidden',
   },
   emptyGradient: {
-    padding: theme.spacing.xxxl,
+    padding: 48,
     alignItems: 'center',
   },
   emptyTitle: {
-    fontSize: theme.fontSize.xxl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textInverse,
-    marginTop: theme.spacing.md,
+    fontSize: 24,
+    fontWeight: '700' as '700',
+    marginTop: 16,
     textAlign: 'center',
   },
   emptyText: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textInverse,
+    fontSize: 16,
     textAlign: 'center',
-    marginTop: theme.spacing.sm,
+    marginTop: 12,
     opacity: 0.9,
   },
   createButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    marginTop: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.full,
+    gap: 12,
+    marginTop: 24,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 24,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   createButtonText: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textInverse,
+    fontSize: 16,
+    fontWeight: '700' as '700',
   },
   tripCard: {
-    marginHorizontal: theme.spacing.lg,
-    padding: theme.spacing.lg,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.lg,
+    marginHorizontal: 24,
+    padding: 24,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   tripTitle: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: 18,
+    fontWeight: '700' as '700',
   },
   inspirationSection: {
-    paddingHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.xl,
+    paddingHorizontal: 24,
+    marginBottom: 32,
   },
   inspirationCard: {
-    padding: theme.spacing.xl,
-    borderRadius: theme.borderRadius.xl,
+    padding: 32,
+    borderRadius: 20,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   inspirationTitle: {
-    fontSize: theme.fontSize.xxl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
-    marginTop: theme.spacing.md,
+    fontSize: 24,
+    fontWeight: '700' as '700',
+    marginTop: 16,
     textAlign: 'center',
   },
   inspirationText: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
+    fontSize: 16,
     textAlign: 'center',
-    marginTop: theme.spacing.sm,
+    marginTop: 12,
     lineHeight: 22,
   },
   inspirationButton: {
-    marginTop: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.xl,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.primary,
+    marginTop: 24,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 24,
   },
   inspirationButtonText: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textInverse,
+    fontSize: 16,
+    fontWeight: '700' as '700',
   },
 });
