@@ -413,11 +413,22 @@ export default function PlannerScreen() {
               </LinearGradient>
             </TouchableOpacity>
           ) : (
-            trips.map((trip) => (
-              <View key={trip.id} style={[styles.tripCard, { borderColor: colors.gold + '33', backgroundColor: colors.surface }]}>
-                <Text style={[styles.tripTitle, { color: colors.text }]>{trip.title}</Text>
-              </View>
-            ))
+            {trips.map((trip) => (
+  <View
+    key={trip.id}
+    style={[
+      styles.tripCard,
+      {
+        borderColor: `${colors.gold}33`, // Template literal instead of +
+        backgroundColor: colors.surface,
+      },
+    ]}
+  >
+    <Text style={[styles.tripTitle, { color: colors.text }]}>
+      {trip.title}
+    </Text>
+  </View>
+))}
           )}
         </View>
 
