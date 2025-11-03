@@ -8,6 +8,8 @@ import {
   TextInput,
   Image,
   Alert,
+  ViewStyle,
+  TextStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,16 +18,14 @@ import {
   MapPin,
   Star,
   Clock,
-  DollarSign,
   UtensilsCrossed,
   Pizza,
   Coffee,
   Soup,
-  IceCream,
   Beef,
   Salad,
 } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
+import { useTheme } from '@/store/ThemeContext';
 
 interface Restaurant {
   id: string;
@@ -103,32 +103,282 @@ const restaurants: Restaurant[] = [
   },
 ];
 
-const cuisineTypes = [
-  { icon: UtensilsCrossed, label: 'Tous', color: theme.colors.primary },
-  { icon: Pizza, label: 'Italien', color: '#ef4444' },
-  { icon: Coffee, label: 'Café', color: '#8b5cf6' },
-  { icon: Soup, label: 'Asiatique', color: '#f59e0b' },
-  { icon: Beef, label: 'Viande', color: '#dc2626' },
-  { icon: Salad, label: 'Végétarien', color: '#10b981' },
-];
-
 export default function RestaurantsScreen() {
   const insets = useSafeAreaInsets();
+  const { colors, spacing, fontSize, fontWeight, borderRadius } = useTheme();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCuisine, setSelectedCuisine] = useState<string>('Tous');
 
+  const cuisineTypes = useMemo(() => ([
+    { icon: UtensilsCrossed, label: 'Tous', color: colors.primary },
+    { icon: Pizza, label: 'Italien', color: '#ef4444' },
+    { icon: Coffee, label: 'Café', color: '#8b5cf6' },
+    { icon: Soup, label: 'Asiatique', color: '#f59e0b' },
+    { icon: Beef, label: 'Viande', color: '#dc2626' },
+    { icon: Salad, label: 'Végétarien', color: '#10b981' },
+  ]), [colors.primary]);
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    header: {
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.md,
+    },
+    title: {
+      fontSize: fontSize.hero,
+      fontWeight: fontWeight.bold,
+      color: colors.text,
+      letterSpacing: -0.5,
+    },
+    subtitle: {
+      fontSize: fontSize.md,
+      color: colors.textSecondary,
+      marginTop: spacing.xs,
+      marginBottom: spacing.lg,
+    },
+    searchBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      backgroundColor: colors.surface,
+      borderRadius: borderRadius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    searchInput: {
+      flex: 1,
+      fontSize: fontSize.md,
+      color: colors.text,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingTop: spacing.md,
+    },
+    cuisinesSection: {
+      marginBottom: spacing.xl,
+    },
+    sectionTitle: {
+      fontSize: fontSize.xl,
+      fontWeight: fontWeight.bold,
+      color: colors.text,
+      paddingHorizontal: spacing.lg,
+      marginBottom: spacing.md,
+    },
+    cuisinesScroll: {
+      paddingHorizontal: spacing.lg,
+      gap: spacing.md,
+    },
+    cuisineCard: {
+      borderRadius: borderRadius.lg,
+      overflow: 'hidden',
+    },
+    cuisineCardActive: {
+      transform: [{ scale: 1.05 }],
+    },
+    cuisineGradient: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.lg,
+      gap: spacing.xs,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    cuisineLabel: {
+      fontSize: fontSize.sm,
+      fontWeight: fontWeight.semibold,
+      color: colors.text,
+    },
+    cuisineLabelActive: {
+      color: colors.white,
+    },
+    restaurantsSection: {
+      paddingHorizontal: spacing.lg,
+    },
+    restaurantsHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    resultsCount: {
+      fontSize: fontSize.sm,
+      color: colors.textSecondary,
+    },
+    restaurantCard: {
+      backgroundColor: colors.surface,
+      borderRadius: borderRadius.xl,
+      marginBottom: spacing.md,
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    restaurantImageContainer: {
+      height: 180,
+      position: 'relative' as const,
+    },
+    restaurantImage: {
+      width: '100%',
+      height: '100%',
+    },
+    cuisineBadge: {
+      position: 'absolute' as const,
+      top: spacing.md,
+      right: spacing.md,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      borderRadius: borderRadius.full,
+    },
+    cuisineBadgeText: {
+      fontSize: fontSize.xs,
+      fontWeight: fontWeight.semibold,
+      color: colors.white,
+    },
+    restaurantInfo: {
+      padding: spacing.md,
+    },
+    restaurantHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.xs,
+    },
+    restaurantName: {
+      flex: 1,
+      fontSize: fontSize.lg,
+      fontWeight: fontWeight.bold,
+      color: colors.text,
+      marginRight: spacing.sm,
+    },
+    priceContainer: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      backgroundColor: colors.backgroundLight,
+      borderRadius: borderRadius.sm,
+    },
+    priceRange: {
+      fontSize: fontSize.sm,
+      fontWeight: fontWeight.bold,
+      color: colors.primary,
+    },
+    locationContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      marginBottom: spacing.sm,
+    },
+    location: {
+      fontSize: fontSize.sm,
+      color: colors.textSecondary,
+    },
+    metaRow: {
+      flexDirection: 'row',
+      gap: spacing.lg,
+      marginBottom: spacing.md,
+    },
+    ratingContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    ratingText: {
+      fontSize: fontSize.sm,
+      fontWeight: fontWeight.bold,
+      color: colors.text,
+    },
+    reviewsText: {
+      fontSize: fontSize.sm,
+      color: colors.textSecondary,
+    },
+    metaItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    metaText: {
+      fontSize: fontSize.sm,
+      color: colors.textSecondary,
+    },
+    specialtiesContainer: {
+      marginBottom: spacing.md,
+    },
+    specialtiesLabel: {
+      fontSize: fontSize.sm,
+      fontWeight: fontWeight.semibold,
+      color: colors.textLight,
+      marginBottom: spacing.xs,
+    },
+    specialtiesRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.xs,
+    },
+    specialtyChip: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      backgroundColor: `${colors.primary}15`,
+      borderRadius: borderRadius.full,
+    },
+    specialtyText: {
+      fontSize: fontSize.xs,
+      color: colors.text,
+    },
+    reserveButton: {
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.xl,
+      backgroundColor: colors.primary,
+      borderRadius: borderRadius.full,
+      alignItems: 'center',
+    },
+    reserveButtonText: {
+      fontSize: fontSize.sm,
+      fontWeight: fontWeight.bold,
+      color: colors.white,
+    },
+    emptyState: {
+      padding: spacing.xxxl,
+      alignItems: 'center' as const,
+      justifyContent: 'center' as const,
+    },
+    emptyStateText: {
+      fontSize: fontSize.md,
+      color: colors.textSecondary,
+      textAlign: 'center' as const,
+    },
+  }), [colors, spacing, fontSize, fontWeight, borderRadius]);
+
+  const handleRestaurantPress = useCallback((restaurant: Restaurant) => {
+    Alert.alert(
+      restaurant.name,
+      `${restaurant.location}\n\n⭐ ${restaurant.rating} (${restaurant.reviews} avis)\n🍴 ${restaurant.cuisine}\n💰 ${restaurant.priceRange}\n⏰ ${restaurant.openHours}\n\nSpécialités: ${restaurant.specialties.join(', ')}`,
+      [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Réserver' },
+      ]
+    );
+  }, []);
+
+  const handleCuisinePress = useCallback((cuisine: string) => {
+    setSelectedCuisine(cuisine);
+  }, []);
+
   const filteredRestaurants = useMemo(() => {
     let results = restaurants;
-
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      results = results.filter(r => 
+      results = results.filter(r =>
         r.name.toLowerCase().includes(query) ||
         r.location.toLowerCase().includes(query) ||
         r.cuisine.toLowerCase().includes(query)
       );
     }
-
     if (selectedCuisine !== 'Tous') {
       const cuisineMap: Record<string, string[]> = {
         'Italien': ['Italien'],
@@ -137,52 +387,33 @@ export default function RestaurantsScreen() {
         'Végétarien': [],
         'Café': [],
       };
-      
       const allowedCuisines = cuisineMap[selectedCuisine] || [];
       if (allowedCuisines.length > 0) {
         results = results.filter(r => allowedCuisines.includes(r.cuisine));
       }
     }
-
     return results;
   }, [searchQuery, selectedCuisine]);
-
-  const handleRestaurantPress = useCallback((restaurant: Restaurant) => {
-    console.log('[Restaurants] Restaurant pressed:', restaurant.name);
-    Alert.alert(
-      restaurant.name,
-      `${restaurant.location}\n\n⭐ ${restaurant.rating} (${restaurant.reviews} avis)\n🍴 ${restaurant.cuisine}\n💰 ${restaurant.priceRange}\n⏰ ${restaurant.openHours}\n\nSpécialités: ${restaurant.specialties.join(', ')}`,
-      [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Réserver', onPress: () => {
-          Alert.alert('Réservation', `Fonctionnalité de réservation pour ${restaurant.name} à venir.`);
-        }}
-      ]
-    );
-  }, []);
-
-  const handleCuisinePress = useCallback((cuisine: string) => {
-    console.log('[Restaurants] Cuisine pressed:', cuisine);
-    setSelectedCuisine(cuisine);
-  }, []);
 
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[theme.colors.backgroundDark, theme.colors.background]}
+        colors={[colors.backgroundSecondary, colors.background]}
         style={StyleSheet.absoluteFillObject}
       />
 
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}
+        testID="restaurants-header"
+      >
         <Text style={styles.title}>Restaurants</Text>
         <Text style={styles.subtitle}>Découvrez la gastronomie locale</Text>
 
         <View style={styles.searchBar}>
-          <Search color={theme.colors.textLight} size={20} />
+          <Search color={colors.textLight} size={20} />
           <TextInput
             style={styles.searchInput}
             placeholder="Rechercher un restaurant..."
-            placeholderTextColor={theme.colors.textLight}
+            placeholderTextColor={colors.textLight}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -224,7 +455,7 @@ export default function RestaurantsScreen() {
                   <cuisine.icon
                     color={
                       selectedCuisine === cuisine.label
-                        ? theme.colors.white
+                        ? colors.white
                         : cuisine.color
                     }
                     size={24}
@@ -284,23 +515,23 @@ export default function RestaurantsScreen() {
                 </View>
 
                 <View style={styles.locationContainer}>
-                  <MapPin color={theme.colors.textSecondary} size={14} />
+                  <MapPin color={colors.textSecondary} size={14} />
                   <Text style={styles.location}>{restaurant.location}</Text>
                 </View>
 
                 <View style={styles.metaRow}>
                   <View style={styles.ratingContainer}>
                     <Star
-                      color={theme.colors.warning}
+                      color={colors.warning}
                       size={14}
-                      fill={theme.colors.warning}
+                      fill={colors.warning}
                     />
                     <Text style={styles.ratingText}>{restaurant.rating}</Text>
                     <Text style={styles.reviewsText}>({restaurant.reviews})</Text>
                   </View>
 
                   <View style={styles.metaItem}>
-                    <Clock color={theme.colors.textLight} size={14} />
+                    <Clock color={colors.textLight} size={14} />
                     <Text style={styles.metaText}>{restaurant.openHours}</Text>
                   </View>
                 </View>
@@ -331,239 +562,3 @@ export default function RestaurantsScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.md,
-  },
-  title: {
-    fontSize: theme.fontSize.hero,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.text,
-    letterSpacing: -0.5,
-  },
-  subtitle: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
-    marginTop: theme.spacing.xs,
-    marginBottom: theme.spacing.lg,
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: theme.fontSize.md,
-    color: theme.colors.text,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingTop: theme.spacing.md,
-  },
-  cuisinesSection: {
-    marginBottom: theme.spacing.xl,
-  },
-  sectionTitle: {
-    fontSize: theme.fontSize.xl,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.text,
-    paddingHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
-  },
-  cuisinesScroll: {
-    paddingHorizontal: theme.spacing.lg,
-    gap: theme.spacing.md,
-  },
-  cuisineCard: {
-    borderRadius: theme.borderRadius.lg,
-    overflow: 'hidden',
-  },
-  cuisineCardActive: {
-    transform: [{ scale: 1.05 }],
-  },
-  cuisineGradient: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
-    gap: theme.spacing.xs,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  cuisineLabel: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.semibold as '600',
-    color: theme.colors.text,
-  },
-  cuisineLabelActive: {
-    color: theme.colors.white,
-  },
-  restaurantsSection: {
-    paddingHorizontal: theme.spacing.lg,
-  },
-  restaurantsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.md,
-  },
-  resultsCount: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
-  },
-  restaurantCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.xl,
-    marginBottom: theme.spacing.md,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  restaurantImageContainer: {
-    height: 180,
-    position: 'relative' as const,
-  },
-  restaurantImage: {
-    width: '100%',
-    height: '100%',
-  },
-  cuisineBadge: {
-    position: 'absolute' as const,
-    top: theme.spacing.md,
-    right: theme.spacing.md,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 4,
-    borderRadius: theme.borderRadius.full,
-  },
-  cuisineBadgeText: {
-    fontSize: theme.fontSize.xs,
-    fontWeight: theme.fontWeight.semibold as '600',
-    color: theme.colors.white,
-  },
-  restaurantInfo: {
-    padding: theme.spacing.md,
-  },
-  restaurantHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.xs,
-  },
-  restaurantName: {
-    flex: 1,
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.text,
-    marginRight: theme.spacing.sm,
-  },
-  priceContainer: {
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 4,
-    backgroundColor: theme.colors.backgroundLight,
-    borderRadius: theme.borderRadius.sm,
-  },
-  priceRange: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.primary,
-  },
-  locationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginBottom: theme.spacing.sm,
-  },
-  location: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    gap: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  ratingText: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.text,
-  },
-  reviewsText: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
-  },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  metaText: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
-  },
-  specialtiesContainer: {
-    marginBottom: theme.spacing.md,
-  },
-  specialtiesLabel: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.semibold as '600',
-    color: theme.colors.textLight,
-    marginBottom: theme.spacing.xs,
-  },
-  specialtiesRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: theme.spacing.xs,
-  },
-  specialtyChip: {
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 4,
-    backgroundColor: `${theme.colors.primary}15`,
-    borderRadius: theme.borderRadius.full,
-  },
-  specialtyText: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.text,
-  },
-  reserveButton: {
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.xl,
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.full,
-    alignItems: 'center',
-  },
-  reserveButtonText: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.bold as '700',
-    color: theme.colors.white,
-  },
-  emptyState: {
-    padding: theme.spacing.xxxl,
-    alignItems: 'center' as const,
-    justifyContent: 'center' as const,
-  },
-  emptyStateText: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
-    textAlign: 'center' as const,
-  },
-});

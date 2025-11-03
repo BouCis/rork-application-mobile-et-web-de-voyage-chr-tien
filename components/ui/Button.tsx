@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
-import { theme } from '@/constants/theme';
+import { useTheme } from '@/store/ThemeContext';
 
 interface ButtonProps {
   title: string;
@@ -25,18 +25,88 @@ export function Button({
   textStyle,
   testID,
 }: ButtonProps) {
-  const buttonStyles = [
+  const { colors, spacing, borderRadius, fontSize, fontWeight, shadows } = useTheme();
+
+  const styles = useMemo(() => StyleSheet.create({
+    button: {
+      borderRadius: borderRadius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row',
+    },
+    primary: {
+      backgroundColor: colors.primary,
+      ...shadows.md,
+    },
+    secondary: {
+      backgroundColor: colors.accent,
+      ...shadows.md,
+    },
+    outline: {
+      backgroundColor: 'transparent',
+      borderWidth: 2,
+      borderColor: colors.primary,
+    },
+    ghost: {
+      backgroundColor: 'transparent',
+    },
+    small: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+    },
+    medium: {
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+    },
+    large: {
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.lg,
+    },
+    disabled: {
+      opacity: 0.5,
+    },
+    text: {
+      fontWeight: fontWeight.semibold,
+    },
+    primaryText: {
+      color: colors.textInverse,
+      fontSize: fontSize.md,
+    },
+    secondaryText: {
+      color: colors.text,
+      fontSize: fontSize.md,
+    },
+    outlineText: {
+      color: colors.primary,
+      fontSize: fontSize.md,
+    },
+    ghostText: {
+      color: colors.primary,
+      fontSize: fontSize.md,
+    },
+    smallText: {
+      fontSize: fontSize.sm,
+    },
+    mediumText: {
+      fontSize: fontSize.md,
+    },
+    largeText: {
+      fontSize: fontSize.lg,
+    },
+  }), [colors, spacing, borderRadius, fontSize, fontWeight, shadows]);
+
+  const buttonStyles: (ViewStyle | false | undefined)[] = [
     styles.button,
-    styles[variant],
-    styles[size],
+    styles[variant as 'primary' | 'secondary' | 'outline' | 'ghost'],
+    styles[size as 'small' | 'medium' | 'large'],
     disabled && styles.disabled,
     style,
   ];
 
-  const textStyles = [
+  const textStyles: (TextStyle | false | undefined)[] = [
     styles.text,
-    styles[`${variant}Text` as keyof typeof styles],
-    styles[`${size}Text` as keyof typeof styles],
+    styles[`${variant}Text` as 'primaryText' | 'secondaryText' | 'outlineText' | 'ghostText'],
+    styles[`${size}Text` as 'smallText' | 'mediumText' | 'largeText'],
     textStyle,
   ];
 
@@ -49,78 +119,10 @@ export function Button({
       accessibilityRole="button"
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? theme.colors.textInverse : theme.colors.primary} />
+        <ActivityIndicator color={variant === 'primary' ? colors.textInverse : colors.primary} />
       ) : (
         <Text style={textStyles}>{title}</Text>
       )}
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    borderRadius: theme.borderRadius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  primary: {
-    backgroundColor: theme.colors.primary,
-    ...theme.shadows.md,
-  },
-  secondary: {
-    backgroundColor: theme.colors.accent,
-    ...theme.shadows.md,
-  },
-  outline: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: theme.colors.primary,
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-  },
-  small: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-  },
-  medium: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
-  },
-  large: {
-    paddingHorizontal: theme.spacing.xl,
-    paddingVertical: theme.spacing.lg,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  text: {
-    fontWeight: theme.fontWeight.semibold,
-  },
-  primaryText: {
-    color: theme.colors.textInverse,
-    fontSize: theme.fontSize.md,
-  },
-  secondaryText: {
-    color: theme.colors.text,
-    fontSize: theme.fontSize.md,
-  },
-  outlineText: {
-    color: theme.colors.primary,
-    fontSize: theme.fontSize.md,
-  },
-  ghostText: {
-    color: theme.colors.primary,
-    fontSize: theme.fontSize.md,
-  },
-  smallText: {
-    fontSize: theme.fontSize.sm,
-  },
-  mediumText: {
-    fontSize: theme.fontSize.md,
-  },
-  largeText: {
-    fontSize: theme.fontSize.lg,
-  },
-});
