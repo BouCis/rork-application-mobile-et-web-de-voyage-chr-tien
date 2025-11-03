@@ -25,8 +25,8 @@ import {
   Music,
   Sparkles,
 } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
 import { useApp } from '@/store/AppContext';
+import { useTheme } from '@/store/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
@@ -41,6 +41,7 @@ interface MenuItem {
 export default function MoreScreen() {
   const insets = useSafeAreaInsets();
   const { user } = useApp();
+  const { colors, spacing, borderRadius, fontSize, fontWeight } = useTheme();
 
   const handleFlightsPress = useCallback(() => {
     console.log('[More] Flights pressed');
@@ -178,10 +179,67 @@ export default function MoreScreen() {
     },
   ];
 
+  const dynamicStyles = StyleSheet.create({
+    title: {
+      color: colors.text,
+    },
+    subtitle: {
+      color: colors.textSecondary,
+    },
+    sparkleContainer: {
+      backgroundColor: `${colors.primary}15`,
+    },
+    sectionTitle: {
+      color: colors.textSecondary,
+    },
+    sectionTitleLarge: {
+      color: colors.text,
+    },
+    compactGrid: {
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+    },
+    compactCard: {
+      borderBottomColor: colors.border,
+    },
+    compactLabel: {
+      color: colors.text,
+    },
+    compactDescription: {
+      color: colors.textSecondary,
+    },
+    listContainer: {
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+    },
+    listItem: {
+      borderBottomColor: colors.border,
+    },
+    listIcon: {
+      backgroundColor: `${colors.text}08`,
+    },
+    listItemText: {
+      color: colors.text,
+    },
+    logoutButton: {
+      backgroundColor: `${colors.error}10`,
+      borderColor: `${colors.error}30`,
+    },
+    logoutText: {
+      color: colors.error,
+    },
+    version: {
+      color: colors.textSecondary,
+    },
+    copyright: {
+      color: colors.textSecondary,
+    },
+  });
+
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[theme.colors.backgroundDark, theme.colors.background]}
+        colors={[colors.backgroundSecondary, colors.background]}
         style={StyleSheet.absoluteFillObject}
       />
 
@@ -195,18 +253,18 @@ export default function MoreScreen() {
       >
         <View style={styles.headerContainer}>
           <View style={styles.titleRow}>
-            <Text style={styles.title}>Plus</Text>
-            <View style={styles.sparkleContainer}>
-              <Sparkles color={theme.colors.primary} size={24} />
+            <Text style={[styles.title, dynamicStyles.title]}>Plus</Text>
+            <View style={[styles.sparkleContainer, dynamicStyles.sparkleContainer]}>
+              <Sparkles color={colors.primary} size={24} />
             </View>
           </View>
-          <Text style={styles.subtitle}>Explorez tous nos services</Text>
+          <Text style={[styles.subtitle, dynamicStyles.subtitle]}>Explorez tous nos services</Text>
         </View>
 
         <View style={styles.featuredSection}>
           <View style={styles.sectionHeader}>
             <Heart color="#FF6B9D" size={20} />
-            <Text style={styles.sectionTitleLarge}>Spiritualité</Text>
+            <Text style={[styles.sectionTitleLarge, dynamicStyles.sectionTitleLarge]}>Spiritualité</Text>
           </View>
           <ScrollView 
             horizontal
@@ -240,14 +298,14 @@ export default function MoreScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Plane color={theme.colors.primary} size={18} />
-            <Text style={styles.sectionTitle}>Services Voyage</Text>
+            <Plane color={colors.primary} size={18} />
+            <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Services Voyage</Text>
           </View>
-          <View style={styles.compactGrid}>
+          <View style={[styles.compactGrid, dynamicStyles.compactGrid]}>
             {travelServices.map((item, index) => (
               <TouchableOpacity
                 key={index}
-                style={styles.compactCard}
+                style={[styles.compactCard, dynamicStyles.compactCard]}
                 onPress={item.onPress}
                 activeOpacity={0.8}
               >
@@ -255,35 +313,36 @@ export default function MoreScreen() {
                   <item.icon color={item.color} size={22} />
                 </View>
                 <View style={styles.compactContent}>
-                  <Text style={styles.compactLabel}>{item.label}</Text>
-                  <Text style={styles.compactDescription}>{item.description}</Text>
+                  <Text style={[styles.compactLabel, dynamicStyles.compactLabel]}>{item.label}</Text>
+                  <Text style={[styles.compactDescription, dynamicStyles.compactDescription]}>{item.description}</Text>
                 </View>
-                <ChevronRight color={theme.colors.textLight} size={18} />
+                <ChevronRight color={colors.textSecondary} size={18} />
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Général</Text>
-          <View style={styles.listContainer}>
+          <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Général</Text>
+          <View style={[styles.listContainer, dynamicStyles.listContainer]}>
             {settingsItems.map((item, index) => (
               <TouchableOpacity
                 key={index}
                 style={[
                   styles.listItem,
+                  dynamicStyles.listItem,
                   index === settingsItems.length - 1 && styles.listItemLast,
                 ]}
                 onPress={item.onPress}
                 activeOpacity={0.7}
               >
                 <View style={styles.listItemLeft}>
-                  <View style={styles.listIcon}>
-                    <item.icon color={theme.colors.text} size={20} />
+                  <View style={[styles.listIcon, dynamicStyles.listIcon]}>
+                    <item.icon color={colors.text} size={20} />
                   </View>
-                  <Text style={styles.listItemText}>{item.label}</Text>
+                  <Text style={[styles.listItemText, dynamicStyles.listItemText]}>{item.label}</Text>
                 </View>
-                <ChevronRight color={theme.colors.textLight} size={18} />
+                <ChevronRight color={colors.textSecondary} size={18} />
               </TouchableOpacity>
             ))}
           </View>
@@ -291,20 +350,20 @@ export default function MoreScreen() {
 
         {user && (
           <TouchableOpacity 
-            style={styles.logoutButton}
+            style={[styles.logoutButton, dynamicStyles.logoutButton]}
             onPress={handleLogoutPress}
             activeOpacity={0.8}
           >
             <View style={styles.logoutContent}>
-              <LogOut color={theme.colors.error} size={20} />
-              <Text style={styles.logoutText}>Déconnexion</Text>
+              <LogOut color={colors.error} size={20} />
+              <Text style={[styles.logoutText, dynamicStyles.logoutText]}>Déconnexion</Text>
             </View>
           </TouchableOpacity>
         )}
 
         <View style={styles.footer}>
-          <Text style={styles.version}>Version 1.0.0</Text>
-          <Text style={styles.copyright}>© 2025 VoyageApp</Text>
+          <Text style={[styles.version, dynamicStyles.version]}>Version 1.0.0</Text>
+          <Text style={[styles.copyright, dynamicStyles.copyright]}>© 2025 VoyageApp</Text>
         </View>
       </ScrollView>
     </View>
@@ -319,10 +378,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: theme.spacing.lg,
+    paddingHorizontal: 24,
   },
   headerContainer: {
-    marginBottom: theme.spacing.xl,
+    marginBottom: 32,
   },
   titleRow: {
     flexDirection: 'row',
@@ -332,20 +391,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 40,
     fontWeight: '800' as const,
-    color: theme.colors.text,
     letterSpacing: -1,
   },
   sparkleContainer: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: `${theme.colors.primary}15`,
     alignItems: 'center',
     justifyContent: 'center',
   },
   subtitle: {
     fontSize: 15,
-    color: theme.colors.textSecondary,
     marginTop: 4,
     fontWeight: '400' as const,
   },
@@ -361,11 +417,10 @@ const styles = StyleSheet.create({
   sectionTitleLarge: {
     fontSize: 22,
     fontWeight: '700' as const,
-    color: theme.colors.text,
   },
   horizontalScrollView: {
-    marginHorizontal: -theme.spacing.lg,
-    paddingHorizontal: theme.spacing.lg,
+    marginHorizontal: -24,
+    paddingHorizontal: 24,
   },
   horizontalScroll: {
     flexDirection: 'row',
@@ -412,17 +467,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 13,
     fontWeight: '700' as const,
-    color: theme.colors.textLight,
     textTransform: 'uppercase' as const,
     letterSpacing: 1.2,
     marginBottom: 12,
   },
   compactGrid: {
-    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   compactCard: {
     flexDirection: 'row',
@@ -430,7 +482,6 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 12,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
   },
   compactIcon: {
     width: 48,
@@ -445,19 +496,15 @@ const styles = StyleSheet.create({
   compactLabel: {
     fontSize: 16,
     fontWeight: '600' as const,
-    color: theme.colors.text,
     marginBottom: 2,
   },
   compactDescription: {
     fontSize: 13,
-    color: theme.colors.textSecondary,
   },
   listContainer: {
-    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   listItem: {
     flexDirection: 'row',
@@ -465,7 +512,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
   },
   listItemLast: {
     borderBottomWidth: 0,
@@ -479,22 +525,18 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: `${theme.colors.text}08`,
     alignItems: 'center',
     justifyContent: 'center',
   },
   listItemText: {
     fontSize: 16,
     fontWeight: '500' as const,
-    color: theme.colors.text,
   },
   logoutButton: {
     marginTop: 12,
     marginBottom: 24,
     borderRadius: 16,
-    backgroundColor: `${theme.colors.error}10`,
     borderWidth: 1.5,
-    borderColor: `${theme.colors.error}30`,
   },
   logoutContent: {
     flexDirection: 'row',
@@ -506,7 +548,6 @@ const styles = StyleSheet.create({
   logoutText: {
     fontSize: 16,
     fontWeight: '600' as const,
-    color: theme.colors.error,
   },
   footer: {
     alignItems: 'center',
@@ -515,12 +556,10 @@ const styles = StyleSheet.create({
   },
   version: {
     fontSize: 13,
-    color: theme.colors.textLight,
     fontWeight: '500' as const,
   },
   copyright: {
     fontSize: 12,
-    color: theme.colors.textLight,
     opacity: 0.6,
   },
 });
