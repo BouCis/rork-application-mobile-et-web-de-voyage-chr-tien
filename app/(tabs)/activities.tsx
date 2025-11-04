@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   TextInput,
   Image,
   Alert,
+  Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -23,8 +25,10 @@ import {
   Landmark,
   Waves,
   Trees,
+  Navigation,
 } from 'lucide-react-native';
 import { useTheme } from '@/store/ThemeContext';
+import * as Location from 'expo-location';
 
 interface Activity {
   id: string;
@@ -37,6 +41,9 @@ interface Activity {
   image: string;
   category: string;
   description: string;
+  latitude?: number;
+  longitude?: number;
+  distance?: number;
 }
 
 const activities: Activity[] = [
@@ -51,6 +58,8 @@ const activities: Activity[] = [
     image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=800',
     category: 'Culture',
     description: 'Découvrez les trésors du plus grand musée du monde',
+    latitude: 48.8606,
+    longitude: 2.3376,
   },
   {
     id: '2',
@@ -63,6 +72,8 @@ const activities: Activity[] = [
     image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
     category: 'Aventure',
     description: 'Explorez les récifs coralliens',
+    latitude: -8.3405,
+    longitude: 115.0920,
   },
   {
     id: '3',
@@ -75,6 +86,8 @@ const activities: Activity[] = [
     image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800',
     category: 'Nature',
     description: 'Observation de la faune sauvage',
+    latitude: -2.3333,
+    longitude: 34.8333,
   },
   {
     id: '4',
@@ -87,6 +100,8 @@ const activities: Activity[] = [
     image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800',
     category: 'Gastronomie',
     description: 'Apprenez à préparer des sushis authentiques',
+    latitude: 35.6762,
+    longitude: 139.6503,
   },
   {
     id: '5',
@@ -99,10 +114,73 @@ const activities: Activity[] = [
     image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
     category: 'Sport',
     description: 'Randonnée guidée avec vues panoramiques',
+    latitude: 46.8182,
+    longitude: 8.2275,
+  },
+  {
+    id: '6',
+    name: 'Tour de la Tour Eiffel',
+    location: 'Paris, France',
+    rating: 4.8,
+    reviews: 8932,
+    price: 35,
+    duration: '2h',
+    image: 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800',
+    category: 'Culture',
+    description: 'Montez au sommet du monument le plus célèbre de Paris',
+    latitude: 48.8584,
+    longitude: 2.2945,
+  },
+  {
+    id: '7',
+    name: 'Balade en bateau-mouche',
+    location: 'Paris, France',
+    rating: 4.5,
+    reviews: 2341,
+    price: 25,
+    duration: '1h30',
+    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800',
+    category: 'Visites',
+    description: 'Découvrez Paris depuis la Seine',
+    latitude: 48.8566,
+    longitude: 2.3522,
+  },
+  {
+    id: '8',
+    name: 'Visite de Montmartre',
+    location: 'Paris, France',
+    rating: 4.7,
+    reviews: 1876,
+    price: 30,
+    duration: '3h',
+    image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=800',
+    category: 'Culture',
+    description: 'Explorez le quartier bohème de Paris',
+    latitude: 48.8867,
+    longitude: 2.3431,
   },
 ];
 
 
+
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
 export default function ActivitiesScreen() {
   const insets = useSafeAreaInsets();
@@ -117,9 +195,83 @@ export default function ActivitiesScreen() {
   ];
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const [locationLoading, setLocationLoading] = useState<boolean>(true);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.log('[Activities] Requesting location permission...');
+    (async () => {
+      try {
+        if (Platform.OS === 'web') {
+          if (!navigator.geolocation) {
+            console.log('[Activities] Geolocation not supported on web');
+            setLocationError('Géolocalisation non supportée');
+            setLocationLoading(false);
+            return;
+          }
+
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              console.log('[Activities] Web location obtained:', position.coords);
+              setUserLocation({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              });
+              setLocationLoading(false);
+            },
+            (error) => {
+              console.log('[Activities] Web location error:', error);
+              setLocationError('Impossible d\'obtenir votre position');
+              setLocationLoading(false);
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+          );
+        } else {
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          console.log('[Activities] Permission status:', status);
+
+          if (status !== 'granted') {
+            console.log('[Activities] Permission denied');
+            setLocationError('Permission de localisation refusée');
+            setLocationLoading(false);
+            return;
+          }
+
+          const location = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+          });
+          console.log('[Activities] Location obtained:', location.coords);
+          setUserLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
+          setLocationLoading(false);
+        }
+      } catch (error) {
+        console.log('[Activities] Location error:', error);
+        setLocationError('Erreur lors de la récupération de votre position');
+        setLocationLoading(false);
+      }
+    })();
+  }, []);
 
   const filteredActivities = useMemo(() => {
-    let results = activities;
+    let results = activities.map(activity => {
+      if (userLocation && activity.latitude && activity.longitude) {
+        const distance = calculateDistance(
+          userLocation.latitude,
+          userLocation.longitude,
+          activity.latitude,
+          activity.longitude
+        );
+        return { ...activity, distance };
+      }
+      return activity;
+    });
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -135,8 +287,12 @@ export default function ActivitiesScreen() {
       results = results.filter(a => a.category === selectedCategory);
     }
 
+    if (userLocation) {
+      results.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
+    }
+
     return results;
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, userLocation]);
 
   const handleActivityPress = useCallback((activity: Activity) => {
     console.log('[Activities] Activity pressed:', activity.name);
@@ -174,7 +330,21 @@ export default function ActivitiesScreen() {
       />
 
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={styles.title}>Activités</Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Activités</Text>
+          {locationLoading && (
+            <ActivityIndicator size="small" color={colors.primary} />
+          )}
+          {!locationLoading && userLocation && (
+            <View style={styles.locationIndicator}>
+              <Navigation color={colors.primary} size={16} />
+              <Text style={styles.locationText}>Autour de vous</Text>
+            </View>
+          )}
+        </View>
+        {locationError && (
+          <Text style={styles.locationError}>{locationError}</Text>
+        )}
         <Text style={styles.subtitle}>Choses à faire</Text>
 
         <View style={styles.searchBar}>
@@ -245,7 +415,9 @@ export default function ActivitiesScreen() {
 
         <View style={styles.activitiesSection}>
           <View style={styles.activitiesHeader}>
-            <Text style={styles.sectionTitle}>Activités populaires</Text>
+            <Text style={styles.sectionTitle}>
+              {userLocation ? 'Activités proches' : 'Activités populaires'}
+            </Text>
             <Text style={styles.resultsCount}>{filteredActivities.length} activité{filteredActivities.length > 1 ? 's' : ''}</Text>
           </View>
 
@@ -281,6 +453,13 @@ export default function ActivitiesScreen() {
                 <View style={styles.locationContainer}>
                   <MapPin color={colors.textSecondary} size={14} />
                   <Text style={styles.location}>{activity.location}</Text>
+                  {activity.distance !== undefined && (
+                    <Text style={styles.distanceText}>
+                      • {activity.distance < 1
+                        ? `${Math.round(activity.distance * 1000)}m`
+                        : `${activity.distance.toFixed(1)}km`}
+                    </Text>
+                  )}
                 </View>
 
                 <Text style={styles.description} numberOfLines={2}>
@@ -334,10 +513,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 16,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   title: {
     fontSize: 32,
     fontWeight: '700' as '700',
     letterSpacing: -0.5,
+  },
+  locationIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  locationText: {
+    fontSize: 12,
+    fontWeight: '600' as '600',
+  },
+  locationError: {
+    fontSize: 12,
+    marginTop: 4,
   },
   subtitle: {
     fontSize: 16,
@@ -453,6 +653,11 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 14,
+    flex: 1,
+  },
+  distanceText: {
+    fontSize: 12,
+    fontWeight: '600' as '600',
   },
   description: {
     fontSize: 14,
