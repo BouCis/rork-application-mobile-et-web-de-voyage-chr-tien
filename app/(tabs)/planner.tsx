@@ -115,10 +115,7 @@ export default function PlannerScreen() {
     );
   }, []);
 
-  const handleSeeAllPress = useCallback(() => {
-    console.log('[Planner] See all destinations pressed');
-    router.push('/search/results');
-  }, [router]);
+
 
   const handleDestinationPress = useCallback((destination: LocalDestination) => {
     console.log('[Planner] Destination pressed', destination);
@@ -375,9 +372,6 @@ export default function PlannerScreen() {
               <TrendingUp color={colors.primary} size={20} />
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Destinations populaires</Text>
             </View>
-            <TouchableOpacity testID="btn-see-all" onPress={handleSeeAllPress} accessible accessibilityRole="button" accessibilityLabel="Voir tout">
-              <Text style={[styles.seeAllText, { color: colors.primary }]}>Voir tout</Text>
-            </TouchableOpacity>
           </View>
 
           <ScrollView
