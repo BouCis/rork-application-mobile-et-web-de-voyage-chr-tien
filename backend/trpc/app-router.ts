@@ -9,6 +9,9 @@ import { getTripsByUserProcedure, getTripByIdProcedure } from "./routes/trips/ge
 import { updateTripProcedure } from "./routes/trips/update";
 import { deleteTripProcedure } from "./routes/trips/delete";
 import { getAllActivitiesProcedure, getActivityByIdProcedure } from "./routes/activities/get";
+import { planTripProcedure } from "./routes/trips/plan";
+import { fetchVisaInfoProcedure } from "./routes/trips/visa-info";
+import { fetchHealthInfoProcedure } from "./routes/trips/health-info";
 import { createActivityProcedure } from "./routes/activities/create";
 import { createBookingProcedure } from "./routes/activities/bookings/create";
 import { getUserBookingsProcedure } from "./routes/activities/bookings/get";
@@ -31,6 +34,9 @@ export const appRouter = createTRPCRouter({
     getById: getTripByIdProcedure,
     update: updateTripProcedure,
     delete: deleteTripProcedure,
+    plan: planTripProcedure,
+    visaInfo: fetchVisaInfoProcedure,
+    healthInfo: fetchHealthInfoProcedure,
   }),
   activities: createTRPCRouter({
     getAll: getAllActivitiesProcedure,

@@ -210,7 +210,7 @@ export default function HotelsScreen() {
                 style={[styles.bookButton, { backgroundColor: colors.primary }]}
                 onPress={() => handleHotelPress(hotel)}
               >
-                <Text style={[styles.bookButtonText, { color: colors.white }]}>Réserver maintenant</Text>
+                <Text style={[styles.bookButtonText, { color: colors.white }]}>Détails</Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>

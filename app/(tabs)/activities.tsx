@@ -182,7 +182,7 @@ export default function ActivitiesScreen() {
       `${activity.location}\n\n${activity.description}\n\n⭐ ${activity.rating} (${activity.reviews} avis)\n⏱️ ${activity.duration}\n🎫 ${activity.category}`,
       [
         { text: 'Annuler', style: 'cancel' },
-        { text: 'Réserver - €${activity.price}', onPress: () => {
+        { text: 'Détails', onPress: () => {
           Alert.alert(
             'Réservation',
             `Confirmer la réservation pour ${activity.name} ?\n\nPrix: €${activity.price} par personne\nDurée: ${activity.duration}`,
@@ -384,7 +384,7 @@ export default function ActivitiesScreen() {
                     style={styles.bookButton}
                     onPress={() => handleActivityPress(activity)}
                   >
-                    <Text style={styles.bookButtonText}>Réserver</Text>
+                    <Text style={styles.bookButtonText}>Détails</Text>
                   </TouchableOpacity>
                 </View>
               </View>

@@ -8,16 +8,19 @@ import { theme } from '@/constants/theme';
 import { useRouter } from 'expo-router';
 import { useApp } from '@/store/AppContext';
 import type { Trip } from '@/types';
+import CountryCityPicker from '@/components/CountryCityPicker';
+import { trpcClient } from '@/lib/trpc';
 
 export default function CreateTripScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { addTrip } = useApp();
+  const { addTrip, user, updateTrip, addChecklistItem, addExpense } = useApp();
   
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [destination, setDestination] = useState<string>('');
   const [country, setCountry] = useState<string>('');
+  const [countryIso2, setCountryIso2] = useState<string>('FR');
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
   const [showStartDatePicker, setShowStartDatePicker] = useState<boolean>(false);
@@ -109,7 +112,58 @@ export default function CreateTripScreen() {
       };
 
       await addTrip(newTrip);
-      Alert.alert('Succès', 'Voyage créé avec succès !', [
+
+      try {
+        const plan = await trpcClient.trips.plan.mutate({
+          tripId: newTrip.id,
+          userId: user?.id ?? 'anonymous',
+          originCountry: '',
+          originCity: '',
+          destinationCountry: country,
+          destinationCity: destination,
+          startDate: newTrip.startDate,
+          endDate: newTrip.endDate,
+          currency: newTrip.budget.currency,
+        });
+
+        if (plan?.locations?.length) {
+          await updateTrip(newTrip.id, { locations: plan.locations.map((l: any) => ({ id: l.id, name: l.name, latitude: l.latitude, longitude: l.longitude, address: l.address, country: l.country, city: l.city, type: l.type })) });
+        }
+        if (plan?.checklists?.length) {
+          for (const chk of plan.checklists) {
+            await addChecklistItem({
+              id: chk.id,
+              tripId: chk.tripId,
+              title: chk.title,
+              description: chk.description ?? undefined,
+              category: chk.category,
+              completed: chk.completed,
+              dueDate: chk.dueDate ?? undefined,
+              priority: chk.priority,
+              reminder: chk.reminder ?? undefined,
+            });
+          }
+        }
+        if (plan?.expenses?.length) {
+          for (const exp of plan.expenses) {
+            await addExpense({
+              id: exp.id,
+              tripId: exp.tripId,
+              title: exp.title,
+              amount: exp.amount,
+              currency: exp.currency,
+              category: exp.category,
+              date: exp.date,
+              notes: exp.notes ?? undefined,
+              receipt: undefined,
+            });
+          }
+        }
+      } catch (e) {
+        console.log('[CreateTrip] plan error (simulé si offline)', e);
+      }
+
+      Alert.alert('Succès', 'Voyage créé avec itinéraire simulé ✔️', [
         { text: 'OK', onPress: () => router.back() }
       ]);
     } catch (error) {
@@ -180,32 +234,22 @@ export default function CreateTripScreen() {
             </View>
           </View>
 
-          <View style={styles.formRow}>
-            <View style={styles.formFieldHalf}>
-              <Text style={styles.label}>Destination *</Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Ville"
-                  placeholderTextColor={theme.colors.textLight}
-                  value={destination}
-                  onChangeText={setDestination}
-                />
-              </View>
-            </View>
-
-            <View style={styles.formFieldHalf}>
-              <Text style={styles.label}>Pays *</Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Pays"
-                  placeholderTextColor={theme.colors.textLight}
-                  value={country}
-                  onChangeText={setCountry}
-                />
-              </View>
-            </View>
+          <View style={styles.formField}>
+            <CountryCityPicker
+              testIDPrefix="trip"
+              countryIso2={countryIso2}
+              city={destination}
+              onChange={({ countryIso2: iso, countryLabel, city }) => {
+                setCountryIso2(iso);
+                const cleanCountry = countryLabel.replace(/\s*\([A-Z]{2}\)$/, '');
+                setCountry(cleanCountry);
+                setDestination(city);
+              }}
+              labelColor={theme.colors.text}
+              borderColor={theme.colors.border}
+              backgroundColor={theme.colors.surface}
+              textColor={theme.colors.text}
+            />
           </View>
 
           <View style={styles.formRow}>
