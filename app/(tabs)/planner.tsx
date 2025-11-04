@@ -20,7 +20,6 @@ import {
   Search, 
   TrendingUp, 
   MapPin, 
-  Calendar,
   Plane,
   Hotel,
   Sparkles,
@@ -76,19 +75,11 @@ const trendingDestinations: LocalDestination[] = [
 
 
 
-const topTabs = [
-  { label: 'Destinations', value: 'destinations' },
-  { label: 'Hôtels', value: 'hotels' },
-  { label: 'Activités', value: 'activities' },
-  { label: 'Restaurants', value: 'restaurants' },
-];
-
 export default function PlannerScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { trips, user } = useApp();
-  const { colors, spacing, fontSize, fontWeight, borderRadius } = useTheme();
-  const [selectedTab, setSelectedTab] = useState<string>('destinations');
+  const { colors } = useTheme();
   const [scrollY] = useState<Animated.Value>(new Animated.Value(0));
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
@@ -135,24 +126,6 @@ export default function PlannerScreen() {
   const handleQuickAction = useCallback((route: string, label: string) => {
     console.log('[Planner] Quick action pressed', label);
     router.push(route as any);
-  }, [router]);
-
-  const handleTabPress = useCallback((tab: string) => {
-    console.log('[Planner] Tab pressed', tab);
-    setSelectedTab(tab);
-    switch (tab) {
-      case 'hotels':
-        router.push('/(tabs)/hotels');
-        break;
-      case 'activities':
-        router.push('/(tabs)/activities');
-        break;
-      case 'restaurants':
-        router.push('/(tabs)/restaurants');
-        break;
-      default:
-        break;
-    }
   }, [router]);
 
   const handleCreateTrip = useCallback(() => {
@@ -312,31 +285,7 @@ export default function PlannerScreen() {
           )}
         </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabsScroll}
-        >
-          {topTabs.map((tab, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.tabChip,
-                selectedTab === tab.value && styles.tabChipActive,
-              ]}
-              onPress={() => handleTabPress(tab.value)}
-            >
-              <Text
-                style={[
-                  styles.tabLabel,
-                  selectedTab === tab.value && styles.tabLabelActive,
-                ]}
-              >
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+
       </View>
 
       <ScrollView
@@ -669,30 +618,7 @@ const styles = StyleSheet.create({
   searchResultEmptyText: {
     fontSize: 14,
   },
-  tabsScroll: {
-    paddingTop: 16,
-    gap: 12,
-  },
-  tabChip: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-  },
-  tabChipActive: {
-    backgroundColor: 'rgba(175, 203, 255, 0.15)',
-    borderColor: 'rgba(175, 203, 255, 0.4)',
-  },
-  tabLabel: {
-    fontSize: 14,
-    fontWeight: '600' as '600',
-    color: 'rgba(255, 255, 255, 0.7)',
-  },
-  tabLabelActive: {
-    color: '#AFCBFF',
-  },
+
   scrollView: {
     flex: 1,
   },
