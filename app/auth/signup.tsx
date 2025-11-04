@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   View, 
   Text, 
@@ -30,8 +30,8 @@ import {
   Check,
 
 } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
 import { useApp } from '@/store/AppContext';
+import { useTheme } from '@/store/ThemeContext';
 import { router } from 'expo-router';
 import type { User } from '@/types';
 import { trpc } from '@/lib/trpc';
@@ -58,6 +58,7 @@ interface FormData {
 export default function SignUpScreen() {
   const insets = useSafeAreaInsets();
   const { saveUser } = useApp();
+  const theme = useTheme();
   const [currentStep, setCurrentStep] = useState<Step>(1);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -82,6 +83,8 @@ export default function SignUpScreen() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const updateField = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setFormData(prev => ({ ...prev, [key]: value }));
@@ -652,7 +655,7 @@ export default function SignUpScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[theme.colors.backgroundDark, theme.colors.background]}
+        colors={[theme.colors.backgroundSecondary, theme.colors.background]}
         style={StyleSheet.absoluteFillObject}
       />
 
@@ -702,7 +705,7 @@ export default function SignUpScreen() {
               disabled={loading}
             >
               <LinearGradient
-                colors={theme.colors.primaryGradient}
+                colors={theme.colors.primaryGradient as readonly [string, string]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.nextButtonGradient}
@@ -763,433 +766,436 @@ export default function SignUpScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: theme.spacing.lg,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: theme.spacing.xl,
-  },
-  title: {
-    fontSize: theme.fontSize.xxxl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
-    marginBottom: theme.spacing.xs,
-  },
-  subtitle: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing.xl,
-    paddingHorizontal: theme.spacing.xl,
-  },
-  progressStep: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  progressStepActive: {
-    borderColor: theme.colors.primary,
-    backgroundColor: theme.colors.primary,
-  },
-  progressStepCompleted: {
-    backgroundColor: theme.colors.success,
-    borderColor: theme.colors.success,
-  },
-  progressStepText: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textLight,
-  },
-  progressStepTextActive: {
-    color: theme.colors.white,
-  },
-  stepContainer: {
-    marginBottom: theme.spacing.xl,
-  },
-  stepHeader: {
-    alignItems: 'center',
-    marginBottom: theme.spacing.xl,
-  },
-  stepTitle: {
-    fontSize: theme.fontSize.xxl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
-    marginTop: theme.spacing.md,
-  },
-  stepSubtitle: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
-    marginTop: theme.spacing.xs,
-  },
-  formField: {
-    marginBottom: theme.spacing.lg,
-  },
-  formRow: {
-    flexDirection: 'row',
-    gap: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
-  },
-  formFieldHalf: {
-    flex: 1,
-  },
-  formLabel: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
-    marginBottom: theme.spacing.sm,
-  },
-  formInput: {
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.md,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
-    fontSize: theme.fontSize.md,
-    color: theme.colors.text,
-  },
-  formInputError: {
-    borderColor: theme.colors.error,
-  },
-  inputWithIcon: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.md,
-    paddingHorizontal: theme.spacing.md,
-    gap: theme.spacing.sm,
-  },
-  formInputWithIcon: {
-    flex: 1,
-    paddingVertical: theme.spacing.md,
-    fontSize: theme.fontSize.md,
-    color: theme.colors.text,
-  },
-  datePickerText: {
-    flex: 1,
-    paddingVertical: theme.spacing.md,
-    fontSize: theme.fontSize.md,
-    color: theme.colors.text,
-  },
-  datePickerPlaceholder: {
-    color: theme.colors.textLight,
-  },
-  formTextArea: {
-    height: 120,
-    textAlignVertical: 'top',
-    paddingTop: theme.spacing.md,
-  },
-  errorText: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.error,
-    marginTop: theme.spacing.xs,
-  },
-  genderRow: {
-    flexDirection: 'row',
-    gap: theme.spacing.md,
-  },
-  genderChip: {
-    flex: 1,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-  },
-  genderChipActive: {
-    backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
-  },
-  genderChipError: {
-    borderColor: theme.colors.error,
-  },
-  genderChipText: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
-  },
-  genderChipTextActive: {
-    color: theme.colors.white,
-  },
-  photoUploadButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing.sm,
-    paddingVertical: theme.spacing.lg,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.md,
-    borderStyle: 'dashed',
-  },
-  photoUploadText: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.medium,
-    color: theme.colors.text,
-  },
-  preferenceGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: theme.spacing.md,
-  },
-  preferenceCard: {
-    width: '30%',
-    aspectRatio: 1,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: theme.spacing.sm,
-  },
-  preferenceCardActive: {
-    backgroundColor: `${theme.colors.primary}20`,
-    borderColor: theme.colors.primary,
-  },
-  preferenceIcon: {
-    fontSize: 32,
-    marginBottom: theme.spacing.xs,
-  },
-  preferenceLabel: {
-    fontSize: theme.fontSize.xs,
-    fontWeight: theme.fontWeight.medium,
-    color: theme.colors.text,
-    textAlign: 'center',
-  },
-  preferenceLabelActive: {
-    color: theme.colors.primary,
-    fontWeight: theme.fontWeight.bold,
-  },
-  budgetRow: {
-    flexDirection: 'row',
-    gap: theme.spacing.md,
-  },
-  budgetChip: {
-    flex: 1,
-    paddingVertical: theme.spacing.md,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.md,
-    alignItems: 'center',
-    gap: theme.spacing.xs,
-  },
-  budgetChipActive: {
-    backgroundColor: `${theme.colors.secondary}20`,
-    borderColor: theme.colors.secondary,
-  },
-  budgetIcon: {
-    fontSize: 24,
-  },
-  budgetLabel: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.medium,
-    color: theme.colors.text,
-  },
-  budgetLabelActive: {
-    color: theme.colors.secondary,
-    fontWeight: theme.fontWeight.bold,
-  },
-  toggleSection: {
-    gap: theme.spacing.md,
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.md,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  toggleLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.md,
-    flex: 1,
-  },
-  toggleTextContainer: {
-    flex: 1,
-  },
-  toggleLabel: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
-  },
-  toggleDescription: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.textSecondary,
-    marginTop: 2,
-  },
-  toggle: {
-    width: 50,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: theme.colors.border,
-    padding: 2,
-    justifyContent: 'center',
-  },
-  toggleActive: {
-    backgroundColor: theme.colors.primary,
-  },
-  toggleThumb: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: theme.colors.white,
-  },
-  toggleThumbActive: {
-    alignSelf: 'flex-end',
-  },
-  charCount: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.textLight,
-    textAlign: 'right',
-    marginTop: theme.spacing.xs,
-  },
-  summaryCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  summaryTitle: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
-    marginBottom: theme.spacing.md,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: theme.spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  summaryLabel: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
-  },
-  summaryValue: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
-  },
-  navigationButtons: {
-    flexDirection: 'row',
-    gap: theme.spacing.md,
-    marginBottom: theme.spacing.xl,
-  },
-  backButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing.xs,
-    paddingVertical: theme.spacing.md,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  backButtonText: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
-  },
-  nextButton: {
-    flex: 2,
-    borderRadius: theme.borderRadius.md,
-    overflow: 'hidden',
-  },
-  nextButtonFull: {
-    flex: 1,
-  },
-  nextButtonDisabled: {
-    opacity: 0.6,
-  },
-  nextButtonGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing.xs,
-    paddingVertical: theme.spacing.md,
-  },
-  nextButtonText: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.white,
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: theme.spacing.xl,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: theme.colors.border,
-  },
-  dividerText: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textLight,
-    marginHorizontal: theme.spacing.md,
-  },
-  socialButtons: {
-    gap: theme.spacing.md,
-    marginBottom: theme.spacing.xl,
-  },
-  socialButton: {
-    paddingVertical: theme.spacing.md,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-  },
-  socialButtonText: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
-  },
-  loginLink: {
-    alignItems: 'center',
-  },
-  loginLinkText: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
-  },
-  loginLinkBold: {
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.primary,
-  },
-});
+function createStyles(theme: ReturnType<typeof useTheme>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    keyboardView: {
+      flex: 1,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    scrollContent: {
+      padding: 24,
+    },
+    header: {
+      alignItems: 'center',
+      marginBottom: 32,
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: '700' as const,
+      color: theme.colors.text,
+      marginBottom: 4,
+    },
+    subtitle: {
+      fontSize: 15,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+    },
+    progressContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 32,
+      paddingHorizontal: 32,
+    },
+    progressStep: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: theme.colors.surface,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    progressStepActive: {
+      borderColor: theme.colors.primary,
+      backgroundColor: theme.colors.primary,
+    },
+    progressStepCompleted: {
+      backgroundColor: theme.colors.success,
+      borderColor: theme.colors.success,
+    },
+    progressStepText: {
+      fontSize: 15,
+      fontWeight: '700' as const,
+      color: theme.colors.textLight,
+    },
+    progressStepTextActive: {
+      color: theme.colors.white,
+    },
+    stepContainer: {
+      marginBottom: 32,
+    },
+    stepHeader: {
+      alignItems: 'center',
+      marginBottom: 32,
+    },
+    stepTitle: {
+      fontSize: 24,
+      fontWeight: '700' as const,
+      color: theme.colors.text,
+      marginTop: 16,
+    },
+    stepSubtitle: {
+      fontSize: 15,
+      color: theme.colors.textSecondary,
+      marginTop: 4,
+    },
+    formField: {
+      marginBottom: 24,
+    },
+    formRow: {
+      flexDirection: 'row',
+      gap: 16,
+      marginBottom: 24,
+    },
+    formFieldHalf: {
+      flex: 1,
+    },
+    formLabel: {
+      fontSize: 13,
+      fontWeight: '600' as const,
+      color: theme.colors.text,
+      marginBottom: 8,
+    },
+    formInput: {
+      backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 16,
+      fontSize: 15,
+      color: theme.colors.text,
+    },
+    formInputError: {
+      borderColor: theme.colors.error,
+    },
+    inputWithIcon: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      gap: 8,
+    },
+    formInputWithIcon: {
+      flex: 1,
+      paddingVertical: 16,
+      fontSize: 15,
+      color: theme.colors.text,
+    },
+    datePickerText: {
+      flex: 1,
+      paddingVertical: 16,
+      fontSize: 15,
+      color: theme.colors.text,
+    },
+    datePickerPlaceholder: {
+      color: theme.colors.textLight,
+    },
+    formTextArea: {
+      height: 120,
+      textAlignVertical: 'top',
+      paddingTop: 16,
+    },
+    errorText: {
+      fontSize: 11,
+      color: theme.colors.error,
+      marginTop: 4,
+    },
+    genderRow: {
+      flexDirection: 'row',
+      gap: 16,
+    },
+    genderChip: {
+      flex: 1,
+      paddingVertical: 16,
+      paddingHorizontal: 24,
+      borderRadius: 12,
+      backgroundColor: theme.colors.surface,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      alignItems: 'center',
+    },
+    genderChipActive: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    genderChipError: {
+      borderColor: theme.colors.error,
+    },
+    genderChipText: {
+      fontSize: 15,
+      fontWeight: '600' as const,
+      color: theme.colors.text,
+    },
+    genderChipTextActive: {
+      color: theme.colors.white,
+    },
+    photoUploadButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      paddingVertical: 24,
+      backgroundColor: theme.colors.surface,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      borderRadius: 12,
+      borderStyle: 'dashed',
+    },
+    photoUploadText: {
+      fontSize: 15,
+      fontWeight: '500' as const,
+      color: theme.colors.text,
+    },
+    preferenceGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 16,
+    },
+    preferenceCard: {
+      width: '30%',
+      aspectRatio: 1,
+      backgroundColor: theme.colors.surface,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 8,
+    },
+    preferenceCardActive: {
+      backgroundColor: `${theme.colors.primary}20`,
+      borderColor: theme.colors.primary,
+    },
+    preferenceIcon: {
+      fontSize: 32,
+      marginBottom: 4,
+    },
+    preferenceLabel: {
+      fontSize: 11,
+      fontWeight: '500' as const,
+      color: theme.colors.text,
+      textAlign: 'center',
+    },
+    preferenceLabelActive: {
+      color: theme.colors.primary,
+      fontWeight: '700' as const,
+    },
+    budgetRow: {
+      flexDirection: 'row',
+      gap: 16,
+    },
+    budgetChip: {
+      flex: 1,
+      paddingVertical: 16,
+      backgroundColor: theme.colors.surface,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      borderRadius: 12,
+      alignItems: 'center',
+      gap: 4,
+    },
+    budgetChipActive: {
+      backgroundColor: `${theme.colors.secondary}20`,
+      borderColor: theme.colors.secondary,
+    },
+    budgetIcon: {
+      fontSize: 24,
+    },
+    budgetLabel: {
+      fontSize: 13,
+      fontWeight: '500' as const,
+      color: theme.colors.text,
+    },
+    budgetLabelActive: {
+      color: theme.colors.secondary,
+      fontWeight: '700' as const,
+    },
+    toggleSection: {
+      gap: 16,
+    },
+    toggleRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 16,
+      paddingHorizontal: 16,
+      backgroundColor: theme.colors.surface,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    toggleLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 16,
+      flex: 1,
+    },
+    toggleTextContainer: {
+      flex: 1,
+    },
+    toggleLabel: {
+      fontSize: 15,
+      fontWeight: '600' as const,
+      color: theme.colors.text,
+    },
+    toggleDescription: {
+      fontSize: 11,
+      color: theme.colors.textSecondary,
+      marginTop: 2,
+    },
+    toggle: {
+      width: 50,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: theme.colors.border,
+      padding: 2,
+      justifyContent: 'center',
+    },
+    toggleActive: {
+      backgroundColor: theme.colors.primary,
+    },
+    toggleThumb: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      backgroundColor: theme.colors.white,
+    },
+    toggleThumbActive: {
+      alignSelf: 'flex-end',
+    },
+    charCount: {
+      fontSize: 11,
+      color: theme.colors.textLight,
+      textAlign: 'right',
+      marginTop: 4,
+    },
+    summaryCard: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: 16,
+      padding: 24,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    summaryTitle: {
+      fontSize: 17,
+      fontWeight: '700' as const,
+      color: theme.colors.text,
+      marginBottom: 16,
+    },
+    summaryRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingVertical: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    summaryLabel: {
+      fontSize: 13,
+      color: theme.colors.textSecondary,
+    },
+    summaryValue: {
+      fontSize: 13,
+      fontWeight: '600' as const,
+      color: theme.colors.text,
+    },
+    navigationButtons: {
+      flexDirection: 'row',
+      gap: 16,
+      marginBottom: 32,
+    },
+    backButton: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 4,
+      paddingVertical: 16,
+      backgroundColor: theme.colors.surface,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    backButtonText: {
+      fontSize: 15,
+      fontWeight: '600' as const,
+      color: theme.colors.text,
+    },
+    nextButton: {
+      flex: 2,
+      borderRadius: 12,
+      overflow: 'hidden',
+    },
+    nextButtonFull: {
+      flex: 1,
+    },
+    nextButtonDisabled: {
+      opacity: 0.6,
+    },
+    nextButtonGradient: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 4,
+      paddingVertical: 16,
+    },
+    nextButtonText: {
+      fontSize: 15,
+      fontWeight: '700' as const,
+      color: theme.colors.white,
+    },
+    divider: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginVertical: 32,
+    },
+    dividerLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: theme.colors.border,
+    },
+    dividerText: {
+      fontSize: 13,
+      color: theme.colors.textLight,
+      marginHorizontal: 16,
+    },
+    socialButtons: {
+      gap: 16,
+      marginBottom: 32,
+    },
+    socialButton: {
+      paddingVertical: 16,
+      backgroundColor: theme.colors.surface,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      alignItems: 'center',
+    },
+    socialButtonText: {
+      fontSize: 15,
+      fontWeight: '600' as const,
+      color: theme.colors.text,
+    },
+    loginLink: {
+      alignItems: 'center',
+    },
+    loginLinkText: {
+      fontSize: 13,
+      color: theme.colors.textSecondary,
+    },
+    loginLinkBold: {
+      fontWeight: '700' as const,
+      color: theme.colors.primary,
+    },
+  });
+}
