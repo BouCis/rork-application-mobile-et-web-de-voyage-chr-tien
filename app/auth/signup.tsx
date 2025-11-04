@@ -237,33 +237,55 @@ export default function SignUpScreen() {
       await saveUser(newUser);
 
       console.log('[SignUp] Sending verification email...');
-      const emailResult = await sendEmailMutation.mutateAsync({
-        email: formData.email,
-        firstName: formData.firstName,
-        code: verificationCode,
-      });
+      try {
+        const emailResult = await sendEmailMutation.mutateAsync({
+          email: formData.email,
+          firstName: formData.firstName,
+          code: verificationCode,
+        });
 
-      const emailSuccess = emailResult.success;
+        const emailSuccess = emailResult.success;
 
-      if (emailSuccess) {
+        if (emailSuccess) {
+          Alert.alert(
+            'Compte créé ! 🎉',
+            `Un code de vérification a été envoyé à ${formData.email}. Code: ${verificationCode} (valide 15 min)`,
+            [
+              {
+                text: 'Vérifier maintenant',
+                onPress: () => router.push({ pathname: '/auth/verify-email', params: { email: formData.email } }),
+              },
+              {
+                text: 'Plus tard',
+                onPress: () => router.replace('/(tabs)/planner'),
+              },
+            ]
+          );
+        } else {
+          Alert.alert(
+            'Compte créé ! 🎉',
+            `Votre compte a été créé avec succès. Code de vérification: ${verificationCode} (valide 15 min)`,
+            [
+              {
+                text: 'Vérifier maintenant',
+                onPress: () => router.push({ pathname: '/auth/verify-email', params: { email: formData.email } }),
+              },
+              {
+                text: 'Plus tard',
+                onPress: () => router.replace('/(tabs)/planner'),
+              },
+            ]
+          );
+        }
+      } catch (emailError) {
+        console.warn('[SignUp] Email sending failed, but user was created:', emailError);
         Alert.alert(
           'Compte créé ! 🎉',
-          `Un code de vérification a été envoyé à ${formData.email}. Veuillez vérifier votre boîte de réception pour confirmer votre email.`,
+          `Votre compte a été créé. Code de vérification: ${verificationCode} (valide 15 min)`,
           [
             {
               text: 'Vérifier maintenant',
               onPress: () => router.push({ pathname: '/auth/verify-email', params: { email: formData.email } }),
-            },
-          ]
-        );
-      } else {
-        Alert.alert(
-          'Erreur',
-          'Impossible d\'envoyer l\'email de vérification. Veuillez réessayer.',
-          [
-            {
-              text: 'Réessayer',
-              onPress: handleSubmit,
             },
             {
               text: 'Plus tard',
@@ -278,12 +300,10 @@ export default function SignUpScreen() {
       let errorMessage = 'Impossible de créer le compte. Veuillez réessayer.';
       
       if (error instanceof Error) {
-        if (error.message.includes('existe déjà')) {
-          errorMessage = 'Un compte avec cet email existe déjà. Veuillez vous connecter ou utiliser un autre email.';
-        } else if (error.message.includes('JSON Parse error')) {
-          errorMessage = 'Erreur de connexion au serveur. Veuillez vérifier votre connexion et réessayer.';
+        if (error.message.includes('existe déjà') || error.message.includes('CONFLICT')) {
+          errorMessage = 'Un compte avec cet email existe déjà. Veuillez utiliser un autre email.';
         } else {
-          errorMessage = error.message;
+          errorMessage = `Erreur: ${error.message}`;
         }
       }
       
