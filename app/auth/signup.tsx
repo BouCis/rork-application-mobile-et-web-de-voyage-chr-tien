@@ -34,6 +34,7 @@ import { theme } from '@/constants/theme';
 import { useApp } from '@/store/AppContext';
 import { router } from 'expo-router';
 import type { User } from '@/types';
+import { trpc } from '@/lib/trpc';
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -178,6 +179,8 @@ export default function SignUpScreen() {
     }
   };
 
+  const createUserMutation = trpc.users.create.useMutation();
+
   const handleSubmit = async () => {
     if (!validateStep(currentStep)) return;
 
@@ -188,8 +191,11 @@ export default function SignUpScreen() {
       const expiresAt = new Date();
       expiresAt.setMinutes(expiresAt.getMinutes() + 15);
 
-      const newUser: User = {
-        id: Date.now().toString(),
+      const userId = `user_${Date.now()}`;
+
+      console.log('[SignUp] Creating user in database...');
+      const dbUser = await createUserMutation.mutateAsync({
+        id: userId,
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
@@ -203,15 +209,40 @@ export default function SignUpScreen() {
         departureCity: formData.departureCity,
         avatar: formData.avatar,
         bio: formData.bio || undefined,
-        preferences: {
-          travelStyle: formData.travelStyle,
-          budgetRange: formData.budgetRange,
-          notifications: formData.notifications,
-          inspirations: formData.inspirations,
-        },
+        travelStyle: formData.travelStyle,
+        budgetRange: formData.budgetRange,
+        notifications: formData.notifications,
+        inspirations: formData.inspirations,
         joinedDate: new Date().toISOString(),
+      });
+
+      console.log('[SignUp] User created in database:', dbUser.id);
+
+      const newUser: User = {
+        id: dbUser.id,
+        firstName: dbUser.firstName,
+        lastName: dbUser.lastName,
+        email: dbUser.email,
+        emailVerified: dbUser.emailVerified,
+        verificationCode: dbUser.verificationCode || undefined,
+        verificationCodeExpiresAt: dbUser.verificationCodeExpiresAt || undefined,
+        phone: dbUser.phone || undefined,
+        dateOfBirth: dbUser.dateOfBirth || undefined,
+        gender: dbUser.gender || undefined,
+        nationality: dbUser.nationality || undefined,
+        departureCity: dbUser.departureCity || undefined,
+        avatar: dbUser.avatar || undefined,
+        bio: dbUser.bio || undefined,
+        preferences: {
+          travelStyle: dbUser.travelStyle || 'mixed',
+          budgetRange: dbUser.budgetRange || 'moderate',
+          notifications: dbUser.notifications,
+          inspirations: dbUser.inspirations,
+        },
+        joinedDate: dbUser.joinedDate,
       };
 
+      console.log('[SignUp] Saving user to local storage...');
       await saveUser(newUser);
 
       const emailSuccess = await sendVerificationEmail(formData.email, formData.firstName, verificationCode);
@@ -244,8 +275,12 @@ export default function SignUpScreen() {
         );
       }
     } catch (error) {
-      console.error('Erreur lors de la création du compte:', error);
-      Alert.alert('Erreur', 'Impossible de créer le compte. Veuillez réessayer.');
+      console.error('[SignUp] Erreur lors de la création du compte:', error);
+      Alert.alert(
+        'Erreur',
+        'Impossible de créer le compte. Veuillez réessayer.\n' +
+        (error instanceof Error ? error.message : '')
+      );
     } finally {
       setLoading(false);
     }
