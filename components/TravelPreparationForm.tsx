@@ -17,7 +17,7 @@ import {
   ChevronRight,
   Check,
 } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
+import { useTheme } from '@/store/ThemeContext';
 import type { Destination } from '@/data/destinations';
 
 interface TravelPreparationFormProps {
@@ -47,6 +47,7 @@ export default function TravelPreparationForm({
   onSubmit,
   userNationality = 'France',
 }: TravelPreparationFormProps) {
+  const { colors } = useTheme();
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [travelers, setTravelers] = useState<string>('2');
@@ -81,61 +82,61 @@ export default function TravelPreparationForm({
     >
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <MapPin color={theme.colors.primary} size={20} />
-          <Text style={styles.sectionTitle}>Destination</Text>
+          <MapPin color={colors.primary} size={20} />
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Destination</Text>
         </View>
-        <View style={styles.destinationCard}>
-          <Text style={styles.destinationName}>{destination.name}</Text>
-          <Text style={styles.destinationCountry}>{destination.country}</Text>
+        <View style={[styles.destinationCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.destinationName, { color: colors.text }]}>{destination.name}</Text>
+          <Text style={[styles.destinationCountry, { color: colors.textSecondary }]}>{destination.country}</Text>
         </View>
       </View>
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Calendar color={theme.colors.primary} size={20} />
-          <Text style={styles.sectionTitle}>Dates du voyage</Text>
+          <Calendar color={colors.primary} size={20} />
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Dates du voyage</Text>
         </View>
         <View style={styles.dateInputs}>
           <View style={styles.dateInputContainer}>
-            <Text style={styles.inputLabel}>Date de départ</Text>
+            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Date de départ</Text>
             <TextInput
               testID="input-start-date"
-              style={styles.input}
+              style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
               placeholder="JJ/MM/AAAA"
-              placeholderTextColor={theme.colors.textLight}
+              placeholderTextColor={colors.textLight}
               value={startDate}
               onChangeText={setStartDate}
               keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'default'}
             />
           </View>
           <View style={styles.dateInputContainer}>
-            <Text style={styles.inputLabel}>Date de retour</Text>
+            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Date de retour</Text>
             <TextInput
               testID="input-end-date"
-              style={styles.input}
+              style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
               placeholder="JJ/MM/AAAA"
-              placeholderTextColor={theme.colors.textLight}
+              placeholderTextColor={colors.textLight}
               value={endDate}
               onChangeText={setEndDate}
               keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'default'}
             />
           </View>
         </View>
-        <Text style={styles.helperText}>
+        <Text style={[styles.helperText, { color: colors.textLight }]}>
           Meilleure période : {destination.bestTimeToVisit}
         </Text>
       </View>
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Users color={theme.colors.primary} size={20} />
-          <Text style={styles.sectionTitle}>Nombre de voyageurs</Text>
+          <Users color={colors.primary} size={20} />
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Nombre de voyageurs</Text>
         </View>
         <TextInput
           testID="input-travelers"
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
           placeholder="Nombre de personnes"
-          placeholderTextColor={theme.colors.textLight}
+          placeholderTextColor={colors.textLight}
           value={travelers}
           onChangeText={setTravelers}
           keyboardType="number-pad"
@@ -144,8 +145,8 @@ export default function TravelPreparationForm({
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Wallet color={theme.colors.primary} size={20} />
-          <Text style={styles.sectionTitle}>Niveau de budget</Text>
+          <Wallet color={colors.primary} size={20} />
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Niveau de budget</Text>
         </View>
         <View style={styles.budgetLevels}>
           {budgetLevels.map((level) => (
@@ -164,8 +165,8 @@ export default function TravelPreparationForm({
               <LinearGradient
                 colors={
                   budgetLevel === level.id
-                    ? theme.colors.primaryGradient
-                    : ['rgba(99, 102, 241, 0.05)', 'rgba(236, 72, 153, 0.05)']
+                    ? (colors.primaryGradient as [string, string])
+                    : [colors.borderSubtle, colors.borderLight]
                 }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -173,14 +174,14 @@ export default function TravelPreparationForm({
               >
                 {budgetLevel === level.id && (
                   <View style={styles.checkIcon}>
-                    <Check color={theme.colors.textInverse} size={16} strokeWidth={3} />
+                    <Check color={colors.textInverse} size={16} strokeWidth={3} />
                   </View>
                 )}
                 <Text style={styles.budgetIcon}>{level.icon}</Text>
                 <Text
                   style={[
                     styles.budgetLabel,
-                    budgetLevel === level.id && styles.budgetLabelActive,
+                    { color: budgetLevel === level.id ? colors.textInverse : colors.text },
                   ]}
                 >
                   {level.label}
@@ -188,7 +189,7 @@ export default function TravelPreparationForm({
                 <Text
                   style={[
                     styles.budgetPrice,
-                    budgetLevel === level.id && styles.budgetPriceActive,
+                    { color: budgetLevel === level.id ? colors.textInverse : colors.primary },
                   ]}
                 >
                   {destination.averageBudget[level.id]}€/jour
@@ -201,14 +202,14 @@ export default function TravelPreparationForm({
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <MapPin color={theme.colors.primary} size={20} />
-          <Text style={styles.sectionTitle}>Ville de départ</Text>
+          <MapPin color={colors.primary} size={20} />
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Ville de départ</Text>
         </View>
         <TextInput
           testID="input-departure-city"
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
           placeholder="Ex: Paris, Lyon, Marseille..."
-          placeholderTextColor={theme.colors.textLight}
+          placeholderTextColor={colors.textLight}
           value={departureCity}
           onChangeText={setDepartureCity}
         />
@@ -216,18 +217,18 @@ export default function TravelPreparationForm({
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <MapPin color={theme.colors.primary} size={20} />
-          <Text style={styles.sectionTitle}>Nationalité</Text>
+          <MapPin color={colors.primary} size={20} />
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Nationalité</Text>
         </View>
         <TextInput
           testID="input-nationality"
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
           placeholder="Votre nationalité"
-          placeholderTextColor={theme.colors.textLight}
+          placeholderTextColor={colors.textLight}
           value={nationality}
           onChangeText={setNationality}
         />
-        <Text style={styles.helperText}>
+        <Text style={[styles.helperText, { color: colors.textLight }]}>
           Nécessaire pour les informations visa et santé
         </Text>
       </View>
@@ -242,13 +243,13 @@ export default function TravelPreparationForm({
         accessibilityLabel="Obtenir les informations de voyage"
       >
         <LinearGradient
-          colors={isFormValid ? theme.colors.primaryGradient : ['#4B5563', '#374151']}
+          colors={isFormValid ? (colors.primaryGradient as [string, string]) : [colors.textTertiary, colors.textSecondary]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.submitGradient}
         >
-          <Text style={styles.submitText}>Obtenir les informations</Text>
-          <ChevronRight color={theme.colors.textInverse} size={20} />
+          <Text style={[styles.submitText, { color: colors.textInverse }]}>Obtenir les informations</Text>
+          <ChevronRight color={colors.textInverse} size={20} />
         </LinearGradient>
       </TouchableOpacity>
     </ScrollView>
@@ -260,94 +261,83 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: theme.spacing.lg,
-    paddingBottom: theme.spacing.xxxl,
+    padding: 24,
+    paddingBottom: 64,
   },
   section: {
-    marginBottom: theme.spacing.xl,
+    marginBottom: 32,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.md,
+    gap: 8,
+    marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: 17,
+    fontWeight: '700' as const,
   },
   destinationCard: {
-    padding: theme.spacing.md,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.lg,
+    padding: 16,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   destinationName: {
-    fontSize: theme.fontSize.xl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: 20,
+    fontWeight: '700' as const,
     marginBottom: 4,
   },
   destinationCountry: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
+    fontSize: 15,
   },
   dateInputs: {
     flexDirection: 'row',
-    gap: theme.spacing.md,
+    gap: 16,
   },
   dateInputContainer: {
     flex: 1,
   },
   inputLabel: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.medium,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.xs,
+    fontSize: 13,
+    fontWeight: '500' as const,
+    marginBottom: 4,
   },
   input: {
-    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.md,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    fontSize: theme.fontSize.md,
-    color: theme.colors.text,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    fontSize: 15,
   },
   helperText: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textLight,
-    marginTop: theme.spacing.xs,
+    fontSize: 13,
+    marginTop: 4,
     fontStyle: 'italic' as const,
   },
   budgetLevels: {
-    gap: theme.spacing.md,
+    gap: 16,
   },
   budgetLevel: {
-    borderRadius: theme.borderRadius.lg,
+    borderRadius: 16,
     overflow: 'hidden',
   },
   budgetLevelActive: {
     borderWidth: 2,
-    borderColor: theme.colors.primary,
   },
   budgetLevelGradient: {
-    padding: theme.spacing.md,
+    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
+    gap: 8,
     position: 'relative',
   },
   checkIcon: {
     position: 'absolute',
-    top: theme.spacing.xs,
-    right: theme.spacing.xs,
+    top: 4,
+    right: 4,
     width: 24,
     height: 24,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: 9999,
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -357,24 +347,16 @@ const styles = StyleSheet.create({
   },
   budgetLabel: {
     flex: 1,
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
-  },
-  budgetLabelActive: {
-    color: theme.colors.textInverse,
+    fontSize: 15,
+    fontWeight: '600' as const,
   },
   budgetPrice: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.primary,
-  },
-  budgetPriceActive: {
-    color: theme.colors.textInverse,
+    fontSize: 13,
+    fontWeight: '700' as const,
   },
   submitButton: {
-    marginTop: theme.spacing.lg,
-    borderRadius: theme.borderRadius.xl,
+    marginTop: 24,
+    borderRadius: 20,
     overflow: 'hidden',
   },
   submitButtonDisabled: {
@@ -384,13 +366,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: theme.spacing.sm,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
+    gap: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
   },
   submitText: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textInverse,
+    fontSize: 17,
+    fontWeight: '700' as const,
   },
 });

@@ -21,7 +21,7 @@ import {
   AlertCircle,
   Info,
 } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
+import { useTheme } from '@/store/ThemeContext';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import TravelPreparationForm, { type TravelFormData } from '@/components/TravelPreparationForm';
 import { getDestinationById, type Destination } from '@/data/destinations';
@@ -57,6 +57,7 @@ export default function DestinationPrepareScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const params = useLocalSearchParams<{ destinationId: string }>();
+  const { colors } = useTheme();
   
   const [showResults, setShowResults] = useState<boolean>(false);
   const [travelData, setTravelData] = useState<TravelFormData | null>(null);
@@ -168,8 +169,8 @@ export default function DestinationPrepareScreen() {
 
   if (!destination) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>Destination non trouvée</Text>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <Text style={[styles.errorText, { color: colors.error }]}>Destination non trouvée</Text>
       </View>
     );
   }
@@ -192,42 +193,42 @@ export default function DestinationPrepareScreen() {
       >
         <View style={styles.resultSection}>
           <View style={styles.resultHeader}>
-            <DollarSign color={theme.colors.primary} size={24} />
-            <Text style={styles.resultTitle}>Budget estimé</Text>
+            <DollarSign color={colors.primary} size={24} />
+            <Text style={[styles.resultTitle, { color: colors.text }]}>Budget estimé</Text>
           </View>
-          <View style={styles.budgetCard}>
+          <View style={[styles.budgetCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <LinearGradient
-              colors={theme.colors.primaryGradient}
+              colors={colors.primaryGradient as [string, string]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.budgetTotal}
             >
-              <Text style={styles.budgetTotalLabel}>Budget total</Text>
-              <Text style={styles.budgetTotalValue}>{budget.total}€</Text>
-              <Text style={styles.budgetTotalSubtext}>
+              <Text style={[styles.budgetTotalLabel, { color: colors.textInverse }]}>Budget total</Text>
+              <Text style={[styles.budgetTotalValue, { color: colors.textInverse }]}>{budget.total}€</Text>
+              <Text style={[styles.budgetTotalSubtext, { color: colors.textInverse }]}>
                 Pour {travelData.travelers} {travelData.travelers > 1 ? 'personnes' : 'personne'}
               </Text>
             </LinearGradient>
             <View style={styles.budgetBreakdown}>
               <View style={styles.budgetItem}>
-                <Plane color={theme.colors.textSecondary} size={18} />
-                <Text style={styles.budgetItemLabel}>Transport</Text>
-                <Text style={styles.budgetItemValue}>{budget.transport}€</Text>
+                <Plane color={colors.textSecondary} size={18} />
+                <Text style={[styles.budgetItemLabel, { color: colors.textSecondary }]}>Transport</Text>
+                <Text style={[styles.budgetItemValue, { color: colors.text }]}>{budget.transport}€</Text>
               </View>
               <View style={styles.budgetItem}>
-                <Hotel color={theme.colors.textSecondary} size={18} />
-                <Text style={styles.budgetItemLabel}>Hébergement</Text>
-                <Text style={styles.budgetItemValue}>{budget.accommodation}€</Text>
+                <Hotel color={colors.textSecondary} size={18} />
+                <Text style={[styles.budgetItemLabel, { color: colors.textSecondary }]}>Hébergement</Text>
+                <Text style={[styles.budgetItemValue, { color: colors.text }]}>{budget.accommodation}€</Text>
               </View>
               <View style={styles.budgetItem}>
                 <Text style={styles.budgetIcon}>🍽️</Text>
-                <Text style={styles.budgetItemLabel}>Nourriture</Text>
-                <Text style={styles.budgetItemValue}>{budget.food}€</Text>
+                <Text style={[styles.budgetItemLabel, { color: colors.textSecondary }]}>Nourriture</Text>
+                <Text style={[styles.budgetItemValue, { color: colors.text }]}>{budget.food}€</Text>
               </View>
               <View style={styles.budgetItem}>
                 <Text style={styles.budgetIcon}>🎭</Text>
-                <Text style={styles.budgetItemLabel}>Activités</Text>
-                <Text style={styles.budgetItemValue}>{budget.activities}€</Text>
+                <Text style={[styles.budgetItemLabel, { color: colors.textSecondary }]}>Activités</Text>
+                <Text style={[styles.budgetItemValue, { color: colors.text }]}>{budget.activities}€</Text>
               </View>
             </View>
           </View>
@@ -235,38 +236,38 @@ export default function DestinationPrepareScreen() {
 
         <View style={styles.resultSection}>
           <View style={styles.resultHeader}>
-            <FileText color={theme.colors.secondary} size={24} />
-            <Text style={styles.resultTitle}>Exigences administratives</Text>
+            <FileText color={colors.secondary} size={24} />
+            <Text style={[styles.resultTitle, { color: colors.text }]}>Exigences administratives</Text>
           </View>
-          <View style={styles.infoCard}>
+          <View style={[styles.infoCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.infoRow}>
               {visaInfo.required ? (
-                <AlertCircle color={theme.colors.warning} size={20} />
+                <AlertCircle color={colors.warning} size={20} />
               ) : (
-                <CheckCircle2 color={theme.colors.success} size={20} />
+                <CheckCircle2 color={colors.success} size={20} />
               )}
-              <Text style={styles.infoLabel}>
+              <Text style={[styles.infoLabel, { color: colors.text }]}>
                 {visaInfo.required ? 'Visa requis' : 'Pas de visa requis'}
               </Text>
             </View>
             {visaInfo.type && (
-              <Text style={styles.infoDetail}>Type: {visaInfo.type}</Text>
+              <Text style={[styles.infoDetail, { color: colors.textSecondary }]}>Type: {visaInfo.type}</Text>
             )}
             {visaInfo.duration && (
-              <Text style={styles.infoDetail}>Durée: {visaInfo.duration}</Text>
+              <Text style={[styles.infoDetail, { color: colors.textSecondary }]}>Durée: {visaInfo.duration}</Text>
             )}
             {visaInfo.cost && (
-              <Text style={styles.infoDetail}>Coût: {visaInfo.cost}€</Text>
+              <Text style={[styles.infoDetail, { color: colors.textSecondary }]}>Coût: {visaInfo.cost}€</Text>
             )}
             {visaInfo.processingTime && (
-              <Text style={styles.infoDetail}>Délai: {visaInfo.processingTime}</Text>
+              <Text style={[styles.infoDetail, { color: colors.textSecondary }]}>Délai: {visaInfo.processingTime}</Text>
             )}
             <View style={styles.requirementsList}>
-              <Text style={styles.requirementsTitle}>Documents requis:</Text>
+              <Text style={[styles.requirementsTitle, { color: colors.text }]}>Documents requis:</Text>
               {visaInfo.requirements.map((req, index) => (
                 <View key={index} style={styles.requirementItem}>
-                  <View style={styles.requirementDot} />
-                  <Text style={styles.requirementText}>{req}</Text>
+                  <View style={[styles.requirementDot, { backgroundColor: colors.primary }]} />
+                  <Text style={[styles.requirementText, { color: colors.textSecondary }]}>{req}</Text>
                 </View>
               ))}
             </View>
@@ -275,46 +276,47 @@ export default function DestinationPrepareScreen() {
 
         <View style={styles.resultSection}>
           <View style={styles.resultHeader}>
-            <Heart color={theme.colors.error} size={24} />
-            <Text style={styles.resultTitle}>Informations sanitaires</Text>
+            <Heart color={colors.error} size={24} />
+            <Text style={[styles.resultTitle, { color: colors.text }]}>Informations sanitaires</Text>
           </View>
-          <View style={styles.infoCard}>
-            <Text style={styles.subsectionTitle}>Vaccinations</Text>
+          <View style={[styles.infoCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.subsectionTitle, { color: colors.text }]}>Vaccinations</Text>
             {healthInfo.vaccinations.map((vac, index) => (
               <View key={index} style={styles.vaccinationItem}>
                 <View style={styles.vaccinationHeader}>
                   {vac.required ? (
-                    <AlertCircle color={theme.colors.error} size={18} />
+                    <AlertCircle color={colors.error} size={18} />
                   ) : (
-                    <Info color={theme.colors.info} size={18} />
+                    <Info color={colors.info} size={18} />
                   )}
                   <Text style={[
                     styles.vaccinationName,
-                    vac.required && styles.vaccinationRequired
+                    { color: colors.text },
+                    vac.required && { color: colors.error }
                   ]}>
                     {vac.name}
                   </Text>
                 </View>
-                <Text style={styles.vaccinationDesc}>{vac.description}</Text>
+                <Text style={[styles.vaccinationDesc, { color: colors.textSecondary }]}>{vac.description}</Text>
               </View>
             ))}
             
             {healthInfo.healthRisks.length > 0 && (
               <>
-                <Text style={styles.subsectionTitle}>Risques sanitaires</Text>
+                <Text style={[styles.subsectionTitle, { color: colors.text }]}>Risques sanitaires</Text>
                 {healthInfo.healthRisks.map((risk, index) => (
                   <View key={index} style={styles.riskItem}>
-                    <View style={styles.riskDot} />
-                    <Text style={styles.riskText}>{risk}</Text>
+                    <View style={[styles.riskDot, { backgroundColor: colors.warning }]} />
+                    <Text style={[styles.riskText, { color: colors.textSecondary }]}>{risk}</Text>
                   </View>
                 ))}
               </>
             )}
 
             {healthInfo.medicalInsurance && (
-              <View style={styles.insuranceAlert}>
-                <Shield color={theme.colors.primary} size={20} />
-                <Text style={styles.insuranceText}>
+              <View style={[styles.insuranceAlert, { backgroundColor: `${colors.primary}10` }]}>
+                <Shield color={colors.primary} size={20} />
+                <Text style={[styles.insuranceText, { color: colors.text }]}>
                   Assurance voyage et rapatriement fortement recommandée
                 </Text>
               </View>
@@ -334,12 +336,12 @@ export default function DestinationPrepareScreen() {
           accessibilityLabel="Créer mon voyage"
         >
           <LinearGradient
-            colors={theme.colors.primaryGradient}
+            colors={colors.primaryGradient as [string, string]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.createTripGradient}
           >
-            <Text style={styles.createTripText}>Créer mon voyage</Text>
+            <Text style={[styles.createTripText, { color: colors.textInverse }]}>Créer mon voyage</Text>
           </LinearGradient>
         </TouchableOpacity>
       </ScrollView>
@@ -347,24 +349,24 @@ export default function DestinationPrepareScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <LinearGradient
-        colors={[theme.colors.backgroundDark, theme.colors.background]}
+        colors={[colors.backgroundTertiary, colors.background]}
         style={StyleSheet.absoluteFillObject}
       />
 
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <TouchableOpacity
           testID="btn-back"
-          style={styles.backButton}
+          style={[styles.backButton, { backgroundColor: colors.surface }]}
           onPress={handleBack}
           accessible
           accessibilityRole="button"
           accessibilityLabel="Retour"
         >
-          <ArrowLeft color={theme.colors.text} size={24} />
+          <ArrowLeft color={colors.text} size={24} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>
           {showResults ? 'Informations de voyage' : 'Préparer mon voyage'}
         </Text>
         <View style={styles.headerSpacer} />
@@ -390,226 +392,197 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.md,
+    paddingHorizontal: 24,
+    paddingBottom: 16,
   },
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.surface,
+    borderRadius: 9999,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: theme.fontSize.xl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: 20,
+    fontWeight: '700' as const,
   },
   headerSpacer: {
     width: 40,
   },
   errorText: {
-    fontSize: theme.fontSize.lg,
-    color: theme.colors.error,
-    textAlign: 'center',
-    marginTop: theme.spacing.xxxl,
+    fontSize: 17,
+    textAlign: 'center' as const,
+    marginTop: 64,
   },
   resultsContainer: {
     flex: 1,
   },
   resultsContent: {
-    padding: theme.spacing.lg,
+    padding: 24,
   },
   resultSection: {
-    marginBottom: theme.spacing.xl,
+    marginBottom: 32,
   },
   resultHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.md,
+    gap: 8,
+    marginBottom: 16,
   },
   resultTitle: {
-    fontSize: theme.fontSize.xl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: 20,
+    fontWeight: '700' as const,
   },
   budgetCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.xl,
+    borderRadius: 20,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   budgetTotal: {
-    padding: theme.spacing.xl,
+    padding: 32,
     alignItems: 'center',
   },
   budgetTotalLabel: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textInverse,
+    fontSize: 13,
     opacity: 0.9,
-    marginBottom: theme.spacing.xs,
+    marginBottom: 4,
   },
   budgetTotalValue: {
-    fontSize: theme.fontSize.hero,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textInverse,
-    marginBottom: theme.spacing.xs,
+    fontSize: 40,
+    fontWeight: '700' as const,
+    marginBottom: 4,
   },
   budgetTotalSubtext: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textInverse,
+    fontSize: 13,
     opacity: 0.8,
   },
   budgetBreakdown: {
-    padding: theme.spacing.lg,
-    gap: theme.spacing.md,
+    padding: 24,
+    gap: 16,
   },
   budgetItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.md,
+    gap: 16,
   },
   budgetIcon: {
     fontSize: 18,
   },
   budgetItemLabel: {
     flex: 1,
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
+    fontSize: 15,
   },
   budgetItemValue: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: 15,
+    fontWeight: '700' as const,
   },
   infoCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
+    borderRadius: 16,
+    padding: 24,
     borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.md,
+    gap: 8,
+    marginBottom: 16,
   },
   infoLabel: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
+    fontSize: 17,
+    fontWeight: '700' as const,
   },
   infoDetail: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.xs,
+    fontSize: 15,
+    marginBottom: 4,
   },
   requirementsList: {
-    marginTop: theme.spacing.md,
+    marginTop: 16,
   },
   requirementsTitle: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
-    marginBottom: theme.spacing.sm,
+    fontSize: 15,
+    fontWeight: '600' as const,
+    marginBottom: 8,
   },
   requirementItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.xs,
+    gap: 8,
+    marginBottom: 4,
   },
   requirementDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: theme.colors.primary,
     marginTop: 8,
   },
   requirementText: {
     flex: 1,
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    fontSize: 13,
     lineHeight: 20,
   },
   subsectionTitle: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
-    marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
+    fontSize: 15,
+    fontWeight: '700' as const,
+    marginTop: 16,
+    marginBottom: 8,
   },
   vaccinationItem: {
-    marginBottom: theme.spacing.md,
+    marginBottom: 16,
   },
   vaccinationHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.xs,
+    gap: 8,
+    marginBottom: 4,
   },
   vaccinationName: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
-  },
-  vaccinationRequired: {
-    color: theme.colors.error,
+    fontSize: 15,
+    fontWeight: '600' as const,
   },
   vaccinationDesc: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    fontSize: 13,
     marginLeft: 26,
   },
   riskItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.xs,
+    gap: 8,
+    marginBottom: 4,
   },
   riskDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: theme.colors.warning,
     marginTop: 8,
   },
   riskText: {
     flex: 1,
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    fontSize: 13,
   },
   insuranceAlert: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    marginTop: theme.spacing.md,
-    padding: theme.spacing.md,
-    backgroundColor: `${theme.colors.primary}10`,
-    borderRadius: theme.borderRadius.md,
+    gap: 8,
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 12,
   },
   insuranceText: {
     flex: 1,
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.medium,
-    color: theme.colors.text,
+    fontSize: 13,
+    fontWeight: '500' as const,
   },
   createTripButton: {
-    marginTop: theme.spacing.lg,
-    borderRadius: theme.borderRadius.xl,
+    marginTop: 24,
+    borderRadius: 20,
     overflow: 'hidden',
   },
   createTripGradient: {
-    paddingVertical: theme.spacing.md,
+    paddingVertical: 16,
     alignItems: 'center',
   },
   createTripText: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textInverse,
+    fontSize: 17,
+    fontWeight: '700' as const,
   },
 });
