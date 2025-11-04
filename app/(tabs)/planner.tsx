@@ -403,12 +403,12 @@ export default function PlannerScreen() {
                 style={styles.emptyGradient}
               >
                 <MapPin color={colors.textInverse} size={32} strokeWidth={2} />
-                <Text style={[styles.emptyTitle, { color: colors.text }]}>Commencez votre aventure</Text>
-                <Text style={[styles.emptyText, { color: colors.text }]}>
+                <Text style={[styles.emptyTitle, { color: colors.textInverse }]}>Commencez votre aventure</Text>
+                <Text style={[styles.emptyText, { color: colors.textInverse }]}>
                   Créez votre premier voyage et découvrez le monde
                 </Text>
                 <View testID="btn-create-trip" style={styles.createButton}>
-                  <Text style={[styles.createButtonText, { color: colors.text }]}>Créer un voyage</Text>
+                  <Text style={[styles.createButtonText, { color: colors.textInverse }]}>Créer un voyage</Text>
                   <ArrowRight color={colors.textInverse} size={18} />
                 </View>
               </LinearGradient>
