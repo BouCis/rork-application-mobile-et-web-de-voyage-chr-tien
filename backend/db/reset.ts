@@ -1,10 +1,21 @@
 import { db } from './index';
 import { sql } from 'drizzle-orm';
+import * as fs from 'fs';
+import * as path from 'path';
 
-async function migrate() {
-  console.log('🚀 Starting database migration...');
+async function resetDatabase() {
+  console.log('🗑️  Resetting database...');
 
   try {
+    const dbPath = path.join(process.cwd(), 'local.db');
+    
+    if (fs.existsSync(dbPath)) {
+      fs.unlinkSync(dbPath);
+      console.log('✅ Old database deleted');
+    }
+
+    console.log('🚀 Creating new database schema...');
+
     await db.run(sql`
       CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
@@ -219,20 +230,20 @@ async function migrate() {
       );
     `);
 
-    console.log('✅ Migration completed successfully!');
-    console.log('📊 All tables created.');
+    console.log('✅ Database reset completed successfully!');
+    console.log('📊 All tables created with new schema.');
   } catch (error) {
-    console.error('❌ Migration failed:', error);
+    console.error('❌ Database reset failed:', error);
     throw error;
   }
 }
 
-migrate()
+resetDatabase()
   .then(() => {
-    console.log('🎉 Database setup complete!');
+    console.log('🎉 Database reset complete!');
     process.exit(0);
   })
   .catch((error) => {
-    console.error('💥 Database setup failed:', error);
+    console.error('💥 Database reset failed:', error);
     process.exit(1);
   });
