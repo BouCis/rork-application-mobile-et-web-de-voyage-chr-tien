@@ -1,5 +1,5 @@
 import { createTRPCReact } from "@trpc/react-query";
-import { httpLink, loggerLink } from "@trpc/client";
+import { httpLink } from "@trpc/client";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
 import type { AppRouter } from "@/backend/trpc/app-router";
@@ -38,9 +38,6 @@ const getBaseUrl = () => {
 
 export const trpcClient = trpc.createClient({
   links: [
-    loggerLink({
-      enabled: (opts) => opts.direction === 'down' && opts.result instanceof Error,
-    }),
     httpLink({
       url: `${getBaseUrl()}/api/trpc`,
     }),
