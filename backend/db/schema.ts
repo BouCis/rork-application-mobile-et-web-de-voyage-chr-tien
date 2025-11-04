@@ -1,0 +1,179 @@
+import { sql } from 'drizzle-orm';
+import { text, integer, sqliteTable } from 'drizzle-orm/sqlite-core';
+
+export const users = sqliteTable('users', {
+  id: text('id').primaryKey(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
+  email: text('email').notNull().unique(),
+  emailVerified: integer('email_verified', { mode: 'boolean' }).notNull().default(false),
+  verificationCode: text('verification_code'),
+  verificationCodeExpiresAt: text('verification_code_expires_at'),
+  phone: text('phone'),
+  dateOfBirth: text('date_of_birth'),
+  age: integer('age'),
+  gender: text('gender', { enum: ['male', 'female'] }),
+  nationality: text('nationality'),
+  countryOfBirth: text('country_of_birth'),
+  departureCity: text('departure_city'),
+  avatar: text('avatar'),
+  bio: text('bio'),
+  travelStyle: text('travel_style', { enum: ['cultural', 'adventure', 'relaxation', 'mixed'] }).default('mixed'),
+  budgetRange: text('budget_range', { enum: ['budget', 'moderate', 'luxury'] }).default('moderate'),
+  notifications: integer('notifications', { mode: 'boolean' }).notNull().default(true),
+  inspirations: integer('inspirations', { mode: 'boolean' }).notNull().default(true),
+  joinedDate: text('joined_date').notNull().default(sql`CURRENT_TIMESTAMP`),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const trips = sqliteTable('trips', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  destination: text('destination').notNull(),
+  country: text('country').notNull(),
+  startDate: text('start_date').notNull(),
+  endDate: text('end_date').notNull(),
+  coverImage: text('cover_image'),
+  budgetTotal: integer('budget_total').notNull().default(0),
+  budgetSpent: integer('budget_spent').notNull().default(0),
+  budgetCurrency: text('budget_currency').notNull().default('EUR'),
+  budgetTransport: integer('budget_transport').notNull().default(0),
+  budgetAccommodation: integer('budget_accommodation').notNull().default(0),
+  budgetFood: integer('budget_food').notNull().default(0),
+  budgetActivities: integer('budget_activities').notNull().default(0),
+  budgetOther: integer('budget_other').notNull().default(0),
+  status: text('status', { enum: ['planning', 'upcoming', 'ongoing', 'completed'] }).notNull().default('planning'),
+  isPublic: integer('is_public', { mode: 'boolean' }).notNull().default(false),
+  travelers: integer('travelers').notNull().default(1),
+  notes: text('notes').default(''),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const locations = sqliteTable('locations', {
+  id: text('id').primaryKey(),
+  tripId: text('trip_id').notNull().references(() => trips.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  latitude: integer('latitude').notNull(),
+  longitude: integer('longitude').notNull(),
+  address: text('address').notNull(),
+  country: text('country').notNull(),
+  city: text('city').notNull(),
+  type: text('type', { enum: ['tourist', 'historical', 'natural', 'other'] }).notNull(),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const expenses = sqliteTable('expenses', {
+  id: text('id').primaryKey(),
+  tripId: text('trip_id').notNull().references(() => trips.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  amount: integer('amount').notNull(),
+  currency: text('currency').notNull().default('EUR'),
+  category: text('category', { enum: ['transport', 'accommodation', 'food', 'activities', 'shopping', 'other'] }).notNull(),
+  date: text('date').notNull(),
+  notes: text('notes'),
+  receipt: text('receipt'),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const checklists = sqliteTable('checklists', {
+  id: text('id').primaryKey(),
+  tripId: text('trip_id').notNull().references(() => trips.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description'),
+  category: text('category', { enum: ['documents', 'health', 'packing', 'booking', 'preparation', 'other'] }).notNull(),
+  completed: integer('completed', { mode: 'boolean' }).notNull().default(false),
+  dueDate: text('due_date'),
+  priority: text('priority', { enum: ['low', 'medium', 'high'] }).notNull().default('medium'),
+  reminder: text('reminder'),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const media = sqliteTable('media', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  tripId: text('trip_id').notNull().references(() => trips.id, { onDelete: 'cascade' }),
+  locationId: text('location_id').references(() => locations.id, { onDelete: 'set null' }),
+  uri: text('uri').notNull(),
+  type: text('type', { enum: ['photo', 'video'] }).notNull(),
+  caption: text('caption'),
+  takenAt: text('taken_at').notNull(),
+  isDronePhoto: integer('is_drone_photo', { mode: 'boolean' }).notNull().default(false),
+  isPublic: integer('is_public', { mode: 'boolean' }).notNull().default(false),
+  likes: integer('likes').notNull().default(0),
+  tags: text('tags'),
+  editedWith: text('edited_with'),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const savedPlaces = sqliteTable('saved_places', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  locationId: text('location_id').notNull().references(() => locations.id, { onDelete: 'cascade' }),
+  notes: text('notes').default(''),
+  visitedDate: text('visited_date'),
+  rating: integer('rating'),
+  photos: text('photos'),
+  recommendations: text('recommendations').default(''),
+  isPublic: integer('is_public', { mode: 'boolean' }).notNull().default(false),
+  sharedWith: text('shared_with'),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const journals = sqliteTable('journals', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  tripId: text('trip_id').notNull().references(() => trips.id, { onDelete: 'cascade' }),
+  locationId: text('location_id').references(() => locations.id, { onDelete: 'set null' }),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  date: text('date').notNull(),
+  mood: text('mood', { enum: ['happy', 'excited', 'peaceful', 'grateful', 'adventurous'] }),
+  isPublic: integer('is_public', { mode: 'boolean' }).notNull().default(false),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const playlists = sqliteTable('playlists', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  tripId: text('trip_id').references(() => trips.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  description: text('description'),
+  coverImage: text('cover_image'),
+  songs: text('songs'),
+  isPublic: integer('is_public', { mode: 'boolean' }).notNull().default(false),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const posts = sqliteTable('posts', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  tripId: text('trip_id').references(() => trips.id, { onDelete: 'set null' }),
+  locationId: text('location_id').references(() => locations.id, { onDelete: 'set null' }),
+  content: text('content').notNull(),
+  likes: integer('likes').notNull().default(0),
+  shares: integer('shares').notNull().default(0),
+  hashtags: text('hashtags'),
+  isPublic: integer('is_public', { mode: 'boolean' }).notNull().default(true),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const notifications = sqliteTable('notifications', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  type: text('type', { enum: ['reminder', 'deal', 'social', 'system'] }).notNull(),
+  title: text('title').notNull(),
+  message: text('message').notNull(),
+  read: integer('read', { mode: 'boolean' }).notNull().default(false),
+  actionUrl: text('action_url'),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});

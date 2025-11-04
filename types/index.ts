@@ -222,6 +222,19 @@ export interface TravelJournal {
   createdAt: string;
 }
 
+export interface Playlist {
+  id: string;
+  userId?: string;
+  tripId?: string;
+  name: string;
+  description?: string;
+  coverImage?: string;
+  songs?: string[];
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface Notification {
   id: string;
   type: 'reminder' | 'deal' | 'social' | 'system';

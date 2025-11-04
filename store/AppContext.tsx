@@ -1,6 +1,7 @@
 import createContextHook from '@nkzw/create-context-hook';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { trpc } from '@/lib/trpc';
 import type { 
   User, 
   Trip, 
@@ -31,6 +32,23 @@ const STORAGE_KEYS = {
 export const [AppProvider, useApp] = createContextHook(() => {
   const [user, setUser] = useState<User | null>(null);
   const [trips, setTrips] = useState<Trip[]>([]);
+
+  const { data: serverUser, refetch: refetchUser } = trpc.users.get.useQuery(
+    { id: user?.id || '' },
+    { enabled: !!user?.id }
+  );
+
+  const { data: serverTrips = [], refetch: refetchTrips } = trpc.users.get.useQuery(
+    { id: user?.id || '' },
+    { enabled: !!user?.id }
+  );
+
+  const createUserMutation = trpc.users.create.useMutation();
+  const updateUserMutation = trpc.users.update.useMutation();
+  const deleteUserMutation = trpc.users.delete.useMutation();
+  const createTripMutation = trpc.trips.create.useMutation();
+  const updateTripMutation = trpc.trips.update.useMutation();
+  const deleteTripMutation = trpc.trips.delete.useMutation();
   const [media, setMedia] = useState<Media[]>([]);
   const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>([]);
   const [journals, setJournals] = useState<TravelJournal[]>([]);
@@ -98,44 +116,116 @@ export const [AppProvider, useApp] = createContextHook(() => {
 
   const saveUser = useCallback(async (userData: User) => {
     try {
+      await createUserMutation.mutateAsync({
+        id: userData.id,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        emailVerified: userData.emailVerified,
+        verificationCode: userData.verificationCode,
+        verificationCodeExpiresAt: userData.verificationCodeExpiresAt,
+        phone: userData.phone,
+        dateOfBirth: userData.dateOfBirth,
+        age: userData.age,
+        gender: userData.gender,
+        nationality: userData.nationality,
+        countryOfBirth: userData.countryOfBirth,
+        departureCity: userData.departureCity,
+        avatar: userData.avatar,
+        bio: userData.bio,
+        travelStyle: userData.preferences.travelStyle,
+        budgetRange: userData.preferences.budgetRange,
+        notifications: userData.preferences.notifications,
+        inspirations: userData.preferences.inspirations,
+        joinedDate: userData.joinedDate,
+      });
       await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
       setUser(userData);
+      console.log('[AppContext] User saved to database:', userData.id);
     } catch (error) {
       console.error('Error saving user:', error);
+      throw error;
     }
-  }, []);
+  }, [createUserMutation]);
 
   const addTrip = useCallback(async (trip: Trip) => {
     try {
+      if (!user?.id) {
+        console.error('[AppContext] Cannot add trip: No user logged in');
+        return;
+      }
+
+      await createTripMutation.mutateAsync({
+        id: trip.id,
+        userId: user.id,
+        title: trip.title,
+        description: trip.description,
+        destination: trip.destination,
+        country: trip.country,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        coverImage: trip.coverImage,
+        budget: trip.budget,
+        status: trip.status,
+        isPublic: trip.isPublic,
+        travelers: trip.travelers,
+        notes: trip.notes,
+        locations: trip.locations,
+      });
+
       const updatedTrips = [...trips, trip];
       await AsyncStorage.setItem(STORAGE_KEYS.TRIPS, JSON.stringify(updatedTrips));
       setTrips(updatedTrips);
+      console.log('[AppContext] Trip added to database:', trip.id);
     } catch (error) {
       console.error('Error adding trip:', error);
+      throw error;
     }
-  }, [trips]);
+  }, [trips, user, createTripMutation]);
 
   const updateTrip = useCallback(async (tripId: string, updates: Partial<Trip>) => {
     try {
+      await updateTripMutation.mutateAsync({
+        id: tripId,
+        title: updates.title,
+        description: updates.description,
+        destination: updates.destination,
+        country: updates.country,
+        startDate: updates.startDate,
+        endDate: updates.endDate,
+        coverImage: updates.coverImage,
+        budget: updates.budget,
+        status: updates.status,
+        isPublic: updates.isPublic,
+        travelers: updates.travelers,
+        notes: updates.notes,
+      });
+
       const updatedTrips = trips.map(t => 
         t.id === tripId ? { ...t, ...updates, updatedAt: new Date().toISOString() } : t
       );
       await AsyncStorage.setItem(STORAGE_KEYS.TRIPS, JSON.stringify(updatedTrips));
       setTrips(updatedTrips);
+      console.log('[AppContext] Trip updated in database:', tripId);
     } catch (error) {
       console.error('Error updating trip:', error);
+      throw error;
     }
-  }, [trips]);
+  }, [trips, updateTripMutation]);
 
   const deleteTrip = useCallback(async (tripId: string) => {
     try {
+      await deleteTripMutation.mutateAsync({ id: tripId });
+      
       const updatedTrips = trips.filter(t => t.id !== tripId);
       await AsyncStorage.setItem(STORAGE_KEYS.TRIPS, JSON.stringify(updatedTrips));
       setTrips(updatedTrips);
+      console.log('[AppContext] Trip deleted from database:', tripId);
     } catch (error) {
       console.error('Error deleting trip:', error);
+      throw error;
     }
-  }, [trips]);
+  }, [trips, deleteTripMutation]);
 
   const addMedia = useCallback(async (mediaItem: Media) => {
     try {
@@ -271,6 +361,11 @@ export const [AppProvider, useApp] = createContextHook(() => {
 
   const deleteAccount = useCallback(async () => {
     try {
+      if (user?.id) {
+        await deleteUserMutation.mutateAsync({ id: user.id });
+        console.log('[AppContext] User deleted from database:', user.id);
+      }
+
       await AsyncStorage.multiRemove([
         STORAGE_KEYS.USER,
         STORAGE_KEYS.TRIPS,
@@ -298,7 +393,7 @@ export const [AppProvider, useApp] = createContextHook(() => {
       console.error('Error deleting account:', error);
       throw error;
     }
-  }, []);
+  }, [user, deleteUserMutation]);
 
   return useMemo(() => ({
     user,
