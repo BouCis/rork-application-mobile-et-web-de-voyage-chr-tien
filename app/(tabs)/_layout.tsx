@@ -114,7 +114,6 @@ export default function TabLayout() {
         options={{
           href: null,
           title: "Profil",
-          tabBarButton: () => null,
         }}
       />
       <Tabs.Screen
@@ -122,7 +121,6 @@ export default function TabLayout() {
         options={{
           href: null,
           title: "Galerie",
-          tabBarButton: () => null,
         }}
       />
       <Tabs.Screen
