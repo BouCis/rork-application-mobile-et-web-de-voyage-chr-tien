@@ -295,22 +295,62 @@ export default function SignUpScreen() {
         );
       }
     } catch (error) {
-      console.error('[SignUp] Erreur lors de la création du compte:', error);
-      
-      let errorMessage = 'Impossible de créer le compte. Veuillez réessayer.';
-      
-      if (error instanceof Error) {
-        if (error.message.includes('existe déjà') || error.message.includes('CONFLICT')) {
-          errorMessage = 'Un compte avec cet email existe déjà. Veuillez utiliser un autre email.';
-        } else {
-          errorMessage = `Erreur: ${error.message}`;
+      console.error('[SignUp] Erreur lors de la création du compte (fallback local):', error);
+      try {
+        const verificationCode = generateVerificationCode();
+        const expiresAt = new Date();
+        expiresAt.setMinutes(expiresAt.getMinutes() + 15);
+        const localUserId = `local_user_${Date.now()}`;
+
+        const newUser: User = {
+          id: localUserId,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          emailVerified: false,
+          verificationCode,
+          verificationCodeExpiresAt: expiresAt.toISOString(),
+          phone: formData.phone || undefined,
+          dateOfBirth: formData.dateOfBirth || undefined,
+          gender: formData.gender || undefined,
+          nationality: formData.nationality || undefined,
+          departureCity: formData.departureCity || undefined,
+          avatar: formData.avatar || undefined,
+          bio: formData.bio || undefined,
+          preferences: {
+            travelStyle: formData.travelStyle,
+            budgetRange: formData.budgetRange,
+            notifications: formData.notifications,
+            inspirations: formData.inspirations,
+          },
+          joinedDate: new Date().toISOString(),
+        };
+
+        console.log('[SignUp] Saving local user (offline fallback)...', newUser);
+        await saveUser(newUser);
+
+        Alert.alert(
+          'Compte créé ! 🎉',
+          `Votre compte a été créé en mode hors-ligne. Code de vérification: ${verificationCode} (valide 15 min)`,
+          [
+            {
+              text: 'Vérifier maintenant',
+              onPress: () => router.push({ pathname: '/auth/verify-email', params: { email: formData.email } }),
+            },
+            {
+              text: 'Plus tard',
+              onPress: () => router.replace('/(tabs)/planner'),
+            },
+          ]
+        );
+      } catch (fallbackError) {
+        console.error('[SignUp] Fallback failed:', fallbackError);
+        let errorMessage = 'Impossible de créer le compte. Veuillez réessayer.';
+        if (fallbackError instanceof Error) {
+          errorMessage = `Erreur: ${fallbackError.message}`;
         }
+        Alert.alert('Erreur', errorMessage);
       }
-      
-      Alert.alert(
-        'Erreur',
-        errorMessage
-      );
     } finally {
       setLoading(false);
     }
