@@ -20,11 +20,8 @@ import {
   Search, 
   TrendingUp, 
   MapPin, 
-  Plane,
-  Hotel,
   Sparkles,
   ArrowRight,
-  Globe,
   Star,
 } from 'lucide-react-native';
 import { useApp } from '@/store/AppContext';
@@ -84,12 +81,7 @@ export default function PlannerScreen() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
 
-  const quickActions = [
-    { icon: Hotel, label: 'Hôtels', route: '/(tabs)/hotels', color: colors.primary },
-    { icon: MapPin, label: 'Activités', route: '/(tabs)/activities', color: colors.secondary },
-    { icon: Globe, label: 'Restaurants', route: '/(tabs)/restaurants', color: colors.accent },
-    { icon: Plane, label: 'Plus', route: '/(tabs)/more', color: colors.warning },
-  ];
+
 
   const headerOpacity = Platform.OS === 'web' ? 0 : scrollY.interpolate({
     inputRange: [0, 100],
@@ -123,10 +115,7 @@ export default function PlannerScreen() {
     handleDestinationPress(destination);
   }, [handleDestinationPress]);
 
-  const handleQuickAction = useCallback((route: string, label: string) => {
-    console.log('[Planner] Quick action pressed', label);
-    router.push(route as any);
-  }, [router]);
+
 
   const handleCreateTrip = useCallback(() => {
     console.log('[Planner] Create trip pressed');
@@ -296,31 +285,6 @@ export default function PlannerScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.quickActionsContainer}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Réservez votre prochaine aventure</Text>
-          <View style={styles.quickActions}>
-            {quickActions.map((action, index) => (
-              <TouchableOpacity
-                key={index}
-                testID={`quick-action-${action.label}`}
-                style={styles.quickActionCard}
-                onPress={() => handleQuickAction(action.route, action.label)}
-                accessible
-                accessibilityRole="button"
-                accessibilityLabel={action.label}
-              >
-                <LinearGradient
-                  colors={[`${action.color}20`, `${action.color}10`]}
-                  style={styles.quickActionGradient}
-                >
-                  <action.icon color={action.color} size={24} strokeWidth={2} />
-                  <Text style={[styles.quickActionLabel, { color: colors.text }]}>{action.label}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleContainer}>
@@ -625,29 +589,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingTop: 16,
   },
-  quickActionsContainer: {
-    paddingHorizontal: 24,
-    marginBottom: 32,
-  },
-  quickActions: {
-    flexDirection: 'row',
-    gap: 16,
-    marginTop: 16,
-  },
-  quickActionCard: {
-    flex: 1,
-  },
-  quickActionGradient: {
-    alignItems: 'center',
-    paddingVertical: 24,
-    borderRadius: 16,
-    gap: 12,
-  },
-  quickActionLabel: {
-    fontSize: 14,
-    fontWeight: '600' as '600',
-    color: '#FFFFFF',
-  },
+
   section: {
     marginBottom: 32,
   },
