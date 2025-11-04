@@ -6,12 +6,12 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Platform,
+  Modal,
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowDownUp, TrendingUp, DollarSign } from 'lucide-react-native';
+import { ArrowDownUp, TrendingUp, DollarSign, ChevronDown, X } from 'lucide-react-native';
 import { useTheme } from '@/store/ThemeContext';
 
 interface Currency {
@@ -37,6 +37,21 @@ const currencies: Currency[] = [
   { code: 'ZAR', name: 'Rand sud-africain', symbol: 'R', rate: 20.21 },
   { code: 'NGN', name: 'Naira nigérian', symbol: '₦', rate: 1686.50 },
   { code: 'KES', name: 'Shilling kenyan', symbol: 'KSh', rate: 140.85 },
+  { code: 'INR', name: 'Roupie indienne', symbol: '₹', rate: 91.45 },
+  { code: 'BRL', name: 'Real brésilien', symbol: 'R$', rate: 6.13 },
+  { code: 'MXN', name: 'Peso mexicain', symbol: 'MX$', rate: 21.93 },
+  { code: 'RUB', name: 'Rouble russe', symbol: '₽', rate: 106.42 },
+  { code: 'AED', name: 'Dirham émirati', symbol: 'د.إ', rate: 4.00 },
+  { code: 'SAR', name: 'Riyal saoudien', symbol: 'ر.س', rate: 4.09 },
+  { code: 'TRY', name: 'Livre turque', symbol: '₺', rate: 37.52 },
+  { code: 'KRW', name: 'Won sud-coréen', symbol: '₩', rate: 1501.23 },
+  { code: 'SEK', name: 'Couronne suédoise', symbol: 'kr', rate: 11.67 },
+  { code: 'NOK', name: 'Couronne norvégienne', symbol: 'kr', rate: 12.01 },
+  { code: 'DKK', name: 'Couronne danoise', symbol: 'kr', rate: 7.46 },
+  { code: 'PLN', name: 'Zloty polonais', symbol: 'zł', rate: 4.31 },
+  { code: 'THB', name: 'Baht thaïlandais', symbol: '฿', rate: 37.85 },
+  { code: 'SGD', name: 'Dollar singapourien', symbol: 'S$', rate: 1.46 },
+  { code: 'HKD', name: 'Dollar de Hong Kong', symbol: 'HK$', rate: 8.48 },
 ];
 
 export default function CurrencyConverterScreen() {
@@ -45,6 +60,8 @@ export default function CurrencyConverterScreen() {
   const [amount, setAmount] = useState<string>('100');
   const [fromCurrency, setFromCurrency] = useState<Currency>(currencies[0]);
   const [toCurrency, setToCurrency] = useState<Currency>(currencies[1]);
+  const [showFromPicker, setShowFromPicker] = useState<boolean>(false);
+  const [showToPicker, setShowToPicker] = useState<boolean>(false);
 
   const convertedAmount = useMemo(() => {
     const numAmount = parseFloat(amount) || 0;
@@ -60,10 +77,12 @@ export default function CurrencyConverterScreen() {
 
   const handleSelectFromCurrency = useCallback((currency: Currency) => {
     setFromCurrency(currency);
+    setShowFromPicker(false);
   }, []);
 
   const handleSelectToCurrency = useCallback((currency: Currency) => {
     setToCurrency(currency);
+    setShowToPicker(false);
   }, []);
 
   return (
@@ -108,13 +127,17 @@ export default function CurrencyConverterScreen() {
               <Text style={[styles.label, { color: colors.textSecondary }]}>De</Text>
               <TouchableOpacity
                 style={[styles.currencySelector, { backgroundColor: colors.background }]}
+                onPress={() => setShowFromPicker(true)}
               >
-                <Text style={[styles.currencyCode, { color: colors.text }]}>
-                  {fromCurrency.code}
-                </Text>
-                <Text style={[styles.currencyName, { color: colors.textSecondary }]}>
-                  {fromCurrency.name}
-                </Text>
+                <View style={styles.currencySelectorContent}>
+                  <Text style={[styles.currencyCode, { color: colors.text }]}>
+                    {fromCurrency.code}
+                  </Text>
+                  <Text style={[styles.currencyName, { color: colors.textSecondary }]}>
+                    {fromCurrency.name}
+                  </Text>
+                </View>
+                <ChevronDown color={colors.textSecondary} size={20} />
               </TouchableOpacity>
               <TextInput
                 style={[styles.amountInput, { color: colors.text }]}
@@ -137,13 +160,17 @@ export default function CurrencyConverterScreen() {
               <Text style={[styles.label, { color: colors.textSecondary }]}>Vers</Text>
               <TouchableOpacity
                 style={[styles.currencySelector, { backgroundColor: colors.background }]}
+                onPress={() => setShowToPicker(true)}
               >
-                <Text style={[styles.currencyCode, { color: colors.text }]}>
-                  {toCurrency.code}
-                </Text>
-                <Text style={[styles.currencyName, { color: colors.textSecondary }]}>
-                  {toCurrency.name}
-                </Text>
+                <View style={styles.currencySelectorContent}>
+                  <Text style={[styles.currencyCode, { color: colors.text }]}>
+                    {toCurrency.code}
+                  </Text>
+                  <Text style={[styles.currencyName, { color: colors.textSecondary }]}>
+                    {toCurrency.name}
+                  </Text>
+                </View>
+                <ChevronDown color={colors.textSecondary} size={20} />
               </TouchableOpacity>
               <View style={[styles.resultContainer, { backgroundColor: `${colors.primary}10` }]}>
                 <Text style={[styles.resultAmount, { color: colors.primary }]}>
@@ -162,7 +189,7 @@ export default function CurrencyConverterScreen() {
                 1 {fromCurrency.code} = {(toCurrency.rate / fromCurrency.rate).toFixed(4)} {toCurrency.code}
               </Text>
               <Text style={[styles.rateSubtext, { color: colors.textLight }]}>
-                Mis à jour aujourd'hui
+                Mis à jour aujourd&apos;hui
               </Text>
             </View>
           </View>
@@ -198,6 +225,102 @@ export default function CurrencyConverterScreen() {
           </View>
         </View>
       </ScrollView>
+
+      <Modal
+        visible={showFromPicker}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowFromPicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>Choisir la devise</Text>
+              <TouchableOpacity
+                onPress={() => setShowFromPicker(false)}
+                style={styles.closeButton}
+              >
+                <X color={colors.text} size={24} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.modalScroll}>
+              {currencies.map((currency) => (
+                <TouchableOpacity
+                  key={currency.code}
+                  style={[
+                    styles.modalCurrencyItem,
+                    { borderBottomColor: colors.border },
+                    fromCurrency.code === currency.code && {
+                      backgroundColor: `${colors.primary}10`,
+                    },
+                  ]}
+                  onPress={() => handleSelectFromCurrency(currency)}
+                >
+                  <View style={styles.modalCurrencyInfo}>
+                    <Text style={[styles.modalCurrencyCode, { color: colors.text }]}>
+                      {currency.symbol} {currency.code}
+                    </Text>
+                    <Text style={[styles.modalCurrencyName, { color: colors.textSecondary }]}>
+                      {currency.name}
+                    </Text>
+                  </View>
+                  {fromCurrency.code === currency.code && (
+                    <View style={[styles.selectedIndicator, { backgroundColor: colors.primary }]} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={showToPicker}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowToPicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>Choisir la devise</Text>
+              <TouchableOpacity
+                onPress={() => setShowToPicker(false)}
+                style={styles.closeButton}
+              >
+                <X color={colors.text} size={24} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.modalScroll}>
+              {currencies.map((currency) => (
+                <TouchableOpacity
+                  key={currency.code}
+                  style={[
+                    styles.modalCurrencyItem,
+                    { borderBottomColor: colors.border },
+                    toCurrency.code === currency.code && {
+                      backgroundColor: `${colors.primary}10`,
+                    },
+                  ]}
+                  onPress={() => handleSelectToCurrency(currency)}
+                >
+                  <View style={styles.modalCurrencyInfo}>
+                    <Text style={[styles.modalCurrencyCode, { color: colors.text }]}>
+                      {currency.symbol} {currency.code}
+                    </Text>
+                    <Text style={[styles.modalCurrencyName, { color: colors.textSecondary }]}>
+                      {currency.name}
+                    </Text>
+                  </View>
+                  {toCurrency.code === currency.code && (
+                    <View style={[styles.selectedIndicator, { backgroundColor: colors.primary }]} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -258,6 +381,9 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     marginBottom: 12,
+  },
+  currencySelectorContent: {
+    flex: 1,
   },
   currencyCode: {
     fontSize: 20,
@@ -344,5 +470,55 @@ const styles = StyleSheet.create({
   currencyItemRate: {
     fontSize: 14,
     fontWeight: '600' as const,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    maxHeight: '80%',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 20,
+    borderBottomWidth: 1,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+  },
+  closeButton: {
+    padding: 4,
+  },
+  modalScroll: {
+    maxHeight: 500,
+  },
+  modalCurrencyItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  modalCurrencyInfo: {
+    flex: 1,
+  },
+  modalCurrencyCode: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    marginBottom: 4,
+  },
+  modalCurrencyName: {
+    fontSize: 14,
+  },
+  selectedIndicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
 });
