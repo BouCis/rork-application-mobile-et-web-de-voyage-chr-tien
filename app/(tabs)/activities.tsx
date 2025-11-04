@@ -18,8 +18,6 @@ import {
   MapPin,
   Star,
   Clock,
-  Users,
-  Compass,
   Mountain,
   Camera,
   Landmark,
@@ -29,6 +27,7 @@ import {
 } from 'lucide-react-native';
 import { useTheme } from '@/store/ThemeContext';
 import * as Location from 'expo-location';
+import { trpc } from '@/lib/trpc';
 
 interface Activity {
   id: string;
@@ -46,288 +45,7 @@ interface Activity {
   distance?: number;
 }
 
-const activities: Activity[] = [
-  {
-    id: '1',
-    name: 'Visite guidée du Louvre',
-    location: 'Paris, France',
-    rating: 4.9,
-    reviews: 3245,
-    price: 45,
-    duration: '3h',
-    image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=800',
-    category: 'Culture',
-    description: 'Découvrez les trésors du plus grand musée du monde',
-    latitude: 48.8606,
-    longitude: 2.3376,
-  },
-  {
-    id: '2',
-    name: 'Plongée sous-marine',
-    location: 'Bali, Indonésie',
-    rating: 4.8,
-    reviews: 892,
-    price: 80,
-    duration: '4h',
-    image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
-    category: 'Aventure',
-    description: 'Explorez les récifs coralliens',
-    latitude: -8.3405,
-    longitude: 115.0920,
-  },
-  {
-    id: '3',
-    name: 'Safari en jeep',
-    location: 'Serengeti, Tanzanie',
-    rating: 4.9,
-    reviews: 1567,
-    price: 150,
-    duration: '8h',
-    image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800',
-    category: 'Nature',
-    description: 'Observation de la faune sauvage',
-    latitude: -2.3333,
-    longitude: 34.8333,
-  },
-  {
-    id: '4',
-    name: 'Cours de cuisine locale',
-    location: 'Tokyo, Japon',
-    rating: 4.7,
-    reviews: 654,
-    price: 70,
-    duration: '3h',
-    image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800',
-    category: 'Gastronomie',
-    description: 'Apprenez à préparer des sushis authentiques',
-    latitude: 35.6762,
-    longitude: 139.6503,
-  },
-  {
-    id: '5',
-    name: 'Randonnée en montagne',
-    location: 'Alpes, Suisse',
-    rating: 4.6,
-    reviews: 432,
-    price: 60,
-    duration: '6h',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-    category: 'Sport',
-    description: 'Randonnée guidée avec vues panoramiques',
-    latitude: 46.8182,
-    longitude: 8.2275,
-  },
-  {
-    id: '6',
-    name: 'Tour de la Tour Eiffel',
-    location: 'Paris, France',
-    rating: 4.8,
-    reviews: 8932,
-    price: 35,
-    duration: '2h',
-    image: 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800',
-    category: 'Culture',
-    description: 'Montez au sommet du monument le plus célèbre de Paris',
-    latitude: 48.8584,
-    longitude: 2.2945,
-  },
-  {
-    id: '7',
-    name: 'Balade en bateau-mouche',
-    location: 'Paris, France',
-    rating: 4.5,
-    reviews: 2341,
-    price: 25,
-    duration: '1h30',
-    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800',
-    category: 'Visites',
-    description: 'Découvrez Paris depuis la Seine',
-    latitude: 48.8566,
-    longitude: 2.3522,
-  },
-  {
-    id: '8',
-    name: 'Visite de Montmartre',
-    location: 'Paris, France',
-    rating: 4.7,
-    reviews: 1876,
-    price: 30,
-    duration: '3h',
-    image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=800',
-    category: 'Culture',
-    description: 'Explorez le quartier bohème de Paris',
-    latitude: 48.8867,
-    longitude: 2.3431,
-  },
-  {
-    id: '9',
-    name: 'Visite de la Cité de Carcassonne',
-    location: 'Carcassonne, Occitanie',
-    rating: 4.9,
-    reviews: 5432,
-    price: 25,
-    duration: '3h',
-    image: 'https://images.unsplash.com/photo-1569949381669-ecf31ae8e613?w=800',
-    category: 'Culture',
-    description: 'Découvrez la plus grande cité médiévale fortifiée d\'Europe',
-    latitude: 43.2063,
-    longitude: 2.3629,
-  },
-  {
-    id: '10',
-    name: 'Balade au Pont du Gard',
-    location: 'Vers-Pont-du-Gard, Occitanie',
-    rating: 4.8,
-    reviews: 4321,
-    price: 12,
-    duration: '2h',
-    image: 'https://images.unsplash.com/photo-1590955256807-a5b33dc08b55?w=800',
-    category: 'Culture',
-    description: 'Aqueduc romain classé au patrimoine mondial de l\'UNESCO',
-    latitude: 43.9475,
-    longitude: 4.5357,
-  },
-  {
-    id: '11',
-    name: 'Tour en bateau sur le Canal du Midi',
-    location: 'Toulouse, Occitanie',
-    rating: 4.6,
-    reviews: 2134,
-    price: 35,
-    duration: '2h30',
-    image: 'https://images.unsplash.com/photo-1581888227599-779811939961?w=800',
-    category: 'Visites',
-    description: 'Croisière sur le célèbre canal inscrit à l\'UNESCO',
-    latitude: 43.6047,
-    longitude: 1.4442,
-  },
-  {
-    id: '12',
-    name: 'Visite du Musée Toulouse-Lautrec',
-    location: 'Albi, Occitanie',
-    rating: 4.7,
-    reviews: 1987,
-    price: 18,
-    duration: '2h',
-    image: 'https://images.unsplash.com/photo-1577083552431-6e5fd01988ec?w=800',
-    category: 'Culture',
-    description: 'Plus grande collection d\'œuvres de Toulouse-Lautrec au monde',
-    latitude: 43.9285,
-    longitude: 2.1472,
-  },
-  {
-    id: '13',
-    name: 'Randonnée au Pic du Canigou',
-    location: 'Pyrénées-Orientales, Occitanie',
-    rating: 4.8,
-    reviews: 876,
-    price: 45,
-    duration: '8h',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-    category: 'Sport',
-    description: 'Ascension du sommet emblématique de la Catalogne',
-    latitude: 42.5186,
-    longitude: 2.4561,
-  },
-  {
-    id: '14',
-    name: 'Exploration des Arènes de Nîmes',
-    location: 'Nîmes, Occitanie',
-    rating: 4.7,
-    reviews: 3456,
-    price: 15,
-    duration: '2h',
-    image: 'https://images.unsplash.com/photo-1576920360864-b702dd04f6b4?w=800',
-    category: 'Culture',
-    description: 'Amphithéâtre romain le mieux conservé au monde',
-    latitude: 43.8364,
-    longitude: 4.3601,
-  },
-  {
-    id: '15',
-    name: 'Visite de la Place de la Comédie',
-    location: 'Montpellier, Occitanie',
-    rating: 4.5,
-    reviews: 2789,
-    price: 0,
-    duration: '1h30',
-    image: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800',
-    category: 'Visites',
-    description: 'Plus grande place piétonne d\'Europe',
-    latitude: 43.6081,
-    longitude: 3.8784,
-  },
-  {
-    id: '16',
-    name: 'Dégustation de vins à Collioure',
-    location: 'Collioure, Occitanie',
-    rating: 4.9,
-    reviews: 1543,
-    price: 50,
-    duration: '3h',
-    image: 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=800',
-    category: 'Gastronomie',
-    description: 'Dégustation de vins régionaux avec vue sur la Méditerranée',
-    latitude: 42.5260,
-    longitude: 3.0843,
-  },
-  {
-    id: '17',
-    name: 'Balade dans le Jardin Japonais',
-    location: 'Toulouse, Occitanie',
-    rating: 4.6,
-    reviews: 1876,
-    price: 8,
-    duration: '1h30',
-    image: 'https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?w=800',
-    category: 'Nature',
-    description: 'Jardin zen au cœur de la ville rose',
-    latitude: 43.5885,
-    longitude: 1.4534,
-  },
-  {
-    id: '18',
-    name: 'Cité de l\'Espace',
-    location: 'Toulouse, Occitanie',
-    rating: 4.8,
-    reviews: 5678,
-    price: 28,
-    duration: '4h',
-    image: 'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?w=800',
-    category: 'Aventure',
-    description: 'Parc à thème dédié à l\'espace et à la conquête spatiale',
-    latitude: 43.5864,
-    longitude: 1.4931,
-  },
-  {
-    id: '19',
-    name: 'Visite du Palais des Papes',
-    location: 'Avignon, Occitanie',
-    rating: 4.7,
-    reviews: 4123,
-    price: 20,
-    duration: '2h30',
-    image: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?w=800',
-    category: 'Culture',
-    description: 'Plus grand palais gothique du monde',
-    latitude: 43.9513,
-    longitude: 4.8075,
-  },
-  {
-    id: '20',
-    name: 'Plage et sports nautiques',
-    location: 'Perpignan, Occitanie',
-    rating: 4.5,
-    reviews: 1234,
-    price: 40,
-    duration: '5h',
-    image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
-    category: 'Plage',
-    description: 'Activités nautiques sur les plages catalanes',
-    latitude: 42.6887,
-    longitude: 2.8948,
-  },
-];
+
 
 
 
@@ -369,6 +87,11 @@ export default function ActivitiesScreen() {
   } | null>(null);
   const [locationLoading, setLocationLoading] = useState<boolean>(true);
   const [locationError, setLocationError] = useState<string | null>(null);
+
+  const activitiesQuery = trpc.activities.getAll.useQuery({
+    category: selectedCategory || undefined,
+    search: searchQuery || undefined,
+  });
 
   useEffect(() => {
     console.log('[Activities] Requesting location permission...');
@@ -428,7 +151,11 @@ export default function ActivitiesScreen() {
   }, []);
 
   const filteredActivities = useMemo(() => {
-    let results = activities.map(activity => {
+    if (!activitiesQuery.data) return [];
+
+    type ActivityWithDistance = typeof activitiesQuery.data[number] & { distance?: number };
+
+    let results: ActivityWithDistance[] = activitiesQuery.data.map(activity => {
       if (userLocation && activity.latitude && activity.longitude) {
         const distance = calculateDistance(
           userLocation.latitude,
@@ -441,26 +168,12 @@ export default function ActivitiesScreen() {
       return activity;
     });
 
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      results = results.filter(a => 
-        a.name.toLowerCase().includes(query) ||
-        a.location.toLowerCase().includes(query) ||
-        a.category.toLowerCase().includes(query) ||
-        a.description.toLowerCase().includes(query)
-      );
-    }
-
-    if (selectedCategory) {
-      results = results.filter(a => a.category === selectedCategory);
-    }
-
     if (userLocation) {
       results.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
     }
 
     return results;
-  }, [searchQuery, selectedCategory, userLocation]);
+  }, [activitiesQuery.data, userLocation]);
 
   const handleActivityPress = useCallback((activity: Activity) => {
     console.log('[Activities] Activity pressed:', activity.name);
@@ -589,7 +302,18 @@ export default function ActivitiesScreen() {
             <Text style={styles.resultsCount}>{filteredActivities.length} activité{filteredActivities.length > 1 ? 's' : ''}</Text>
           </View>
 
-          {filteredActivities.length === 0 ? (
+          {activitiesQuery.isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={colors.primary} />
+              <Text style={styles.loadingText}>Chargement des activités...</Text>
+            </View>
+          ) : activitiesQuery.error ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateText}>
+                Erreur lors du chargement des activités
+              </Text>
+            </View>
+          ) : filteredActivities.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateText}>
                 Aucune activité trouvée avec ces critères
@@ -886,6 +610,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center' as const,
   },
   emptyStateText: {
+    fontSize: 15,
+    textAlign: 'center' as const,
+  },
+  loadingContainer: {
+    padding: 64,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    gap: 16,
+  },
+  loadingText: {
     fontSize: 15,
     textAlign: 'center' as const,
   },

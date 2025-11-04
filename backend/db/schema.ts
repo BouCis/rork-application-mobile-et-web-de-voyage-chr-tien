@@ -177,3 +177,38 @@ export const notifications = sqliteTable('notifications', {
   actionUrl: text('action_url'),
   createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const activities = sqliteTable('activities', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  location: text('location').notNull(),
+  city: text('city').notNull(),
+  region: text('region').notNull(),
+  country: text('country').notNull().default('France'),
+  rating: integer('rating').notNull(),
+  reviews: integer('reviews').notNull().default(0),
+  price: integer('price').notNull(),
+  duration: text('duration').notNull(),
+  image: text('image').notNull(),
+  category: text('category', { enum: ['Culture', 'Aventure', 'Nature', 'Gastronomie', 'Sport', 'Visites', 'Plage'] }).notNull(),
+  description: text('description').notNull(),
+  latitude: integer('latitude').notNull(),
+  longitude: integer('longitude').notNull(),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const activityBookings = sqliteTable('activity_bookings', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  activityId: text('activity_id').notNull().references(() => activities.id, { onDelete: 'cascade' }),
+  tripId: text('trip_id').references(() => trips.id, { onDelete: 'set null' }),
+  bookingDate: text('booking_date').notNull(),
+  numberOfPeople: integer('number_of_people').notNull().default(1),
+  totalPrice: integer('total_price').notNull(),
+  status: text('status', { enum: ['pending', 'confirmed', 'cancelled'] }).notNull().default('pending'),
+  notes: text('notes'),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
