@@ -196,7 +196,7 @@ export default function PlannerScreen() {
   }, []);
 
   const handleSearchBlur = useCallback(() => {
-    setTimeout(() => setShowSearchResults(false), 200);
+    setTimeout(() => setShowSearchResults(false), 300);
   }, []);
 
   const searchResults = React.useMemo(() => {
@@ -261,43 +261,47 @@ export default function PlannerScreen() {
               autoCapitalize="words"
             />
           </LinearGradient>
-          {showSearchResults && searchQuery.length > 0 && (
+          {showSearchResults && (
             <View style={[styles.searchResultsContainer, { backgroundColor: colors.surface }]}>
               <ScrollView
                 style={styles.searchResultsScroll}
                 keyboardShouldPersistTaps="handled"
                 nestedScrollEnabled
+                showsVerticalScrollIndicator={true}
               >
-                {searchResults.map((destination) => (
-                  <TouchableOpacity
-                    key={destination.id}
-                    testID={`search-result-${destination.id}`}
-                    style={[styles.searchResultItem, { borderBottomColor: colors.border }]}
-                    onPress={() => handleSelectSearchDestination(destination)}
-                    accessible
-                    accessibilityRole="button"
-                    accessibilityLabel={`Sélectionner ${destination.name}`}
-                  >
-                    <View style={[styles.searchResultIcon, { backgroundColor: `${colors.primary}15` }]}>
-                      <MapPin color={colors.primary} size={18} strokeWidth={2} />
-                    </View>
-                    <View style={styles.searchResultInfo}>
-                      <Text style={[styles.searchResultName, { color: colors.text }]}>{destination.name}</Text>
-                      <Text style={[styles.searchResultCountry, { color: colors.textSecondary }]}>
-                        {destination.country} • {destination.continent}
-                      </Text>
-                    </View>
-                    <View style={styles.searchResultBudget}>
-                      <Text style={[styles.searchResultBudgetValue, { color: colors.primary }]}>
-                        {destination.averageBudget.budget}€
-                      </Text>
-                      <Text style={[styles.searchResultBudgetLabel, { color: colors.textSecondary }]}>/jour</Text>
-                    </View>
-                  </TouchableOpacity>
-                ))}
-                {searchResults.length === 0 && (
+                {searchResults.length > 0 ? (
+                  searchResults.map((destination) => (
+                    <TouchableOpacity
+                      key={destination.id}
+                      testID={`search-result-${destination.id}`}
+                      style={[styles.searchResultItem, { borderBottomColor: colors.border }]}
+                      onPress={() => handleSelectSearchDestination(destination)}
+                      accessible
+                      accessibilityRole="button"
+                      accessibilityLabel={`Sélectionner ${destination.name}`}
+                    >
+                      <View style={[styles.searchResultIcon, { backgroundColor: `${colors.primary}15` }]}>
+                        <MapPin color={colors.primary} size={18} strokeWidth={2} />
+                      </View>
+                      <View style={styles.searchResultInfo}>
+                        <Text style={[styles.searchResultName, { color: colors.text }]}>{destination.name}</Text>
+                        <Text style={[styles.searchResultCountry, { color: colors.textSecondary }]}>
+                          {destination.country} • {destination.continent}
+                        </Text>
+                      </View>
+                      <View style={styles.searchResultBudget}>
+                        <Text style={[styles.searchResultBudgetValue, { color: colors.primary }]}>
+                          {destination.averageBudget.budget}€
+                        </Text>
+                        <Text style={[styles.searchResultBudgetLabel, { color: colors.textSecondary }]}>/jour</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))
+                ) : (
                   <View style={styles.searchResultEmpty}>
-                    <Text style={[styles.searchResultEmptyText, { color: colors.textSecondary }]}>Aucune destination trouvée</Text>
+                    <Text style={[styles.searchResultEmptyText, { color: colors.textSecondary }]}>
+                      {searchQuery ? 'Aucune destination trouvée' : 'Commencez à taper pour rechercher'}
+                    </Text>
                   </View>
                 )}
               </ScrollView>
