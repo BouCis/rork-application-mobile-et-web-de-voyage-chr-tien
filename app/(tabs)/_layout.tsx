@@ -1,8 +1,7 @@
 import { Tabs } from "expo-router";
 import { Home, Hotel, MapPin, UtensilsCrossed, MoreHorizontal } from "lucide-react-native";
 import React from "react";
-import { Platform, StyleSheet } from "react-native";
-import { BlurView } from "expo-blur";
+import { Platform, StyleSheet, View } from "react-native";
 
 import { useTheme } from "@/store/ThemeContext";
 
@@ -29,19 +28,14 @@ export default function TabLayout() {
           shadowOpacity: 0.3,
           shadowRadius: 12,
         },
-        tabBarBackground: () => Platform.OS !== 'web' && colors.tabBarBlur ? (
-          <BlurView
-            intensity={95}
-            tint={isDark ? 'dark' : 'light'}
-            style={StyleSheet.absoluteFill}
+        tabBarBackground: () => (
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              { backgroundColor: (colors.tabBarBackground || colors.surface) + (Platform.OS === 'ios' ? 'CC' : '') }
+            ]}
           />
-        ) : Platform.OS !== 'web' ? (
-          <BlurView
-            intensity={0}
-            tint={isDark ? 'dark' : 'light'}
-            style={[StyleSheet.absoluteFill, { backgroundColor: colors.tabBarBackground || colors.surface }]}
-          />
-        ) : null,
+        ),
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '600',
@@ -109,20 +103,8 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          href: null,
-          title: "Profil",
-        }}
-      />
-      <Tabs.Screen
-        name="gallery"
-        options={{
-          href: null,
-          title: "Galerie",
-        }}
-      />
+
+
       <Tabs.Screen
         name="more"
         options={{

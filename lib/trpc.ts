@@ -39,7 +39,7 @@ const getBaseUrl = () => {
 export const trpcClient = trpc.createClient({
   links: [
     loggerLink({
-      enabled: () => true,
+      enabled: (opts) => opts.direction === 'down' && opts.result instanceof Error,
     }),
     httpLink({
       url: `${getBaseUrl()}/api/trpc`,
