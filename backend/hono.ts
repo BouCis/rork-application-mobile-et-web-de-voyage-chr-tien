@@ -6,13 +6,29 @@ import { createContext } from "./trpc/create-context";
 
 const app = new Hono();
 
-app.use("*", cors());
+app.use("*", cors({
+  origin: '*',
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  exposeHeaders: ['Content-Length'],
+  maxAge: 86400,
+  credentials: false,
+}));
 
 app.use(
   "/trpc/*",
   trpcServer({
     router: appRouter,
     createContext,
+    onError(opts) {
+      const { error, type, path } = opts;
+      console.error('[tRPC Error]', {
+        type,
+        path,
+        error: error.message,
+        code: error.code,
+      });
+    },
   })
 );
 
