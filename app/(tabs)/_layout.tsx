@@ -110,6 +110,22 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="profile"
+        options={{
+          href: null,
+          title: "Profil",
+          tabBarButton: () => null,
+        }}
+      />
+      <Tabs.Screen
+        name="gallery"
+        options={{
+          href: null,
+          title: "Galerie",
+          tabBarButton: () => null,
+        }}
+      />
+      <Tabs.Screen
         name="more"
         options={{
           title: "Plus",
