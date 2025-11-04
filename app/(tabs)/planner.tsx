@@ -193,7 +193,7 @@ export default function PlannerScreen() {
   }, []);
 
   const handleSearchBlur = useCallback(() => {
-    setTimeout(() => setShowSearchResults(false), 300);
+    setTimeout(() => setShowSearchResults(false), 200);
   }, []);
 
   const searchResults = React.useMemo(() => {
@@ -237,27 +237,33 @@ export default function PlannerScreen() {
         </View>
 
         <View style={styles.searchContainer}>
-          <LinearGradient
-            colors={['rgba(99, 102, 241, 0.1)', 'rgba(236, 72, 153, 0.1)']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.searchGradient}
+          <Pressable
+            onPress={() => {
+              console.log('[Planner] Search box pressed - focusing input');
+            }}
           >
-            <Search color={colors.textSecondary} size={20} />
-            <TextInput
-              testID="input-search"
-              style={styles.searchInput}
-              placeholder="Où allez-vous ?"
-              placeholderTextColor={colors.textSecondary}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              onFocus={handleSearchFocus}
-              onBlur={handleSearchBlur}
-              returnKeyType="search"
-              autoCorrect={false}
-              autoCapitalize="words"
-            />
-          </LinearGradient>
+            <LinearGradient
+              colors={['rgba(99, 102, 241, 0.1)', 'rgba(236, 72, 153, 0.1)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.searchGradient}
+            >
+              <Search color={colors.textSecondary} size={20} />
+              <TextInput
+                testID="input-search"
+                style={styles.searchInput}
+                placeholder="Où allez-vous ?"
+                placeholderTextColor={colors.textSecondary}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                onFocus={handleSearchFocus}
+                onBlur={handleSearchBlur}
+                returnKeyType="search"
+                autoCorrect={false}
+                autoCapitalize="words"
+              />
+            </LinearGradient>
+          </Pressable>
           {showSearchResults && (
             <View style={[styles.searchResultsContainer, { backgroundColor: colors.surface }]}>
               <ScrollView
@@ -268,7 +274,7 @@ export default function PlannerScreen() {
               >
                 {searchResults.length > 0 ? (
                   searchResults.map((destination) => (
-                    <TouchableOpacity
+                    <Pressable
                       key={destination.id}
                       testID={`search-result-${destination.id}`}
                       style={[styles.searchResultItem, { borderBottomColor: colors.border }]}
@@ -292,7 +298,7 @@ export default function PlannerScreen() {
                         </Text>
                         <Text style={[styles.searchResultBudgetLabel, { color: colors.textSecondary }]}>/jour</Text>
                       </View>
-                    </TouchableOpacity>
+                    </Pressable>
                   ))
                 ) : (
                   <View style={styles.searchResultEmpty}>

@@ -58,12 +58,6 @@ function RootLayoutNav() {
         }} 
       />
       <Stack.Screen 
-        name="search/results" 
-        options={{ 
-          headerShown: false
-        }} 
-      />
-      <Stack.Screen 
         name="destination/prepare" 
         options={{ 
           headerShown: false
