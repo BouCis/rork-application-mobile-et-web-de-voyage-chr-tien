@@ -158,7 +158,13 @@ export default function VerifyEmailScreen() {
       >
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/(tabs)/planner');
+            }
+          }}
         >
           <ArrowLeft color={theme.colors.text} size={24} />
         </TouchableOpacity>

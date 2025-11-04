@@ -752,7 +752,13 @@ export default function SignUpScreen() {
 
               <TouchableOpacity
                 style={styles.loginLink}
-                onPress={() => router.back()}
+                onPress={() => {
+                  if (router.canGoBack()) {
+                    router.back();
+                  } else {
+                    router.replace('/(tabs)/planner');
+                  }
+                }}
               >
                 <Text style={styles.loginLinkText}>
                   Vous avez déjà un compte ? <Text style={styles.loginLinkBold}>Se connecter</Text>
