@@ -11,7 +11,7 @@ export default function IndexGate() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      router.replace('/(tabs)/planner');
+      router.replace('/auth/signup');
     }, 100);
 
     return () => clearTimeout(timeout);
