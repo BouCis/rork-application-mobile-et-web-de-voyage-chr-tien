@@ -386,7 +386,7 @@ export default function PlannerScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Mes voyages</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text, paddingHorizontal: 24 }]}>Mes voyages</Text>
           {trips.length === 0 ? (
             <TouchableOpacity
               testID="card-create-trip"
