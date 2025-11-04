@@ -11,6 +11,7 @@ import {
   Platform,
   Image,
   Pressable,
+  TextInput,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -29,8 +30,7 @@ import {
 } from 'lucide-react-native';
 import { useApp } from '@/store/AppContext';
 import { useTheme } from '@/store/ThemeContext';
-import DestinationSearch from '@/components/DestinationSearch';
-import type { Destination as DestinationType } from '@/data/destinations';
+import { searchDestinations, type Destination as DestinationType } from '@/data/destinations';
 
 const { width } = Dimensions.get('window');
 
@@ -88,9 +88,10 @@ export default function PlannerScreen() {
   const router = useRouter();
   const { trips, user } = useApp();
   const { colors, spacing, fontSize, fontWeight, borderRadius } = useTheme();
-  const [searchModalVisible, setSearchModalVisible] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<string>('destinations');
   const [scrollY] = useState<Animated.Value>(new Animated.Value(0));
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
 
   const quickActions = [
     { icon: Hotel, label: 'Hôtels', route: '/(tabs)/hotels', color: colors.primary },
@@ -180,22 +181,27 @@ export default function PlannerScreen() {
     );
   }, [handleDestinationPress]);
 
-  const handleOpenSearch = useCallback(() => {
-    console.log('[Planner] Opening destination search');
-    setSearchModalVisible(true);
-  }, []);
-
-  const handleCloseSearch = useCallback(() => {
-    setSearchModalVisible(false);
-  }, []);
-
-  const handleSelectDestination = useCallback((destination: DestinationType) => {
+  const handleSelectSearchDestination = useCallback((destination: DestinationType) => {
     console.log('[Planner] Selected destination:', destination.name);
+    setSearchQuery('');
+    setShowSearchResults(false);
     router.push({
       pathname: '/destination/prepare',
       params: { destinationId: destination.id }
     });
   }, [router]);
+
+  const handleSearchFocus = useCallback(() => {
+    setShowSearchResults(true);
+  }, []);
+
+  const handleSearchBlur = useCallback(() => {
+    setTimeout(() => setShowSearchResults(false), 200);
+  }, []);
+
+  const searchResults = React.useMemo(() => {
+    return searchDestinations(searchQuery);
+  }, [searchQuery]);
 
   return (
     <View style={styles.container}>
@@ -233,14 +239,7 @@ export default function PlannerScreen() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          testID="btn-open-search"
-          style={styles.searchContainer}
-          onPress={handleOpenSearch}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="Rechercher une destination"
-        >
+        <View style={styles.searchContainer}>
           <LinearGradient
             colors={['rgba(99, 102, 241, 0.1)', 'rgba(236, 72, 153, 0.1)']}
             start={{ x: 0, y: 0 }}
@@ -248,9 +247,63 @@ export default function PlannerScreen() {
             style={styles.searchGradient}
           >
             <Search color={colors.textSecondary} size={20} />
-            <Text style={styles.searchPlaceholder}>Où allez-vous ?</Text>
+            <TextInput
+              testID="input-search"
+              style={styles.searchInput}
+              placeholder="Où allez-vous ?"
+              placeholderTextColor={colors.textSecondary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              onFocus={handleSearchFocus}
+              onBlur={handleSearchBlur}
+              returnKeyType="search"
+              autoCorrect={false}
+              autoCapitalize="words"
+            />
           </LinearGradient>
-        </TouchableOpacity>
+          {showSearchResults && searchQuery.length > 0 && (
+            <View style={[styles.searchResultsContainer, { backgroundColor: colors.surface }]}>
+              <ScrollView
+                style={styles.searchResultsScroll}
+                keyboardShouldPersistTaps="handled"
+                nestedScrollEnabled
+              >
+                {searchResults.map((destination) => (
+                  <TouchableOpacity
+                    key={destination.id}
+                    testID={`search-result-${destination.id}`}
+                    style={[styles.searchResultItem, { borderBottomColor: colors.border }]}
+                    onPress={() => handleSelectSearchDestination(destination)}
+                    accessible
+                    accessibilityRole="button"
+                    accessibilityLabel={`Sélectionner ${destination.name}`}
+                  >
+                    <View style={[styles.searchResultIcon, { backgroundColor: `${colors.primary}15` }]}>
+                      <MapPin color={colors.primary} size={18} strokeWidth={2} />
+                    </View>
+                    <View style={styles.searchResultInfo}>
+                      <Text style={[styles.searchResultName, { color: colors.text }]}>{destination.name}</Text>
+                      <Text style={[styles.searchResultCountry, { color: colors.textSecondary }]}>
+                        {destination.country} • {destination.continent}
+                      </Text>
+                    </View>
+                    <View style={styles.searchResultBudget}>
+                      <Text style={[styles.searchResultBudgetValue, { color: colors.primary }]}>
+                        {destination.averageBudget.budget}€
+                      </Text>
+                      <Text style={[styles.searchResultBudgetLabel, { color: colors.textSecondary }]}>/jour</Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+                {searchResults.length === 0 && (
+                  <View style={styles.searchResultEmpty}>
+                    <Text style={[styles.searchResultEmptyText, { color: colors.textSecondary }]}>Aucune destination trouvée</Text>
+                  </View>
+                )}
+              </ScrollView>
+            </View>
+          )}
+        </View>
 
         <ScrollView
           horizontal
@@ -459,11 +512,7 @@ export default function PlannerScreen() {
         </View>
       </ScrollView>
 
-      <DestinationSearch
-        visible={searchModalVisible}
-        onClose={handleCloseSearch}
-        onSelectDestination={handleSelectDestination}
-      />
+
     </View>
   );
 }
@@ -529,6 +578,8 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     marginTop: 16,
+    position: 'relative',
+    zIndex: 1000,
   },
   searchGradient: {
     flexDirection: 'row',
@@ -539,11 +590,80 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
-  searchPlaceholder: {
+  searchInput: {
     flex: 1,
     marginLeft: 12,
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#FFFFFF',
+    paddingVertical: 0,
+  },
+  searchResultsContainer: {
+    position: 'absolute',
+    top: 60,
+    left: 0,
+    right: 0,
+    maxHeight: 300,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  searchResultsScroll: {
+    maxHeight: 300,
+  },
+  searchResultItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  searchResultIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  searchResultInfo: {
+    flex: 1,
+  },
+  searchResultName: {
+    fontSize: 16,
+    fontWeight: '600' as '600',
+    marginBottom: 2,
+  },
+  searchResultCountry: {
+    fontSize: 13,
+  },
+  searchResultBudget: {
+    alignItems: 'flex-end',
+  },
+  searchResultBudgetValue: {
+    fontSize: 16,
+    fontWeight: '700' as '700',
+  },
+  searchResultBudgetLabel: {
+    fontSize: 11,
+  },
+  searchResultEmpty: {
+    padding: 24,
+    alignItems: 'center',
+  },
+  searchResultEmptyText: {
+    fontSize: 14,
   },
   tabsScroll: {
     paddingTop: 16,
