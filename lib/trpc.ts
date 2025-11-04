@@ -1,5 +1,5 @@
 import { createTRPCReact } from "@trpc/react-query";
-import { httpLink } from "@trpc/client";
+import { httpLink, loggerLink } from "@trpc/client";
 import type { AppRouter } from "@/backend/trpc/app-router";
 import superjson from "superjson";
 
@@ -17,9 +17,23 @@ const getBaseUrl = () => {
 
 export const trpcClient = trpc.createClient({
   links: [
+    loggerLink({
+      enabled: (opts) =>
+        process.env.NODE_ENV === 'development' ||
+        (opts.direction === 'down' && opts.result instanceof Error),
+    }),
     httpLink({
       url: `${getBaseUrl()}/api/trpc`,
       transformer: superjson,
+      fetch(url, options) {
+        return fetch(url, {
+          ...options,
+          headers: {
+            ...options?.headers,
+            'Content-Type': 'application/json',
+          },
+        });
+      },
     }),
   ],
 });

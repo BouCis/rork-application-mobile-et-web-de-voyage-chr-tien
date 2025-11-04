@@ -274,10 +274,22 @@ export default function SignUpScreen() {
       }
     } catch (error) {
       console.error('[SignUp] Erreur lors de la création du compte:', error);
+      
+      let errorMessage = 'Impossible de créer le compte. Veuillez réessayer.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('existe déjà')) {
+          errorMessage = 'Un compte avec cet email existe déjà. Veuillez vous connecter ou utiliser un autre email.';
+        } else if (error.message.includes('JSON Parse error')) {
+          errorMessage = 'Erreur de connexion au serveur. Veuillez vérifier votre connexion et réessayer.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       Alert.alert(
         'Erreur',
-        'Impossible de créer le compte. Veuillez réessayer.\n' +
-        (error instanceof Error ? error.message : '')
+        errorMessage
       );
     } finally {
       setLoading(false);
