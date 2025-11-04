@@ -21,6 +21,11 @@ import {
   LogOut,
   ChevronRight,
   Sparkles,
+  DollarSign,
+  Phone,
+  Globe,
+  Calculator,
+  BookOpen,
 } from 'lucide-react-native';
 import { useApp } from '@/store/AppContext';
 import { useTheme } from '@/store/ThemeContext';
@@ -63,6 +68,39 @@ export default function MoreScreen() {
     Alert.alert(
       '💬 Forum de voyage',
       'Partagez vos expériences et conseils.\n\nFonctionnalité à venir.',
+      [{ text: 'OK' }]
+    );
+  }, []);
+
+  const handleCurrencyPress = useCallback(() => {
+    console.log('[More] Currency converter pressed');
+    router.push('/tools/currency-converter');
+  }, []);
+
+  const handleEmergencyPress = useCallback(() => {
+    console.log('[More] Emergency numbers pressed');
+    router.push('/tools/emergency-numbers');
+  }, []);
+
+  const handlePhraseGuidePress = useCallback(() => {
+    console.log('[More] Phrase guide pressed');
+    router.push('/tools/phrase-guide');
+  }, []);
+
+  const handleBudgetPress = useCallback(() => {
+    console.log('[More] Budget calculator pressed');
+    Alert.alert(
+      '💰 Calculateur de budget',
+      'Planifiez et gérez votre budget de voyage.\n\nFonctionnalité à venir.',
+      [{ text: 'OK' }]
+    );
+  }, []);
+
+  const handleJournalPress = useCallback(() => {
+    console.log('[More] Travel journal pressed');
+    Alert.alert(
+      '📖 Carnet de voyage',
+      'Documentez vos aventures et souvenirs.\n\nFonctionnalité à venir.',
       [{ text: 'OK' }]
     );
   }, []);
@@ -131,6 +169,44 @@ export default function MoreScreen() {
       description: 'Communauté voyage',
       onPress: handleForumPress,
       color: '#06B6D4',
+    },
+  ];
+
+  const travelTools: MenuItem[] = [
+    {
+      icon: DollarSign,
+      label: 'Devises',
+      description: 'Convertisseur de monnaie',
+      onPress: handleCurrencyPress,
+      color: '#F59E0B',
+    },
+    {
+      icon: Phone,
+      label: 'Urgences',
+      description: 'Numéros d\'urgence',
+      onPress: handleEmergencyPress,
+      color: '#EF4444',
+    },
+    {
+      icon: Globe,
+      label: 'Phrases',
+      description: 'Guide de conversation',
+      onPress: handlePhraseGuidePress,
+      color: '#8B5CF6',
+    },
+    {
+      icon: Calculator,
+      label: 'Budget',
+      description: 'Calculateur de budget',
+      onPress: handleBudgetPress,
+      color: '#EC4899',
+    },
+    {
+      icon: BookOpen,
+      label: 'Carnet',
+      description: 'Journal de voyage',
+      onPress: handleJournalPress,
+      color: '#14B8A6',
     },
   ];
 
@@ -248,6 +324,32 @@ export default function MoreScreen() {
               <TouchableOpacity
                 key={index}
                 style={[styles.compactCard, dynamicStyles.compactCard]}
+                onPress={item.onPress}
+                activeOpacity={0.8}
+              >
+                <View style={[styles.compactIcon, { backgroundColor: `${item.color}20` }]}>
+                  <item.icon color={item.color} size={22} />
+                </View>
+                <View style={styles.compactContent}>
+                  <Text style={[styles.compactLabel, dynamicStyles.compactLabel]}>{item.label}</Text>
+                  <Text style={[styles.compactDescription, dynamicStyles.compactDescription]}>{item.description}</Text>
+                </View>
+                <ChevronRight color={colors.textSecondary} size={18} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Sparkles color={colors.accent} size={18} />
+            <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Outils Voyage</Text>
+          </View>
+          <View style={[styles.compactGrid, dynamicStyles.compactGrid]}>
+            {travelTools.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[styles.compactCard, dynamicStyles.compactCard, index === travelTools.length - 1 && styles.compactCardLast]}
                 onPress={item.onPress}
                 activeOpacity={0.8}
               >
@@ -424,6 +526,9 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 12,
     borderBottomWidth: 1,
+  },
+  compactCardLast: {
+    borderBottomWidth: 0,
   },
   compactIcon: {
     width: 48,
