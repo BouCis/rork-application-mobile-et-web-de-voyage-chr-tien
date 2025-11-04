@@ -28,7 +28,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Check,
-
+  X
 } from 'lucide-react-native';
 import { useApp } from '@/store/AppContext';
 import { useTheme } from '@/store/ThemeContext';
@@ -658,6 +658,21 @@ export default function SignUpScreen() {
         colors={[theme.colors.backgroundSecondary, theme.colors.background]}
         style={StyleSheet.absoluteFillObject}
       />
+      
+      <TouchableOpacity
+        style={[styles.closeButton, { top: insets.top + 16 }]}
+        onPress={() => {
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.replace('/(tabs)/planner');
+          }
+        }}
+      >
+        <View style={styles.closeButtonInner}>
+          <X color={theme.colors.text} size={24} />
+        </View>
+      </TouchableOpacity>
 
       <KeyboardAvoidingView
         style={styles.keyboardView}
@@ -1202,6 +1217,21 @@ function createStyles(theme: ReturnType<typeof useTheme>) {
     loginLinkBold: {
       fontWeight: '700' as const,
       color: theme.colors.primary,
+    },
+    closeButton: {
+      position: 'absolute',
+      right: 16,
+      zIndex: 10,
+    },
+    closeButtonInner: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: theme.colors.surface,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
     },
   });
 }
