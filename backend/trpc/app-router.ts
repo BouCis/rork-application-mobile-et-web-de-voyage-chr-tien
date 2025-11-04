@@ -12,6 +12,7 @@ import { getAllActivitiesProcedure, getActivityByIdProcedure } from "./routes/ac
 import { createActivityProcedure } from "./routes/activities/create";
 import { createBookingProcedure } from "./routes/activities/bookings/create";
 import { getUserBookingsProcedure } from "./routes/activities/bookings/get";
+import { sendVerificationEmailProcedure } from "./routes/emails/send-verification";
 
 export const appRouter = createTRPCRouter({
   example: createTRPCRouter({
@@ -39,6 +40,9 @@ export const appRouter = createTRPCRouter({
       create: createBookingProcedure,
       getByUser: getUserBookingsProcedure,
     }),
+  }),
+  emails: createTRPCRouter({
+    sendVerification: sendVerificationEmailProcedure,
   }),
 });
 

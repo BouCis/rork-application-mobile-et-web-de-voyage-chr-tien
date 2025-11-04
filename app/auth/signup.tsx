@@ -164,22 +164,10 @@ export default function SignUpScreen() {
     return Math.floor(100000 + Math.random() * 900000).toString();
   };
 
-  const sendVerificationEmail = async (email: string, firstName: string, verificationCode: string): Promise<boolean> => {
-    try {
-      console.log(`📧 Email de vérification envoyé à ${email}`);
-      console.log(`📋 Code de vérification: ${verificationCode}`);
-      console.log(`⏰ Expiration: 15 minutes`);
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      return true;
-    } catch (error) {
-      console.error('Erreur lors de l\'envoi de l\'email:', error);
-      return false;
-    }
-  };
+
 
   const createUserMutation = trpc.users.create.useMutation();
+  const sendEmailMutation = trpc.emails.sendVerification.useMutation();
 
   const handleSubmit = async () => {
     if (!validateStep(currentStep)) return;
@@ -245,7 +233,14 @@ export default function SignUpScreen() {
       console.log('[SignUp] Saving user to local storage...');
       await saveUser(newUser);
 
-      const emailSuccess = await sendVerificationEmail(formData.email, formData.firstName, verificationCode);
+      console.log('[SignUp] Sending verification email...');
+      const emailResult = await sendEmailMutation.mutateAsync({
+        email: formData.email,
+        firstName: formData.firstName,
+        code: verificationCode,
+      });
+
+      const emailSuccess = emailResult.success;
 
       if (emailSuccess) {
         Alert.alert(
