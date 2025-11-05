@@ -36,10 +36,22 @@ const getBaseUrl = () => {
   return "http://localhost:8081";
 };
 
+const fetchWithTimeout: typeof fetch = async (input, init) => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+  try {
+    const res = await fetch(input as RequestInfo, { ...(init ?? {}), signal: controller.signal });
+    return res as Response;
+  } finally {
+    clearTimeout(timeout);
+  }
+};
+
 export const trpcClient = trpc.createClient({
   links: [
     httpLink({
       url: `${getBaseUrl()}/api/trpc`,
+      fetch: fetchWithTimeout as any,
     }),
   ],
 });
