@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,6 @@ import {
   Dimensions,
   Animated,
   Alert,
-  Platform,
   Image,
   Pressable,
   TextInput,
@@ -16,13 +15,17 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { 
-  Search, 
-  TrendingUp, 
-  MapPin, 
+import {
+  MapPin,
   Sparkles,
-  ArrowRight,
   Star,
+  Heart,
+  Flame,
+  Plane,
+  Calendar,
+  Sun,
+  Moon,
+  Compass,
 } from 'lucide-react-native';
 import { useApp } from '@/store/AppContext';
 import { useTheme } from '@/store/ThemeContext';
@@ -30,7 +33,7 @@ import { searchDestinations, type Destination as DestinationType } from '@/data/
 
 const { width } = Dimensions.get('window');
 
-interface LocalDestination {
+type LocalDestination = {
   id: string;
   name: string;
   country: string;
@@ -38,184 +41,225 @@ interface LocalDestination {
   rating: number;
   price: string;
   description: string;
-}
+};
 
 const trendingDestinations: LocalDestination[] = [
   {
     id: '1',
     name: 'Bali',
     country: 'Indonésie',
-    image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800',
+    image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200',
     rating: 4.9,
-    price: '€890',
+    price: '€890 (simulé)',
     description: 'Paradis tropical avec temples et plages',
   },
   {
     id: '2',
     name: 'Santorin',
     country: 'Grèce',
-    image: 'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800',
+    image: 'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=1200',
     rating: 4.8,
-    price: '€1,200',
-    description: 'Couchers de soleil magiques et architecture blanche',
+    price: '€1 200 (simulé)',
+    description: 'Couchers de soleil et villages blancs',
   },
   {
     id: '3',
     name: 'Tokyo',
     country: 'Japon',
-    image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800',
+    image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200',
     rating: 4.9,
-    price: '€1,450',
-    description: 'Fusion parfaite entre tradition et modernité',
+    price: '€1 450 (simulé)',
+    description: 'Traditions et néons futuristes',
   },
 ];
 
-
+const palette = {
+  background: '#0B0F14',
+  surface: '#111821',
+  action: '#3BA3FF',
+  price: '#FF7A3D',
+  text: '#D9E2EC',
+  textSecondary: '#8AA1B4',
+  border: 'rgba(255,255,255,0.06)',
+} as const;
 
 export default function PlannerScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { trips, user } = useApp();
-  const { colors } = useTheme();
+  const { trips } = useApp();
+  const { colors } = useTheme(); // keeping theme available for future hooks
+
   const [scrollY] = useState<Animated.Value>(new Animated.Value(0));
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
+  const [selectedShortcut, setSelectedShortcut] = useState<string>('');
 
+  const promptScale = useRef(new Animated.Value(1)).current;
 
+  const hour = new Date().getHours();
+  const isMorning = hour < 12;
+  const isEvening = hour >= 18;
 
-  const headerOpacity = Platform.OS === 'web' ? 0 : scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [0, 1],
-    extrapolate: 'clamp',
-  });
+  const skyTranslate = scrollY.interpolate({ inputRange: [0, 200], outputRange: [0, -60], extrapolate: 'clamp' });
 
-  const handleNotifyPress = useCallback(() => {
-    console.log('[Planner] Notifications pressed');
-    Alert.alert(
-      'Notifications',
-      'Vous avez 3 nouvelles notifications :\n\n• Offre spéciale : -30% sur les vols vers Bali\n• Rappel : Créez votre profil complet\n• Nouvelle destination tendance : Lisbonne',
-      [{ text: 'OK' }]
-    );
+  const greetings = useMemo(() => {
+    if (isMorning) return '⛅ Prêt à charger ton sac à dos au lever du soleil ? Où t’envole-t-on aujourd’hui ?';
+    if (isEvening) return '✨ Les étoiles montrent la route. On trace où cette nuit ?';
+    return '🌍 Envie d’improviser une escapade ? Dis-moi ta prochaine évasion… ✈';
+  }, [isMorning, isEvening]);
+
+  const onPromptPressIn = useCallback(() => {
+    Animated.spring(promptScale, { toValue: 0.98, useNativeDriver: true, friction: 6, tension: 120 }).start();
+  }, [promptScale]);
+  const onPromptPressOut = useCallback(() => {
+    Animated.spring(promptScale, { toValue: 1, useNativeDriver: true, friction: 6, tension: 120 }).start();
+  }, [promptScale]);
+
+  const handleInspire = useCallback(() => {
+    console.log('[Home] Inspire me');
+    Alert.alert('Inspirations IA', 'Nous allons vous proposer 5 idées adaptées.');
   }, []);
 
-
-
   const handleDestinationPress = useCallback((destination: LocalDestination) => {
-    console.log('[Planner] Destination pressed', destination);
-    try {
-      router.push({ pathname: '/destination/[id]', params: { id: destination.name } });
-    } catch (e) {
-      console.error('Navigation error', e);
-      Alert.alert('Navigation', 'Impossible d\'ouvrir la destination.');
-    }
+    router.push({ pathname: '/destination/[id]', params: { id: destination.name } });
   }, [router]);
 
-  const handleExplorePress = useCallback((destination: LocalDestination) => {
-    console.log('[Planner] Explore pressed', destination);
-    handleDestinationPress(destination);
-  }, [handleDestinationPress]);
-
-
-
   const handleCreateTrip = useCallback(() => {
-    console.log('[Planner] Create trip pressed');
     router.push('/trip/create');
   }, [router]);
 
-  const handleDiscoverInspiration = useCallback(() => {
-    console.log('[Planner] Discover inspiration pressed');
-    const randomDestinations = [...trendingDestinations].sort(() => Math.random() - 0.5);
-    const randomDest = randomDestinations[0];
-    
-    Alert.alert(
-      `✨ ${randomDest.name}, ${randomDest.country}`,
-      `${randomDest.description}\n\n⭐ Note: ${randomDest.rating}\n💰 À partir de ${randomDest.price}\n\nVoulez-vous explorer cette destination ?`,
-      [
-        { text: 'Pas maintenant', style: 'cancel' },
-        { 
-          text: 'Explorer', 
-          onPress: () => handleDestinationPress(randomDest)
-        }
-      ]
-    );
-  }, [handleDestinationPress]);
-
   const handleSelectSearchDestination = useCallback((destination: DestinationType) => {
-    console.log('[Planner] Selected destination:', destination.name);
     setSearchQuery('');
     setShowSearchResults(false);
-    router.push({
-      pathname: '/destination/prepare',
-      params: { destinationId: destination.id }
-    });
+    router.push({ pathname: '/destination/prepare', params: { destinationId: destination.id } });
   }, [router]);
 
-  const handleSearchFocus = useCallback(() => {
-    setShowSearchResults(true);
-  }, []);
+  const handleSearchFocus = useCallback(() => setShowSearchResults(true), []);
+  const handleSearchBlur = useCallback(() => setTimeout(() => setShowSearchResults(false), 180), []);
 
-  const handleSearchBlur = useCallback(() => {
-    setTimeout(() => setShowSearchResults(false), 200);
-  }, []);
+  const searchResults = useMemo(() => searchDestinations(searchQuery), [searchQuery]);
 
-  const searchResults = React.useMemo(() => {
-    return searchDestinations(searchQuery);
-  }, [searchQuery]);
+  const shortcuts = useMemo(() => ['Weekend', 'Plage', 'Montagne', 'Cité d’art', 'Road-trip'], []);
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: { flex: 1, backgroundColor: palette.background },
+    skyWrap: { position: 'absolute', top: 0, left: 0, right: 0, height: 260 },
+    skyLayer: { ...StyleSheet.absoluteFillObject },
+    header: { paddingHorizontal: 20, paddingTop: insets.top + 14, paddingBottom: 12 },
+    headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    badge: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    brand: { color: palette.text, fontSize: 18, fontWeight: '700' as const, letterSpacing: 0.4 },
+    avatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: palette.surface, alignItems: 'center', justifyContent: 'center' },
+
+    promptCard: { backgroundColor: palette.surface, borderColor: palette.border, borderWidth: 1, borderRadius: 18, padding: 16, gap: 10 },
+    promptText: { color: palette.text, fontSize: 16, fontWeight: '700' as const, lineHeight: 22 },
+    chipRow: { flexDirection: 'row', flexWrap: 'wrap' as const, gap: 8 },
+    chip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999, backgroundColor: '#0E141B', borderWidth: 1, borderColor: palette.border },
+    chipActive: { backgroundColor: '#13212E', borderColor: '#1E2F40' },
+    chipText: { color: palette.textSecondary, fontSize: 12, fontWeight: '600' as const },
+
+    searchBar: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 12, borderRadius: 16, backgroundColor: '#0E141B', borderWidth: 1, borderColor: palette.border },
+    searchInput: { flex: 1, fontSize: 15, color: palette.text },
+    shortcutsRow: { flexDirection: 'row', gap: 8, marginTop: 10 },
+    shortcut: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999, borderWidth: 1, borderColor: palette.border },
+    shortcutText: { color: palette.textSecondary, fontSize: 12 },
+    resultsWrap: { position: 'absolute', top: 58, left: 0, right: 0, borderRadius: 14, borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface, maxHeight: 280, overflow: 'hidden' },
+    resultItem: { flexDirection: 'row', alignItems: 'center', padding: 12, gap: 10, borderBottomWidth: 1, borderBottomColor: palette.border },
+    resultName: { color: palette.text, fontSize: 15, fontWeight: '600' as const },
+    resultMeta: { color: palette.textSecondary, fontSize: 12 },
+
+    section: { paddingHorizontal: 20, marginTop: 18 },
+    sectionTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
+    sectionTitle: { color: palette.text, fontSize: 16, fontWeight: '700' as const },
+
+    deckScroll: { paddingHorizontal: 20, gap: 14 },
+    deckCard: { width: width * 0.8, borderRadius: 18, overflow: 'hidden', backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.border },
+    deckImage: { width: '100%', height: 200 },
+    deckOverlay: { position: 'absolute', left: 0, right: 0, bottom: 0, padding: 12, backgroundColor: 'rgba(7,10,14,0.55)' },
+    deckTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    titleText: { color: palette.text, fontSize: 18, fontWeight: '800' as const },
+    subText: { color: palette.textSecondary, fontSize: 12, marginTop: 2 },
+    pricePill: { backgroundColor: '#2A1209', borderColor: '#3D1B0C', borderWidth: 1, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
+    priceText: { color: palette.price, fontSize: 12, fontWeight: '800' as const },
+    ctaBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 },
+    ctaBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, backgroundColor: '#0F2234', borderWidth: 1, borderColor: '#14304B' },
+    ctaLabel: { color: palette.action, fontSize: 12, fontWeight: '700' as const },
+
+    aroundRow: { flexDirection: 'row', gap: 12 },
+    roundCard: { width: 90, alignItems: 'center' as const },
+    roundThumb: { width: 90, height: 90, borderRadius: 52 },
+    roundLabel: { color: palette.text, fontSize: 12, marginTop: 6 },
+    roundMeta: { color: palette.textSecondary, fontSize: 11 },
+
+    grid: { flexDirection: 'row', flexWrap: 'wrap' as const, gap: 10 },
+    wishTile: { width: (width - 20 * 2 - 10) / 2, height: 120, borderRadius: 14, overflow: 'hidden', backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.border },
+    wishBadge: { position: 'absolute', top: 8, left: 8, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999, backgroundColor: '#2A1209', borderWidth: 1, borderColor: '#3D1B0C' },
+    wishBadgeText: { color: palette.price, fontSize: 11, fontWeight: '700' as const },
+
+    timelineCard: { backgroundColor: palette.surface, borderRadius: 16, borderWidth: 1, borderColor: palette.border, padding: 14 },
+    timelineItem: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8 },
+    dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: palette.action },
+    line: { position: 'absolute', left: 3.5, top: 0, bottom: 0, width: 1, backgroundColor: palette.border },
+
+    duoRow: { flexDirection: 'row', gap: 12 },
+    miniCard: { flex: 1, backgroundColor: palette.surface, borderRadius: 16, borderWidth: 1, borderColor: palette.border, padding: 14 },
+    miniTitle: { color: palette.text, fontSize: 14, fontWeight: '700' as const, marginBottom: 8 },
+    checkRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8 },
+    checkLabel: { color: palette.textSecondary, fontSize: 12 },
+
+    iaRow: { flexDirection: 'row', gap: 10 },
+    iaChip: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12, backgroundColor: '#0E141B', borderWidth: 1, borderColor: palette.border },
+    iaText: { color: palette.text, fontSize: 12 },
+  }), [insets.top]);
 
   return (
-    <View style={styles.container}>
-      <LinearGradient
-        colors={[colors.background, colors.backgroundSecondary]}
-        style={StyleSheet.absoluteFillObject}
-      />
-
-      <Animated.View 
-        style={[
-          styles.headerBackground,
-          {
-            opacity: headerOpacity,
-          }
-        ]}
-      >
-        <LinearGradient
-          colors={['rgba(30, 41, 59, 0.95)', 'rgba(15, 23, 42, 0.8)']}
-          style={StyleSheet.absoluteFillObject}
-        />
+    <View style={styles.container} testID="home-root">
+      <Animated.View style={[styles.skyWrap, { transform: [{ translateY: skyTranslate }] }]}>        
+        {isMorning ? (
+          <LinearGradient colors={[palette.background, '#14202B']} style={styles.skyLayer} />
+        ) : isEvening ? (
+          <LinearGradient colors={[palette.background, '#0A1220']} style={styles.skyLayer} />
+        ) : (
+          <LinearGradient colors={[palette.background, '#0E1722']} style={styles.skyLayer} />
+        )}
       </Animated.View>
 
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <View style={styles.headerContent}>
-          <View>
-            <Text testID="brand-name" style={[styles.brand, { color: colors.gold }]}>Sacàdos</Text>
-            <Text style={[styles.greeting, { color: colors.text }]}>
-              {new Date().getHours() < 12 ? 'Bonjour' : new Date().getHours() < 18 ? 'Bon après-midi' : 'Bonsoir'} {user?.firstName || 'Voyageur'} 👋
-            </Text>
-            <Text style={[styles.title, { color: colors.text }]}>Où partons-nous ?</Text>
+      <ScrollView
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 96 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <View style={styles.headerRow}>
+            <View style={styles.badge}>
+              {isEvening ? <Moon color={palette.textSecondary} size={18} /> : isMorning ? <Sun color={palette.textSecondary} size={18} /> : <Compass color={palette.textSecondary} size={18} />}
+              <Text style={styles.brand}>Sacados</Text>
+            </View>
+            <View style={styles.avatar} testID="avatar-pill">
+              <Plane color={palette.action} size={18} />
+            </View>
           </View>
-          <TouchableOpacity testID="btn-notifications" style={styles.notificationButton} onPress={handleNotifyPress} accessible accessibilityRole="button" accessibilityLabel="Notifications">
-            <View style={[styles.notificationDot, { backgroundColor: colors.gold }]} />
-            <Sparkles color={colors.primary} size={24} />
-          </TouchableOpacity>
-        </View>
 
-        <View style={styles.searchContainer}>
-          <Pressable
-            onPress={() => {
-              console.log('[Planner] Search box pressed - focusing input');
-            }}
-          >
-            <LinearGradient
-              colors={['rgba(99, 102, 241, 0.1)', 'rgba(236, 72, 153, 0.1)']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.searchGradient}
-            >
-              <Search color={colors.textSecondary} size={20} />
+          <Animated.View style={[styles.promptCard, { transform: [{ scale: promptScale }] }]} onTouchStart={onPromptPressIn} onTouchEnd={onPromptPressOut} testID="prompt-card">
+            <Text style={styles.promptText}>{greetings}</Text>
+            <View style={styles.chipRow}>
+              {['Inspirer‑moi', 'Budget < 500€', '3–5 jours', 'Solo', 'Nature'].map((c) => (
+                <TouchableOpacity key={c} onPress={() => (c === 'Inspirer‑moi' ? handleInspire() : setSelectedShortcut(c))} activeOpacity={0.85} style={[styles.chip, selectedShortcut === c && styles.chipActive]}>
+                  <Text style={styles.chipText}>{c}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </Animated.View>
+
+          <View style={{ marginTop: 12, position: 'relative' }}>
+            <View style={styles.searchBar}>
+              <MapPin color={palette.textSecondary} size={18} />
               <TextInput
-                testID="input-search"
+                testID="home-search"
                 style={styles.searchInput}
-                placeholder="Où allez-vous ?"
-                placeholderTextColor={colors.textSecondary}
+                placeholder="Où dors-tu ce soir ? Ville, pays, idée…"
+                placeholderTextColor={palette.textSecondary}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 onFocus={handleSearchFocus}
@@ -224,131 +268,66 @@ export default function PlannerScreen() {
                 autoCorrect={false}
                 autoCapitalize="words"
               />
-            </LinearGradient>
-          </Pressable>
-          {showSearchResults && (
-            <View style={[styles.searchResultsContainer, { backgroundColor: colors.surface }]}>
-              <ScrollView
-                style={styles.searchResultsScroll}
-                keyboardShouldPersistTaps="handled"
-                nestedScrollEnabled
-                showsVerticalScrollIndicator={true}
-              >
-                {searchResults.length > 0 ? (
-                  searchResults.map((destination) => (
-                    <Pressable
-                      key={destination.id}
-                      testID={`search-result-${destination.id}`}
-                      style={[styles.searchResultItem, { borderBottomColor: colors.border }]}
-                      onPress={() => handleSelectSearchDestination(destination)}
-                      accessible
-                      accessibilityRole="button"
-                      accessibilityLabel={`Sélectionner ${destination.name}`}
-                    >
-                      <View style={[styles.searchResultIcon, { backgroundColor: `${colors.primary}15` }]}>
-                        <MapPin color={colors.primary} size={18} strokeWidth={2} />
-                      </View>
-                      <View style={styles.searchResultInfo}>
-                        <Text style={[styles.searchResultName, { color: colors.text }]}>{destination.name}</Text>
-                        <Text style={[styles.searchResultCountry, { color: colors.textSecondary }]}>
-                          {destination.country} • {destination.continent}
-                        </Text>
-                      </View>
-                      <View style={styles.searchResultBudget}>
-                        <Text style={[styles.searchResultBudgetValue, { color: colors.primary }]}>
-                          {destination.averageBudget.budget}€
-                        </Text>
-                        <Text style={[styles.searchResultBudgetLabel, { color: colors.textSecondary }]}>/jour</Text>
-                      </View>
-                    </Pressable>
-                  ))
-                ) : (
-                  <View style={styles.searchResultEmpty}>
-                    <Text style={[styles.searchResultEmptyText, { color: colors.textSecondary }]}>
-                      {searchQuery ? 'Aucune destination trouvée' : 'Commencez à taper pour rechercher'}
-                    </Text>
-                  </View>
-                )}
-              </ScrollView>
+              <Sparkles color={palette.action} size={18} />
             </View>
-          )}
+            <View style={styles.shortcutsRow}>
+              {shortcuts.map((s) => (
+                <TouchableOpacity key={s} style={styles.shortcut} onPress={() => setSelectedShortcut(s)}>
+                  <Text style={styles.shortcutText}>{s}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            {showSearchResults && (
+              <View style={styles.resultsWrap} testID="search-results">
+                <ScrollView keyboardShouldPersistTaps="handled" nestedScrollEnabled>
+                  {searchResults.length > 0 ? (
+                    searchResults.map((d) => (
+                      <Pressable key={d.id} style={styles.resultItem} onPress={() => handleSelectSearchDestination(d)}>
+                        <MapPin color={palette.action} size={16} />
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.resultName}>{d.name}</Text>
+                          <Text style={styles.resultMeta}>{d.country} • {d.continent}</Text>
+                        </View>
+                        <Text style={styles.resultMeta}>{d.averageBudget.budget}€/j</Text>
+                      </Pressable>
+                    ))
+                  ) : (
+                    <View style={{ padding: 14 }}>
+                      <Text style={styles.resultMeta}>{searchQuery ? 'Aucune destination' : 'Tapez pour rechercher'}</Text>
+                    </View>
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
         </View>
 
-
-      </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: insets.bottom + 90 }
-        ]}
-        showsVerticalScrollIndicator={false}
-      >
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleContainer}>
-              <TrendingUp color={colors.primary} size={20} />
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Destinations populaires</Text>
-            </View>
+          <View style={styles.sectionTitleRow}>
+            <Text style={styles.sectionTitle}>Inspiration nomade</Text>
+            <Flame color={palette.price} size={16} />
           </View>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.destinationsScroll}
-          >
-            {trendingDestinations.map((destination) => (
-              <View
-                key={destination.id}
-                testID={`card-destination-${destination.id}`}
-                style={[styles.destinationCard, { borderColor: `${colors.gold}33`, backgroundColor: colors.surface }]}
-              >
-                <Pressable onPress={() => handleDestinationPress(destination)} accessibilityRole="button" accessibilityLabel={`Ouvrir ${destination.name}`}>
-                  <View style={styles.destinationImageContainer}>
-                  <LinearGradient
-                    colors={['transparent', 'rgba(15, 23, 42, 0.9)']}
-                    style={styles.destinationGradient}
-                  >
-                    <View style={styles.destinationBadge}>
-                      <Star color={colors.warning} size={12} fill={colors.warning} />
-                      <Text style={[styles.ratingText, { color: colors.text }]}>{destination.rating}</Text>
-                    </View>
-                  </LinearGradient>
-                  <Image
-                    source={{ uri: destination.image }}
-                    style={styles.destinationImage}
-                    resizeMode="cover"
-                  />
-                </View>
-                </Pressable>
-                <View style={styles.destinationInfo}>
-                  <View style={styles.destinationHeader}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.deckScroll}>
+            {trendingDestinations.map((d) => (
+              <View key={d.id} style={styles.deckCard}>
+                <Image source={{ uri: d.image }} style={styles.deckImage} />
+                <View style={styles.deckOverlay}>
+                  <View style={styles.deckTopRow}>
                     <View>
-                      <Text style={[styles.destinationName, { color: colors.text }]}>{destination.name}</Text>
-                      <Text style={[styles.destinationCountry, { color: colors.textSecondary }]}>{destination.country}</Text>
+                      <Text style={styles.titleText}>{d.name}</Text>
+                      <Text style={styles.subText}>{d.country}</Text>
                     </View>
-                    <View style={styles.priceContainer}>
-                      <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>
-	                      À partir de
-	                    </Text>
-                      <Text style={[styles.priceValue, { color: colors.gold }]}>{destination.price}</Text>
-                    </View>
+                    <View style={styles.pricePill}><Text style={styles.priceText}>Dès {d.price}</Text></View>
                   </View>
-                  <Text style={[styles.destinationDescription, { color: colors.textSecondary }]} numberOfLines={2}>
-                    {destination.description}
-                  </Text>
-                  <Pressable
-                    testID={`btn-explore-${destination.id}`}
-                    style={styles.exploreButton}
-                    onPress={() => handleExplorePress(destination)}
-                    accessible
-                    accessibilityRole="button"
-                    accessibilityLabel={`Explorer ${destination.name}`}
-                  >
-                    <Text style={[styles.exploreButtonText, { color: colors.primary }]}>Explorer</Text>
-                    <ArrowRight color={colors.primary} size={16} />
-                  </Pressable>
+                  <View style={styles.ctaBar}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <Star color={palette.price} size={14} fill={palette.price} />
+                      <Text style={styles.subText}>{d.rating.toFixed(1)}</Text>
+                    </View>
+                    <TouchableOpacity style={styles.ctaBtn} onPress={() => handleDestinationPress(d)}>
+                      <Text style={styles.ctaLabel}>Voir l’itinéraire estimé</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             ))}
@@ -356,462 +335,87 @@ export default function PlannerScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text, paddingHorizontal: 24 }]}>Mes voyages</Text>
+          <View style={styles.sectionTitleRow}><Text style={styles.sectionTitle}>Autour de toi</Text></View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
+            {['Café', 'Parc', 'Musée', 'Viewpoint', 'Plage'].map((n, i) => (
+              <View key={n + i} style={styles.roundCard}>
+                <Image source={{ uri: `https://images.unsplash.com/photo-150${i}0${i}0${i}0-aaaa?w=400&auto=format` }} style={styles.roundThumb} />
+                <Text style={styles.roundLabel}>{n}</Text>
+                <Text style={styles.roundMeta}>{(i + 1) * 0.6} km • 4.{i + 3}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionTitleRow}><Text style={styles.sectionTitle}>Wishlist</Text><Heart color={palette.action} size={16} /></View>
+          <View style={styles.grid}>
+            {[1, 2, 3, 4].map((i) => (
+              <View key={i} style={styles.wishTile}>
+                <Image source={{ uri: `https://images.unsplash.com/photo-15${i}0${i}0${i}0-aaaa?w=800` }} style={{ width: '100%', height: '100%' }} />
+                <View style={styles.wishBadge}><Text style={styles.wishBadgeText}>−{10 * i}% vol (simulé)</Text></View>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionTitleRow}><Text style={styles.sectionTitle}>Mes voyages</Text><Calendar color={palette.textSecondary} size={16} /></View>
           {trips.length === 0 ? (
-            <TouchableOpacity
-              testID="card-create-trip"
-              style={styles.emptyCard}
-              onPress={handleCreateTrip}
-              accessible
-              accessibilityRole="button"
-              accessibilityLabel="Créer un voyage"
-            >
-              <LinearGradient
-                colors={colors.primaryGradient as any}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.emptyGradient}
-              >
-                <MapPin color={colors.textInverse} size={32} strokeWidth={2} />
-                <Text style={[styles.emptyTitle, { color: colors.textInverse }]}>Commencez votre aventure</Text>
-                <Text style={[styles.emptyText, { color: colors.textInverse }]}>
-                  Créez votre premier voyage et découvrez le monde
-                </Text>
-                <View testID="btn-create-trip" style={styles.createButton}>
-                  <Text style={[styles.createButtonText, { color: colors.textInverse }]}>Créer un voyage</Text>
-                  <ArrowRight color={colors.textInverse} size={18} />
+            <TouchableOpacity onPress={handleCreateTrip} activeOpacity={0.9}>
+              <View style={styles.timelineCard}>
+                <Text style={styles.subText}>Premier départ ?</Text>
+                <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                  {['City-break 3j < 300€', 'Micro‑aventure 2j', 'Nomad 1 mois'].map((p) => (
+                    <View key={p} style={[styles.chip, { backgroundColor: '#0F2234', borderColor: '#14304B' }]}><Text style={[styles.chipText, { color: palette.action }]}>{p}</Text></View>
+                  ))}
                 </View>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           ) : (
-            trips.map((trip) => (
-  <View
-    key={trip.id}
-    style={[
-      styles.tripCard,
-      {
-        borderColor: `${colors.gold}33`, // Template literal instead of +
-        backgroundColor: colors.surface,
-      },
-    ]}
-  >
-    <Text style={[styles.tripTitle, { color: colors.text }]}>
-      {trip.title}
-    </Text>
-  </View>
-))
+            <View style={[styles.timelineCard, { position: 'relative' }]}>
+              <View style={styles.line} />
+              {trips.slice(0, 3).map((t) => (
+                <View key={t.id} style={styles.timelineItem}>
+                  <View style={styles.dot} />
+                  <Text style={{ color: palette.text, fontSize: 13, fontWeight: '700' as const }}>{t.destination}</Text>
+                  <Text style={styles.subText}> • {new Date(t.startDate).toLocaleDateString('fr-FR')}</Text>
+                </View>
+              ))}
+            </View>
           )}
         </View>
 
-        <View style={styles.inspirationSection}>
-          <LinearGradient
-            colors={['rgba(236, 72, 153, 0.1)', 'rgba(99, 102, 241, 0.1)']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.inspirationCard}
-          >
-            <Sparkles color={colors.secondary} size={32} />
-            <Text style={[styles.inspirationTitle, { color: colors.text }]}>Besoin d&apos;inspiration ?</Text>
-            <Text style={[styles.inspirationText, { color: colors.textSecondary }]}>
-              Découvrez des destinations uniques sélectionnées pour vous
-            </Text>
-            <TouchableOpacity
-              testID="btn-discover-inspiration"
-              style={styles.inspirationButton}
-              onPress={handleDiscoverInspiration}
-              accessible
-              accessibilityRole="button"
-              accessibilityLabel="Découvrir l'inspiration"
-            >
-              <Text style={[styles.inspirationButtonText, { color: colors.gold }]}>Découvrir</Text>
-            </TouchableOpacity>
-          </LinearGradient>
+        <View style={styles.section}>
+          <View style={styles.duoRow}>
+            <View style={styles.miniCard}>
+              <Text style={styles.miniTitle}>Visa & administratif</Text>
+              <View style={styles.checkRow}><Text style={styles.checkLabel}>Passeport 6 mois</Text><Text style={[styles.checkLabel, { color: palette.action }]}>À faire</Text></View>
+              <View style={styles.checkRow}><Text style={styles.checkLabel}>Demande eVisa</Text><Text style={[styles.checkLabel, { color: palette.textSecondary }]}>Lien officiel</Text></View>
+            </View>
+            <View style={styles.miniCard}>
+              <Text style={styles.miniTitle}>Santé & vaccins</Text>
+              <View style={styles.checkRow}><Text style={styles.checkLabel}>Fièvre jaune</Text><Text style={[styles.checkLabel, { color: palette.action }]}>Rappel</Text></View>
+              <View style={styles.checkRow}><Text style={styles.checkLabel}>Carnet vaccination</Text><Text style={[styles.checkLabel, { color: palette.textSecondary }]}>Ok</Text></View>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionTitleRow}><Text style={styles.sectionTitle}>Explorations IA</Text><Sparkles color={palette.action} size={16} /></View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 8 }}>
+            {[
+              '3 jours, budget < 400€, culture + street food',
+              'Randonnée + hostel, 7 jours en septembre',
+              'Surf + couchsurfing, 10 jours',
+            ].map((q) => (
+              <TouchableOpacity key={q} style={styles.iaChip} onPress={() => Alert.alert('Exploration IA', q)}>
+                <Text style={styles.iaText}>{q}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
       </ScrollView>
-
-
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  headerBackground: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 200,
-    zIndex: 1,
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingBottom: 16,
-    zIndex: 2,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 24,
-  },
-  brand: {
-    fontSize: 20,
-    fontWeight: '700' as '700',
-    letterSpacing: 0.5,
-    marginBottom: 2,
-    color: '#E6C97A',
-  },
-  greeting: {
-    fontSize: 16,
-    marginBottom: 4,
-    color: '#FFFFFF',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '700' as '700',
-    letterSpacing: -0.5,
-    color: '#FFFFFF',
-  },
-  notificationButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  notificationDot: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#E6C97A',
-  },
-  searchContainer: {
-    marginTop: 16,
-    position: 'relative',
-    zIndex: 1000,
-  },
-  searchGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 12,
-    fontSize: 16,
-    color: '#FFFFFF',
-    paddingVertical: 0,
-  },
-  searchResultsContainer: {
-    position: 'absolute',
-    top: 60,
-    left: 0,
-    right: 0,
-    maxHeight: 300,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
-  },
-  searchResultsScroll: {
-    maxHeight: 300,
-  },
-  searchResultItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  searchResultIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  searchResultInfo: {
-    flex: 1,
-  },
-  searchResultName: {
-    fontSize: 16,
-    fontWeight: '600' as '600',
-    marginBottom: 2,
-  },
-  searchResultCountry: {
-    fontSize: 13,
-  },
-  searchResultBudget: {
-    alignItems: 'flex-end',
-  },
-  searchResultBudgetValue: {
-    fontSize: 16,
-    fontWeight: '700' as '700',
-  },
-  searchResultBudgetLabel: {
-    fontSize: 11,
-  },
-  searchResultEmpty: {
-    padding: 24,
-    alignItems: 'center',
-  },
-  searchResultEmptyText: {
-    fontSize: 14,
-  },
-
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingTop: 16,
-  },
-
-  section: {
-    marginBottom: 32,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    marginBottom: 16,
-  },
-  sectionTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700' as '700',
-    color: '#FFFFFF',
-  },
-  seeAllText: {
-    fontSize: 14,
-    fontWeight: '600' as '600',
-    color: '#AFCBFF',
-  },
-  destinationsScroll: {
-    paddingHorizontal: 24,
-    gap: 16,
-  },
-  destinationCard: {
-    width: width * 0.75,
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(230, 201, 122, 0.2)',
-    backgroundColor: 'rgba(58, 58, 58, 0.5)',
-  },
-  destinationImageContainer: {
-    height: 200,
-    position: 'relative',
-  },
-  imagePlaceholder: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  destinationImage: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  destinationGradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 100,
-    zIndex: 1,
-    justifyContent: 'flex-end',
-    padding: 16,
-  },
-  destinationBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(15, 23, 42, 0.8)',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 24,
-    alignSelf: 'flex-start',
-  },
-  ratingText: {
-    fontSize: 12,
-    fontWeight: '700' as '700',
-    color: '#FFFFFF',
-  },
-  destinationInfo: {
-    padding: 16,
-  },
-  destinationHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 12,
-  },
-  destinationName: {
-    fontSize: 18,
-    fontWeight: '700' as '700',
-    color: '#FFFFFF',
-  },
-  destinationCountry: {
-    fontSize: 14,
-    marginTop: 2,
-    color: '#AEAEB2',
-  },
-  priceContainer: {
-    alignItems: 'flex-end',
-  },
-  priceLabel: {
-    fontSize: 12,
-    color: '#8E8E93',
-  },
-  priceValue: {
-    fontSize: 18,
-    fontWeight: '700' as '700',
-    color: '#E6C97A',
-  },
-  destinationDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 16,
-    color: '#AEAEB2',
-  },
-  exploreButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    backgroundColor: 'rgba(175, 203, 255, 0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(175, 203, 255, 0.3)',
-  },
-  exploreButtonText: {
-    fontSize: 14,
-    fontWeight: '600' as '600',
-    color: '#AFCBFF',
-  },
-  emptyCard: {
-    marginHorizontal: 24,
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-  emptyGradient: {
-    padding: 48,
-    alignItems: 'center',
-  },
-  emptyTitle: {
-    fontSize: 24,
-    fontWeight: '700' as '700',
-    marginTop: 16,
-    textAlign: 'center',
-    color: '#FFFFFF',
-  },
-  emptyText: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginTop: 12,
-    opacity: 0.9,
-    color: '#FFFFFF',
-  },
-  createButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 24,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  createButtonText: {
-    fontSize: 16,
-    fontWeight: '700' as '700',
-    color: '#FFFFFF',
-  },
-  tripCard: {
-    marginHorizontal: 24,
-    padding: 24,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(230, 201, 122, 0.2)',
-    backgroundColor: 'rgba(58, 58, 58, 0.5)',
-  },
-  tripTitle: {
-    fontSize: 18,
-    fontWeight: '700' as '700',
-    color: '#FFFFFF',
-  },
-  inspirationSection: {
-    paddingHorizontal: 24,
-    marginBottom: 32,
-  },
-  inspirationCard: {
-    padding: 32,
-    borderRadius: 20,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(175, 203, 255, 0.2)',
-  },
-  inspirationTitle: {
-    fontSize: 24,
-    fontWeight: '700' as '700',
-    marginTop: 16,
-    textAlign: 'center',
-    color: '#FFFFFF',
-  },
-  inspirationText: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginTop: 12,
-    lineHeight: 22,
-    color: '#AEAEB2',
-  },
-  inspirationButton: {
-    marginTop: 24,
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 24,
-    backgroundColor: 'rgba(230, 201, 122, 0.2)',
-    borderWidth: 1,
-    borderColor: 'rgba(230, 201, 122, 0.4)',
-  },
-  inspirationButtonText: {
-    fontSize: 16,
-    fontWeight: '700' as '700',
-    color: '#E6C97A',
-  },
-});
