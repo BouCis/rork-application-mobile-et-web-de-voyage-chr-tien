@@ -144,11 +144,8 @@ export default function PlannerScreen() {
   const handleSelectPlace = useCallback((p: GPPlace) => {
     setSearchQuery('');
     setShowSearchResults(false);
-    const lat = p.geometry?.location?.lat ?? 0;
-    const lng = p.geometry?.location?.lng ?? 0;
     const name = p.name ?? '';
-    const pid = p.place_id ?? '';
-    router.push({ pathname: '/destination/prepare', params: { name, lat: String(lat), lng: String(lng), placeId: pid } });
+    router.push({ pathname: '/destination/search-results', params: { cityName: name } });
   }, [router]);
 
   const handleSearchFocus = useCallback(() => setShowSearchResults(true), []);
