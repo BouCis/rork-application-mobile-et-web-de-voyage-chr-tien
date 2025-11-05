@@ -6,7 +6,7 @@ import { Platform, StyleSheet, View } from "react-native";
 import { useTheme } from "@/store/ThemeContext";
 
 export default function TabLayout() {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
 
   return (
     <Tabs
@@ -14,25 +14,26 @@ export default function TabLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           position: 'absolute',
           backgroundColor: Platform.OS === 'web' ? (colors.tabBarBackground || colors.surface) : 'transparent',
           borderTopWidth: 0,
-          paddingHorizontal: 4,
-          height: Platform.OS === 'ios' ? 88 : 72,
-          paddingTop: 8,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 12,
+          paddingHorizontal: 8,
           elevation: 0,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 12,
+          shadowOpacity: 0.15,
+          shadowRadius: 8,
         },
         tabBarBackground: () => (
           <View
             style={[
               StyleSheet.absoluteFill,
-              { backgroundColor: (colors.tabBarBackground || colors.surface) + (Platform.OS === 'ios' ? 'CC' : '') }
+              {
+                // Use the provided RGBA color directly; do not append alpha suffixes
+                backgroundColor: (colors.tabBarBackground || colors.surface),
+              },
             ]}
           />
         ),
@@ -55,7 +56,7 @@ export default function TabLayout() {
         name="planner"
         options={{
           title: "Accueil",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <Home
               color={focused ? colors.primary : colors.textSecondary}
               size={24}
@@ -68,7 +69,7 @@ export default function TabLayout() {
         name="hotels"
         options={{
           title: "Hôtels",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <Hotel
               color={focused ? colors.primary : colors.textSecondary}
               size={24}
@@ -81,7 +82,7 @@ export default function TabLayout() {
         name="activities"
         options={{
           title: "Activités",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <MapPin
               color={focused ? colors.primary : colors.textSecondary}
               size={24}
@@ -94,7 +95,7 @@ export default function TabLayout() {
         name="restaurants"
         options={{
           title: "Restos",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <UtensilsCrossed
               color={focused ? colors.primary : colors.textSecondary}
               size={24}
@@ -104,12 +105,11 @@ export default function TabLayout() {
         }}
       />
 
-
       <Tabs.Screen
         name="more"
         options={{
           title: "Plus",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <MoreHorizontal
               color={focused ? colors.primary : colors.textSecondary}
               size={24}
@@ -121,4 +121,3 @@ export default function TabLayout() {
     </Tabs>
   );
 }
-
