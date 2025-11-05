@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
-import { Home, Hotel, MapPin, UtensilsCrossed, MoreHorizontal } from "lucide-react-native";
+import { Home, Hotel, MapPin, UtensilsCrossed, MoreHorizontal, User } from "lucide-react-native";
 import React from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { View } from "react-native";
 
 import { useTheme } from "@/store/ThemeContext";
 
@@ -94,7 +94,19 @@ export default function TabLayout() {
           ),
         }}
       />
-
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Mon espace",
+          tabBarIcon: ({ focused }) => (
+            <User
+              color={focused ? colors.primary : colors.textSecondary}
+              size={24}
+              strokeWidth={focused ? 2.5 : 2}
+            />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="more"
         options={{

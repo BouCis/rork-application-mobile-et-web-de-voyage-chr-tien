@@ -1,15 +1,15 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, router } from 'expo-router';
-import { Mail, Edit3 } from 'lucide-react-native';
+import { Mail, LogIn, UserPlus, LogOut, Trash2 } from 'lucide-react-native';
 import { useTheme } from '@/store/ThemeContext';
 import { useApp } from '@/store/AppContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ProfileScreen() {
   const { colors, spacing, borderRadius, fontSize, fontWeight } = useTheme();
-  const { user } = useApp();
+  const { user, logout, deleteAccount } = useApp();
   const insets = useSafeAreaInsets();
 
   const initials = useMemo(() => {
@@ -50,12 +50,12 @@ export default function ProfileScreen() {
       alignSelf: 'flex-start',
     },
     pillText: { color: colors.primary, fontWeight: fontWeight.semibold },
-    editBtn: {
-      marginTop: spacing.lg,
+    actions: { marginTop: spacing.xl, gap: spacing.md },
+    btn: {
       borderRadius: borderRadius.lg,
       overflow: 'hidden',
     },
-    editBtnInner: {
+    btnInner: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
@@ -63,12 +63,15 @@ export default function ProfileScreen() {
       paddingVertical: 12,
       paddingHorizontal: spacing.lg,
     },
-    editText: { color: colors.white, fontWeight: fontWeight.semibold },
+    btnText: { color: colors.white, fontWeight: fontWeight.semibold },
+    danger: { backgroundColor: `${colors.error}15`, borderRadius: borderRadius.lg, overflow: 'hidden' },
+    dangerInner: { paddingVertical: 12, alignItems: 'center', justifyContent: 'center' },
+    dangerText: { color: colors.error, fontWeight: fontWeight.semibold },
   });
 
   return (
     <View style={styles.container} testID="profile-screen">
-      <Stack.Screen options={{ title: 'Mon profil', headerShown: false }} />
+      <Stack.Screen options={{ title: 'Mon espace', headerShown: false }} />
       <LinearGradient colors={[colors.background, colors.backgroundSecondary]} style={styles.headerBg} />
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }} style={{ flex: 1 }}>
         <View style={[styles.content]}>
@@ -85,35 +88,77 @@ export default function ProfileScreen() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.name} numberOfLines={1}>
-                  {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'Voyageur'}
+                  {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'Invité'}
                 </Text>
                 <View style={styles.metaRow}>
                   <Mail size={16} color={colors.textSecondary} />
-                  <Text style={styles.email} numberOfLines={1}>{user?.email ?? 'email@example.com'}</Text>
+                  <Text style={styles.email} numberOfLines={1}>{user?.email ?? 'Non connecté'}</Text>
                 </View>
               </View>
             </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Préférences</Text>
-              <View style={styles.row}>
-                <View style={styles.pill}><Text style={styles.pillText}>Voyageur moderne</Text></View>
-                <View style={styles.pill}><Text style={styles.pillText}>EUR (€)</Text></View>
-              </View>
-            </View>
+            {!user ? (
+              <View style={styles.actions}>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  testID="signup-btn"
+                  activeOpacity={0.9}
+                  onPress={() => router.push('/auth/signup')}
+                  style={styles.btn}
+                >
+                  <LinearGradient colors={colors.primaryGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.btnInner}>
+                    <UserPlus color={colors.textInverse} size={18} />
+                    <Text style={styles.btnText}>Créer un compte</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              accessibilityRole="button"
-              testID="edit-profile-btn"
-              activeOpacity={0.85}
-              onPress={() => router.push('/settings/account')}
-              style={styles.editBtn}
-            >
-              <LinearGradient colors={colors.primaryGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.editBtnInner}>
-                <Edit3 color={colors.textInverse} size={18} />
-                <Text style={styles.editText}>Modifier mon profil</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  testID="login-btn"
+                  activeOpacity={0.9}
+                  onPress={() => router.push('/auth/login')}
+                  style={styles.btn}
+                >
+                  <LinearGradient colors={colors.secondaryGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.btnInner}>
+                    <LogIn color={colors.textInverse} size={18} />
+                    <Text style={styles.btnText}>Se connecter</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={styles.actions}>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  testID="logout-btn"
+                  activeOpacity={0.9}
+                  onPress={() => logout().catch(() => Alert.alert('Erreur', 'Impossible de se déconnecter'))}
+                  style={styles.btn}
+                >
+                  <LinearGradient colors={colors.primaryGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.btnInner}>
+                    <LogOut color={colors.textInverse} size={18} />
+                    <Text style={styles.btnText}>Se déconnecter</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  testID="delete-account-btn"
+                  activeOpacity={0.9}
+                  onPress={() => {
+                    Alert.alert('Supprimer mon compte', 'Cette action est irréversible. Confirmer ?', [
+                      { text: 'Annuler', style: 'cancel' },
+                      { text: 'Supprimer', style: 'destructive', onPress: () => deleteAccount().catch(() => Alert.alert('Erreur', 'Suppression impossible')) },
+                    ]);
+                  }}
+                  style={styles.danger}
+                >
+                  <View style={styles.dangerInner}>
+                    <Trash2 color={colors.error} size={18} />
+                    <Text style={styles.dangerText}>Supprimer mon compte</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </View>
       </ScrollView>
