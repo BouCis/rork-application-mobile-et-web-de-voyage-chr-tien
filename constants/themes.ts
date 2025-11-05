@@ -64,121 +64,121 @@ export interface Theme {
 }
 
 const heavenLuxLight: Theme = {
-  name: 'Heaven Lux - Light',
+  name: 'Classic Rork - Light',
   isDark: false,
   colors: {
-    primary: '#AFCBFF',
-    primaryLight: '#C4D7FF',
-    primaryDark: '#96B8F0',
-    
-    secondary: '#E6C97A',
-    secondaryLight: '#F0D99A',
-    secondaryDark: '#D4B665',
-    
-    accent: '#AFCBFF',
-    accentLight: '#C4D7FF',
-    accentDark: '#96B8F0',
-    
-    gold: '#E6C97A',
-    goldLight: '#F0D99A',
-    goldDark: '#D4B665',
-    
-    background: '#FAFAFA',
-    backgroundSecondary: '#FFFFFF',
-    backgroundTertiary: '#F5F5F5',
-    backgroundLight: 'rgba(230, 201, 122, 0.08)',
+    primary: '#6366F1',
+    primaryLight: '#818CF8',
+    primaryDark: '#4F46E5',
+
+    secondary: '#EC4899',
+    secondaryLight: '#F472B6',
+    secondaryDark: '#DB2777',
+
+    accent: '#14B8A6',
+    accentLight: '#2DD4BF',
+    accentDark: '#0D9488',
+
+    gold: '#F59E0B',
+    goldLight: '#FBBF24',
+    goldDark: '#D97706',
+
+    background: '#FFFFFF',
+    backgroundSecondary: '#F8FAFC',
+    backgroundTertiary: '#F1F5F9',
+    backgroundLight: 'rgba(99, 102, 241, 0.06)',
     surface: '#FFFFFF',
-    surfaceSecondary: '#FAFAFA',
+    surfaceSecondary: '#F8FAFC',
     surfaceElevated: '#FFFFFF',
-    
-    text: '#1B1B1B',
-    textSecondary: '#6E6E73',
-    textTertiary: '#8E8E93',
-    textMuted: 'rgba(27, 27, 27, 0.4)',
+
+    text: '#0F172A',
+    textSecondary: '#334155',
+    textTertiary: '#64748B',
+    textMuted: 'rgba(15, 23, 42, 0.35)',
     textInverse: '#FFFFFF',
-    textLight: '#8E8E93',
+    textLight: '#94A3B8',
     white: '#FFFFFF',
-    
-    border: 'rgba(230, 201, 122, 0.15)',
-    borderLight: 'rgba(230, 201, 122, 0.1)',
-    borderSubtle: 'rgba(230, 201, 122, 0.05)',
-    
-    success: '#34C759',
-    warning: '#FF9500',
-    error: '#FF3B30',
-    info: '#AFCBFF',
-    
-    dove: '#1B1B1B',
-    
-    primaryGradient: ['#AFCBFF', '#E6C97A'] as const,
-    secondaryGradient: ['#FAFAFA', '#FFFFFF'] as const,
-    goldGradient: ['#F0D99A', '#E6C97A'] as const,
-    glassGradient: ['rgba(255, 255, 255, 0.85)', 'rgba(250, 250, 250, 0.6)'] as const,
-    neonGradient: ['#AFCBFF', '#E6C97A'] as const,
-    
-    tabBarBackground: 'rgba(250, 250, 250, 0.9)',
+
+    border: '#E2E8F0',
+    borderLight: '#E5E7EB',
+    borderSubtle: '#EEF2F7',
+
+    success: '#10B981',
+    warning: '#F59E0B',
+    error: '#EF4444',
+    info: '#3B82F6',
+
+    dove: '#1F2937',
+
+    primaryGradient: ['#6366F1', '#EC4899'] as const,
+    secondaryGradient: ['#14B8A6', '#6366F1'] as const,
+    goldGradient: ['#F59E0B', '#EC4899'] as const,
+    glassGradient: ['rgba(255, 255, 255, 0.9)', 'rgba(248, 250, 252, 0.7)'] as const,
+    neonGradient: ['#6366F1', '#14B8A6'] as const,
+
+    tabBarBackground: 'rgba(255, 255, 255, 0.92)',
     tabBarBlur: true,
-    cardGlow: 'rgba(230, 201, 122, 0.1)',
+    cardGlow: 'rgba(99, 102, 241, 0.08)',
     glassEffect: true,
   },
 };
 
 const heavenLuxDark: Theme = {
-  name: 'Heaven Lux - Dark',
+  name: 'Classic Rork - Dark',
   isDark: true,
   colors: {
-    primary: '#AFCBFF',
-    primaryLight: '#C4D7FF',
-    primaryDark: '#96B8F0',
-    
-    secondary: '#E6C97A',
-    secondaryLight: '#F0D99A',
-    secondaryDark: '#D4B665',
-    
-    accent: '#AFCBFF',
-    accentLight: '#C4D7FF',
-    accentDark: '#96B8F0',
-    
-    gold: '#E6C97A',
-    goldLight: '#F0D99A',
-    goldDark: '#D4B665',
-    
-    background: '#2C2C2C',
-    backgroundSecondary: '#3A3A3A',
-    backgroundTertiary: '#484848',
-    backgroundLight: 'rgba(230, 201, 122, 0.12)',
-    surface: '#3A3A3A',
-    surfaceSecondary: '#484848',
-    surfaceElevated: '#525252',
-    
-    text: '#FFFFFF',
-    textSecondary: '#AEAEB2',
-    textTertiary: '#8E8E93',
-    textMuted: 'rgba(255, 255, 255, 0.4)',
-    textInverse: '#2C2C2C',
-    textLight: '#AEAEB2',
+    primary: '#6366F1',
+    primaryLight: '#818CF8',
+    primaryDark: '#4F46E5',
+
+    secondary: '#EC4899',
+    secondaryLight: '#F472B6',
+    secondaryDark: '#DB2777',
+
+    accent: '#14B8A6',
+    accentLight: '#2DD4BF',
+    accentDark: '#0D9488',
+
+    gold: '#F59E0B',
+    goldLight: '#FBBF24',
+    goldDark: '#D97706',
+
+    background: '#0F172A',
+    backgroundSecondary: '#1E293B',
+    backgroundTertiary: '#334155',
+    backgroundLight: 'rgba(99, 102, 241, 0.12)',
+    surface: '#1E293B',
+    surfaceSecondary: '#334155',
+    surfaceElevated: '#334155',
+
+    text: '#F8FAFC',
+    textSecondary: '#CBD5E1',
+    textTertiary: '#94A3B8',
+    textMuted: 'rgba(255, 255, 255, 0.3)',
+    textInverse: '#0F172A',
+    textLight: '#94A3B8',
     white: '#FFFFFF',
-    
-    border: 'rgba(230, 201, 122, 0.2)',
-    borderLight: 'rgba(230, 201, 122, 0.15)',
-    borderSubtle: 'rgba(230, 201, 122, 0.08)',
-    
-    success: '#32D74B',
-    warning: '#FF9F0A',
-    error: '#FF453A',
-    info: '#AFCBFF',
-    
-    dove: '#FFFFFF',
-    
-    primaryGradient: ['#AFCBFF', '#E6C97A'] as const,
-    secondaryGradient: ['#3A3A3A', '#2C2C2C'] as const,
-    goldGradient: ['#F0D99A', '#E6C97A'] as const,
-    glassGradient: ['rgba(58, 58, 58, 0.85)', 'rgba(44, 44, 44, 0.6)'] as const,
-    neonGradient: ['#AFCBFF', '#E6C97A'] as const,
-    
-    tabBarBackground: 'rgba(44, 44, 44, 0.9)',
+
+    border: '#334155',
+    borderLight: '#475569',
+    borderSubtle: 'rgba(148, 163, 184, 0.15)',
+
+    success: '#10B981',
+    warning: '#F59E0B',
+    error: '#EF4444',
+    info: '#3B82F6',
+
+    dove: '#E8E8E8',
+
+    primaryGradient: ['#6366F1', '#EC4899'] as const,
+    secondaryGradient: ['#14B8A6', '#6366F1'] as const,
+    goldGradient: ['#F59E0B', '#EC4899'] as const,
+    glassGradient: ['rgba(30, 41, 59, 0.85)', 'rgba(15, 23, 42, 0.6)'] as const,
+    neonGradient: ['#6366F1', '#14B8A6'] as const,
+
+    tabBarBackground: 'rgba(15, 23, 42, 0.9)',
     tabBarBlur: true,
-    cardGlow: 'rgba(230, 201, 122, 0.15)',
+    cardGlow: 'rgba(99, 102, 241, 0.12)',
     glassEffect: true,
   },
 };
