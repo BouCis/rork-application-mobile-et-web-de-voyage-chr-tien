@@ -16,27 +16,13 @@ export default function TabLayout() {
         headerShown: false,
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          position: 'absolute',
-          backgroundColor: Platform.OS === 'web' ? (colors.tabBarBackground || colors.surface) : 'transparent',
+          position: 'relative',
+          backgroundColor: colors.surface,
           borderTopWidth: 0,
           paddingHorizontal: 8,
           elevation: 0,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 8,
         },
-        tabBarBackground: () => (
-          <View
-            style={[
-              StyleSheet.absoluteFill,
-              {
-                // Use the provided RGBA color directly; do not append alpha suffixes
-                backgroundColor: (colors.tabBarBackground || colors.surface),
-              },
-            ]}
-          />
-        ),
+        // removed custom tabBarBackground to fix rendering artifacts on some platforms
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '600',

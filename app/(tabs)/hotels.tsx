@@ -20,7 +20,7 @@ import {
   Car,
 } from 'lucide-react-native';
 import { useTheme } from '@/store/ThemeContext';
-import BookingModal from '@/components/BookingModal';
+import BookingModal from '../../components/BookingModal';
 
 
 
