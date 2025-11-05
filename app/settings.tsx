@@ -15,7 +15,9 @@ import {
   Smartphone,
   FileText,
   Mail,
-  Info
+  Info,
+  LogOut,
+  Trash2
 } from 'lucide-react-native';
 import { useTheme } from '@/store/ThemeContext';
 import { useApp } from '@/store/AppContext';
@@ -23,7 +25,7 @@ import { router, Stack } from 'expo-router';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
-  const { user } = useApp();
+  const { user, logout, deleteAccount } = useApp();
   const { colors, spacing, borderRadius, fontSize, fontWeight, } = useTheme();
 
   const styles = StyleSheet.create({
@@ -170,6 +172,67 @@ export default function SettingsScreen() {
               </View>
             </View>
           ))}
+
+          <View style={styles.menuSection}>
+            <Text style={styles.sectionTitle}>👤 Compte</Text>
+            <View style={styles.menuContainer}>
+              <TouchableOpacity 
+                testID="settings-logout"
+                onPress={() => {
+                  if (!user) {
+                    Alert.alert('Non connecté', "Veuillez vous connecter d'abord.");
+                    return;
+                  }
+                  Alert.alert('Se déconnecter', 'Voulez-vous vous déconnecter ?', [
+                    { text: 'Annuler', style: 'cancel' },
+                    { text: 'Se déconnecter', style: 'destructive', onPress: () => logout().then(() => router.replace('/(tabs)/profile')).catch(() => Alert.alert('Erreur', 'Déconnexion impossible')) },
+                  ]);
+                }}
+                style={styles.menuItem}
+              >
+                <View style={styles.menuItemContent}>
+                  <View style={styles.menuItemLeft}>
+                    <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
+                      <LogOut color={colors.primary} size={20} />
+                    </View>
+                    <View style={styles.menuItemTextContainer}>
+                      <Text style={styles.menuItemText}>Se déconnecter</Text>
+                      <Text style={styles.menuItemDescription}>{user?.email ?? "Vous n'êtes pas connecté"}</Text>
+                    </View>
+                  </View>
+                  <ChevronRight color={colors.textSecondary} size={20} />
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                testID="settings-delete-account"
+                onPress={() => {
+                  if (!user) {
+                    Alert.alert('Aucun compte', 'Aucun compte à supprimer.');
+                    return;
+                  }
+                  Alert.alert('Supprimer mon compte', 'Cette action est irréversible. Confirmer ?', [
+                    { text: 'Annuler', style: 'cancel' },
+                    { text: 'Supprimer', style: 'destructive', onPress: () => deleteAccount().then(() => router.replace('/(tabs)/profile')).catch(() => Alert.alert('Erreur', 'Suppression impossible')) },
+                  ]);
+                }}
+                style={[styles.menuItem, styles.menuItemLast]}
+              >
+                <View style={styles.menuItemContent}>
+                  <View style={styles.menuItemLeft}>
+                    <View style={[styles.iconContainer, { backgroundColor: `${colors.error}15` }]}>
+                      <Trash2 color={colors.error} size={20} />
+                    </View>
+                    <View style={styles.menuItemTextContainer}>
+                      <Text style={styles.menuItemText}>Supprimer mon compte</Text>
+                      <Text style={styles.menuItemDescription}>Supprime définitivement vos données locales</Text>
+                    </View>
+                  </View>
+                  <ChevronRight color={colors.textSecondary} size={20} />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
 
           <Text style={styles.version}>Version 1.0.0</Text>
         </ScrollView>

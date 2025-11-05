@@ -109,23 +109,11 @@ export default function ProfileScreen() {
               </View>
             ) : (
               <View style={styles.actions}>
-                <TouchableOpacity accessibilityRole="button" testID="logout-btn" activeOpacity={0.9} onPress={() => logout().catch(() => Alert.alert('Erreur', 'Impossible de se déconnecter'))} style={styles.btn}>
+                <TouchableOpacity accessibilityRole="button" testID="manage-account-in-settings" activeOpacity={0.9} onPress={() => router.push('/settings')} style={styles.btn}>
                   <LinearGradient colors={colors.primaryGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.btnInner}>
-                    <LogOut color={colors.textInverse} size={18} />
-                    <Text style={styles.btnText}>Se déconnecter</Text>
+                    <Settings color={colors.textInverse} size={18} />
+                    <Text style={styles.btnText}>Gérer le compte dans Paramètres</Text>
                   </LinearGradient>
-                </TouchableOpacity>
-
-                <TouchableOpacity accessibilityRole="button" testID="delete-account-btn" activeOpacity={0.9} onPress={() => {
-                  Alert.alert('Supprimer mon compte', 'Cette action est irréversible. Confirmer ?', [
-                    { text: 'Annuler', style: 'cancel' },
-                    { text: 'Supprimer', style: 'destructive', onPress: () => deleteAccount().catch(() => Alert.alert('Erreur', 'Suppression impossible')) },
-                  ]);
-                }} style={styles.danger}>
-                  <View style={styles.dangerInner}>
-                    <Trash2 color={colors.error} size={18} />
-                    <Text style={styles.dangerText}>Supprimer mon compte</Text>
-                  </View>
                 </TouchableOpacity>
               </View>
             )}
