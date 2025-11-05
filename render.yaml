@@ -1,0 +1,19 @@
+﻿services:
+  - type: web
+    name: rork-api
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run dev:api
+    envVars:
+      AMADEUS_API_KEY:
+        sync: false
+      AMADEUS_API_SECRET:
+        sync: false
+      GOOGLE_PLACES_API_KEY:
+        sync: false
+      TURSO_DATABASE_URL:
+        sync: false
+      TURSO_AUTH_TOKEN:
+        sync: false
