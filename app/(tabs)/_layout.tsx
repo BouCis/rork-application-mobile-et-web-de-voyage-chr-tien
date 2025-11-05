@@ -58,7 +58,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="hotels"
         options={{
-          title: "Hotel",
+          title: "Hôtel",
           tabBarIcon: ({ focused }) => (
             <Hotel
               color={focused ? colors.primary : colors.textSecondary}
@@ -71,7 +71,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="activities"
         options={{
-          title: "Activite",
+          title: "Activités",
           tabBarIcon: ({ focused }) => (
             <MapPin
               color={focused ? colors.primary : colors.textSecondary}
@@ -84,7 +84,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="restaurants"
         options={{
-          title: "Restaurant",
+          title: "Restaurants",
           tabBarIcon: ({ focused }) => (
             <UtensilsCrossed
               color={focused ? colors.primary : colors.textSecondary}

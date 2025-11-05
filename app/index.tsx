@@ -50,7 +50,7 @@ export default function WelcomeScreen() {
 
     const navTimeout = setTimeout(() => {
       try {
-        router.replace('/planner');
+        router.replace('/(tabs)/planner');
       } catch (e) {
         console.log('Navigation error from welcome to planner', e);
       }
@@ -132,8 +132,8 @@ export default function WelcomeScreen() {
         </Animated.View>
 
         <Animated.View style={{ opacity: textOpacity, transform: [{ translateY: textTranslateY }] }} testID="welcome-text-wrap">
-          <Text style={styles.appName} testID="welcome-title">Voyage Planner</Text>
-          <Text style={styles.tagline} testID="welcome-tagline">Planifiez. Réservez. Partez.</Text>
+          <Text style={styles.appName} testID="welcome-title">Sacàdos</Text>
+          <Text style={styles.tagline} testID="welcome-tagline">Votre compagnon de voyage</Text>
         </Animated.View>
       </View>
 
