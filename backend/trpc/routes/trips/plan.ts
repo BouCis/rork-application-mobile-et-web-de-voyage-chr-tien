@@ -2,7 +2,27 @@ import { z } from 'zod';
 import { publicProcedure } from '../../create-context';
 import { db } from '../../../db';
 import { locations, checklists, expenses } from '../../../db/schema';
-import { eq } from 'drizzle-orm';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const countriesData: Record<string, { name: string; cities: { name: string; lat: number; lng: number }[] }> = require('../../../../data/countries-cities.json');
+
+function findCityLatLng(countryCodeOrName: string, cityName: string): { lat: number; lng: number } | null {
+  // Try ISO2 key first
+  const byIso = countriesData[countryCodeOrName as keyof typeof countriesData];
+  const norm = (s: string) => s.toLowerCase();
+  if (byIso) {
+    const city = byIso.cities.find(c => norm(c.name) === norm(cityName));
+    if (city) return { lat: city.lat, lng: city.lng };
+  }
+  // Fallback: search by country name
+  for (const [, v] of Object.entries(countriesData)) {
+    if (norm(v.name) === norm(countryCodeOrName)) {
+      const city = v.cities.find(c => norm(c.name) === norm(cityName));
+      if (city) return { lat: city.lat, lng: city.lng };
+    }
+  }
+  return null;
+}
 
 export const planTripProcedure = publicProcedure
   .input(
@@ -26,13 +46,15 @@ export const planTripProcedure = publicProcedure
       const mockHotelPrice = 80;
       const mockMealPrice = 20;
 
+      const coords = findCityLatLng(destinationCountry, destinationCity);
+
       const mockLocations = [
         {
           id: `loc_${Date.now()}_1`,
           tripId,
           name: `${destinationCity} Centre` ,
-          latitude: 0,
-          longitude: 0,
+          latitude: coords?.lat ?? 0,
+          longitude: coords?.lng ?? 0,
           address: `${destinationCity}, ${destinationCountry}`,
           country: destinationCountry,
           city: destinationCity,
@@ -41,9 +63,9 @@ export const planTripProcedure = publicProcedure
         {
           id: `loc_${Date.now()}_2`,
           tripId,
-          name: 'Attraction principale',
-          latitude: 0,
-          longitude: 0,
+          name: 'Point d\'intérêt',
+          latitude: coords?.lat ?? 0,
+          longitude: coords?.lng ?? 0,
           address: `${destinationCity}, ${destinationCountry}`,
           country: destinationCountry,
           city: destinationCity,
@@ -97,7 +119,7 @@ export const planTripProcedure = publicProcedure
           currency,
           category: 'transport' as const,
           date: startDate,
-          notes: 'Simulation Skyscanner',
+          notes: 'Simulation Amadeus',
           receipt: null as unknown as string | undefined,
           createdAt: nowIso,
         },
@@ -123,7 +145,7 @@ export const planTripProcedure = publicProcedure
           currency,
           category: 'food' as const,
           date: startDate,
-          notes: 'Simulation TripAdvisor',
+          notes: 'Simulation Google Places',
           receipt: null as unknown as string | undefined,
           createdAt: nowIso,
         },
@@ -136,9 +158,9 @@ export const planTripProcedure = publicProcedure
         checklists: mockChecklist,
         expenses: mockExpenses,
         offers: {
-          flight: { provider: 'Skyscanner', price: mockFlightPrice, currency, duration: '2h30', details: `Vol ${destinationCity}` },
+          flight: { provider: 'Amadeus', price: mockFlightPrice, currency, duration: '2h30', details: `Vol ${destinationCity}` },
           hotel: { provider: 'Amadeus', pricePerNight: mockHotelPrice, currency, details: 'Hôtel central – simulation' },
-          food: { provider: 'TripAdvisor', avgMeal: mockMealPrice, currency, details: 'Moyenne repas – simulation' },
+          food: { provider: 'Google Places', avgMeal: mockMealPrice, currency, details: 'Moyenne repas – simulation' },
         },
       };
     } catch (err) {
