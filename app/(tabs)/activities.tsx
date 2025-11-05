@@ -88,10 +88,17 @@ export default function ActivitiesScreen() {
   const [locationLoading, setLocationLoading] = useState<boolean>(true);
   const [locationError, setLocationError] = useState<string | null>(null);
 
-  const activitiesQuery = trpc.activities.getAll.useQuery({
-    category: selectedCategory || undefined,
-    search: searchQuery || undefined,
-  });
+  const activitiesQuery = trpc.activities.getAll.useQuery(
+    {
+      category: selectedCategory || undefined,
+      search: searchQuery || undefined,
+    },
+    {
+      retry: 1,
+      staleTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: false,
+    }
+  );
 
   useEffect(() => {
     console.log('[Activities] Requesting location permission...');
@@ -182,7 +189,7 @@ export default function ActivitiesScreen() {
       `${activity.location}\n\n${activity.description}\n\n⭐ ${activity.rating} (${activity.reviews} avis)\n⏱️ ${activity.duration}\n🎫 ${activity.category}`,
       [
         { text: 'Annuler', style: 'cancel' },
-        { text: 'Réserver - €${activity.price}', onPress: () => {
+        { text: 'Détails', onPress: () => {
           Alert.alert(
             'Réservation',
             `Confirmer la réservation pour ${activity.name} ?\n\nPrix: €${activity.price} par personne\nDurée: ${activity.duration}`,
@@ -204,14 +211,14 @@ export default function ActivitiesScreen() {
   }, [selectedCategory]);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="activities-screen">
       <LinearGradient
         colors={[colors.background, colors.backgroundSecondary]}
         style={StyleSheet.absoluteFillObject}
       />
 
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <View style={styles.titleContainer}>
+        <View style={styles.titleContainer} testID="activities-header">
           <Text style={styles.title}>Activités</Text>
           {locationLoading && (
             <ActivityIndicator size="small" color={colors.primary} />
@@ -304,17 +311,17 @@ export default function ActivitiesScreen() {
 
           {activitiesQuery.isLoading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={colors.primary} />
+              <ActivityIndicator size="large" color={colors.primary} testID="activities-loading" />
               <Text style={styles.loadingText}>Chargement des activités...</Text>
             </View>
           ) : activitiesQuery.error ? (
-            <View style={styles.emptyState}>
+            <View style={styles.emptyState} testID="activities-error">
               <Text style={styles.emptyStateText}>
                 Erreur lors du chargement des activités
               </Text>
             </View>
           ) : filteredActivities.length === 0 ? (
-            <View style={styles.emptyState}>
+            <View style={styles.emptyState} testID="activities-empty">
               <Text style={styles.emptyStateText}>
                 Aucune activité trouvée avec ces critères
               </Text>
@@ -322,6 +329,7 @@ export default function ActivitiesScreen() {
           ) : (
             filteredActivities.map((activity) => (
             <TouchableOpacity
+              testID={`activity-card-${activity.id}`}
               key={activity.id}
               style={styles.activityCard}
               onPress={() => handleActivityPress(activity)}
@@ -384,7 +392,7 @@ export default function ActivitiesScreen() {
                     style={styles.bookButton}
                     onPress={() => handleActivityPress(activity)}
                   >
-                    <Text style={styles.bookButtonText}>Réserver</Text>
+                    <Text style={styles.bookButtonText}>Détails</Text>
                   </TouchableOpacity>
                 </View>
               </View>

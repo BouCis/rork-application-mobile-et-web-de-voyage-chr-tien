@@ -7,17 +7,33 @@ import "dotenv/config";
 
 const app = new Hono();
 
-app.use("*", cors());
+app.use("*", cors({
+  origin: '*',
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  exposeHeaders: ['Content-Length'],
+  maxAge: 86400,
+  credentials: false,
+}));
 
 app.use(
-  "/trpc/*",
+  "/api/trpc/*",
   trpcServer({
     router: appRouter,
     createContext,
+    onError(opts) {
+      const { error, type, path } = opts;
+      console.error('[tRPC Error]', {
+        type,
+        path,
+        error: error.message,
+        code: error.code,
+      });
+    },
   })
 );
 
-app.get("/", (c) => {
+app.get("/api", (c) => {
   return c.json({ status: "ok", message: "API is running" });
 });
 

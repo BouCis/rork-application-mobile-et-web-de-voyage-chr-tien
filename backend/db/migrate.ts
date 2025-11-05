@@ -20,7 +20,6 @@ const db = drizzle(client, { schema });
 
 // Liste des tables dans l'ordre (respect des dépendances)
 const tableQueries = [
-  // 1. users
   `CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     first_name TEXT NOT NULL,
@@ -46,8 +45,6 @@ const tableQueries = [
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );`,
-
-  // 2. trips
   `CREATE TABLE IF NOT EXISTS trips (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -73,8 +70,6 @@ const tableQueries = [
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );`,
-
-  // 3. locations
   `CREATE TABLE IF NOT EXISTS locations (
     id TEXT PRIMARY KEY,
     trip_id TEXT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
@@ -87,8 +82,6 @@ const tableQueries = [
     type TEXT CHECK(type IN ('tourist', 'historical', 'natural', 'other')) NOT NULL,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );`,
-
-  // 4. expenses
   `CREATE TABLE IF NOT EXISTS expenses (
     id TEXT PRIMARY KEY,
     trip_id TEXT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
@@ -102,8 +95,6 @@ const tableQueries = [
     receipt TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );`,
-
-  // 5. checklists
   `CREATE TABLE IF NOT EXISTS checklists (
     id TEXT PRIMARY KEY,
     trip_id TEXT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
@@ -118,8 +109,6 @@ const tableQueries = [
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );`,
-
-  // 6. media
   `CREATE TABLE IF NOT EXISTS media (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -136,8 +125,6 @@ const tableQueries = [
     edited_with TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );`,
-
-  // 7. saved_places
   `CREATE TABLE IF NOT EXISTS saved_places (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -151,8 +138,6 @@ const tableQueries = [
     shared_with TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );`,
-
-  // 8. journals
   `CREATE TABLE IF NOT EXISTS journals (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -166,8 +151,6 @@ const tableQueries = [
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );`,
-
-  // 9. playlists
   `CREATE TABLE IF NOT EXISTS playlists (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -180,8 +163,6 @@ const tableQueries = [
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );`,
-
-  // 10. posts
   `CREATE TABLE IF NOT EXISTS posts (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -195,8 +176,6 @@ const tableQueries = [
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );`,
-
-  // 11. notifications
   `CREATE TABLE IF NOT EXISTS notifications (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -206,7 +185,7 @@ const tableQueries = [
     read INTEGER NOT NULL DEFAULT 0,
     action_url TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-  );`,
+  );`
 ];
 
 async function runMigration() {

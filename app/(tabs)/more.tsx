@@ -18,7 +18,6 @@ import {
   Settings,
   HelpCircle,
   Info,
-  LogOut,
   ChevronRight,
   Sparkles,
   DollarSign,
@@ -27,7 +26,7 @@ import {
   Calculator,
   BookOpen,
 } from 'lucide-react-native';
-import { useApp } from '@/store/AppContext';
+
 import { useTheme } from '@/store/ThemeContext';
 
 const { width } = Dimensions.get('window');
@@ -42,8 +41,7 @@ interface MenuItem {
 
 export default function MoreScreen() {
   const insets = useSafeAreaInsets();
-  const { user } = useApp();
-  const { colors, spacing, borderRadius, fontSize, fontWeight } = useTheme();
+  const { colors } = useTheme();
 
   const handleFlightsPress = useCallback(() => {
     console.log('[More] Flights pressed');
@@ -129,24 +127,6 @@ export default function MoreScreen() {
       [{ text: 'OK' }]
     );
   }, []);
-
-  const handleLogoutPress = useCallback(() => {
-    console.log('[More] Logout pressed');
-    Alert.alert(
-      'Déconnexion',
-      'Êtes-vous sûr de vouloir vous déconnecter ?',
-      [
-        { text: 'Annuler', style: 'cancel' },
-        { 
-          text: 'Déconnexion', 
-          style: 'destructive',
-          onPress: () => console.log('User logged out')
-        }
-      ]
-    );
-  }, []);
-
-
 
   const travelServices: MenuItem[] = [
     {
@@ -391,19 +371,6 @@ export default function MoreScreen() {
             ))}
           </View>
         </View>
-
-        {user && (
-          <TouchableOpacity 
-            style={[styles.logoutButton, dynamicStyles.logoutButton]}
-            onPress={handleLogoutPress}
-            activeOpacity={0.8}
-          >
-            <View style={styles.logoutContent}>
-              <LogOut color={colors.error} size={20} />
-              <Text style={[styles.logoutText, dynamicStyles.logoutText]}>Déconnexion</Text>
-            </View>
-          </TouchableOpacity>
-        )}
 
         <View style={styles.footer}>
           <Text style={[styles.version, dynamicStyles.version]}>Version 1.0.0</Text>

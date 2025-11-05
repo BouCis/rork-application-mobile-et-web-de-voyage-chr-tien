@@ -9,9 +9,15 @@ import { getTripsByUserProcedure, getTripByIdProcedure } from "./routes/trips/ge
 import { updateTripProcedure } from "./routes/trips/update";
 import { deleteTripProcedure } from "./routes/trips/delete";
 import { getAllActivitiesProcedure, getActivityByIdProcedure } from "./routes/activities/get";
+import { planTripProcedure } from "./routes/trips/plan";
+import { fetchVisaInfoProcedure } from "./routes/trips/visa-info";
+import { fetchHealthInfoProcedure } from "./routes/trips/health-info";
 import { createActivityProcedure } from "./routes/activities/create";
 import { createBookingProcedure } from "./routes/activities/bookings/create";
 import { getUserBookingsProcedure } from "./routes/activities/bookings/get";
+import { sendVerificationEmailProcedure } from "./routes/emails/send-verification";
+import { searchFlightsProcedure, searchHotelsProcedure, searchCityOrAirportProcedure } from "./routes/external/amadeus";
+import { searchPlacesProcedure } from "./routes/external/places";
 
 export const appRouter = createTRPCRouter({
   example: createTRPCRouter({
@@ -30,6 +36,9 @@ export const appRouter = createTRPCRouter({
     getById: getTripByIdProcedure,
     update: updateTripProcedure,
     delete: deleteTripProcedure,
+    plan: planTripProcedure,
+    visaInfo: fetchVisaInfoProcedure,
+    healthInfo: fetchHealthInfoProcedure,
   }),
   activities: createTRPCRouter({
     getAll: getAllActivitiesProcedure,
@@ -38,6 +47,19 @@ export const appRouter = createTRPCRouter({
     bookings: createTRPCRouter({
       create: createBookingProcedure,
       getByUser: getUserBookingsProcedure,
+    }),
+  }),
+  emails: createTRPCRouter({
+    sendVerification: sendVerificationEmailProcedure,
+  }),
+  external: createTRPCRouter({
+    amadeus: createTRPCRouter({
+      flights: searchFlightsProcedure,
+      hotels: searchHotelsProcedure,
+      cityOrAirport: searchCityOrAirportProcedure,
+    }),
+    places: createTRPCRouter({
+      search: searchPlacesProcedure,
     }),
   }),
 });

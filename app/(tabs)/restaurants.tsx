@@ -360,7 +360,7 @@ export default function RestaurantsScreen() {
       `${restaurant.location}\n\n⭐ ${restaurant.rating} (${restaurant.reviews} avis)\n🍴 ${restaurant.cuisine}\n💰 ${restaurant.priceRange}\n⏰ ${restaurant.openHours}\n\nSpécialités: ${restaurant.specialties.join(', ')}`,
       [
         { text: 'Annuler', style: 'cancel' },
-        { text: 'Réserver' },
+        { text: 'Détails' },
       ]
     );
   }, []);
@@ -551,7 +551,7 @@ export default function RestaurantsScreen() {
                   style={styles.reserveButton}
                   onPress={() => handleRestaurantPress(restaurant)}
                 >
-                  <Text style={styles.reserveButtonText}>Réserver</Text>
+                  <Text style={styles.reserveButtonText}>Détails</Text>
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>

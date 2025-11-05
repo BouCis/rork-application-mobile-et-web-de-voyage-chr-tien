@@ -14,6 +14,7 @@ import { Mail, Check, ArrowLeft } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
 import { useApp } from '@/store/AppContext';
 import { router, useLocalSearchParams } from 'expo-router';
+import { trpc } from '@/lib/trpc';
 
 export default function VerifyEmailScreen() {
   const insets = useSafeAreaInsets();
@@ -35,20 +36,7 @@ export default function VerifyEmailScreen() {
     return Math.floor(100000 + Math.random() * 900000).toString();
   };
 
-  const sendVerificationEmail = async (email: string, verificationCode: string): Promise<boolean> => {
-    try {
-      console.log(`📧 Email de vérification envoyé à ${email}`);
-      console.log(`📋 Code de vérification: ${verificationCode}`);
-      console.log(`⏰ Expiration: 15 minutes`);
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      return true;
-    } catch (error) {
-      console.error('Erreur lors de l\'envoi de l\'email:', error);
-      return false;
-    }
-  };
+  const sendEmailMutation = trpc.emails.sendVerification.useMutation();
 
   const handleVerify = async () => {
     if (!code.trim()) {
@@ -122,7 +110,13 @@ export default function VerifyEmailScreen() {
       const expiresAt = new Date();
       expiresAt.setMinutes(expiresAt.getMinutes() + 15);
 
-      const emailSuccess = await sendVerificationEmail(user.email, newCode);
+      const emailResult = await sendEmailMutation.mutateAsync({
+        email: user.email,
+        firstName: user.firstName,
+        code: newCode,
+      });
+
+      const emailSuccess = emailResult.success;
 
       if (emailSuccess) {
         const updatedUser = {
@@ -164,7 +158,13 @@ export default function VerifyEmailScreen() {
       >
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/(tabs)/planner');
+            }
+          }}
         >
           <ArrowLeft color={theme.colors.text} size={24} />
         </TouchableOpacity>

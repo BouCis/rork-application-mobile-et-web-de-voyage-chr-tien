@@ -1,47 +1,32 @@
 import { Tabs } from "expo-router";
-import { Home, Hotel, MapPin, UtensilsCrossed, MoreHorizontal } from "lucide-react-native";
+import { Home, Hotel, MapPin, UtensilsCrossed, MoreHorizontal, User } from "lucide-react-native";
 import React from "react";
-import { Platform, StyleSheet } from "react-native";
-import { BlurView } from "expo-blur";
+import { View } from "react-native";
 
 import { useTheme } from "@/store/ThemeContext";
 
 export default function TabLayout() {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
 
   return (
     <Tabs
+      initialRouteName="planner"
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
         headerShown: false,
+        tabBarHideOnKeyboard: true,
+        tabBarBackground: () => (
+          <View style={{ flex: 1, backgroundColor: colors.surface }} />
+        ),
         tabBarStyle: {
-          position: 'absolute',
-          backgroundColor: Platform.OS === 'web' ? (colors.tabBarBackground || colors.surface) : 'transparent',
-          borderTopWidth: 0,
-          paddingHorizontal: 4,
-          height: Platform.OS === 'ios' ? 88 : 72,
-          paddingTop: 8,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 12,
+          backgroundColor: colors.surface,
+          borderTopWidth: 1,
+          borderTopColor: colors.border,
+          paddingHorizontal: 8,
           elevation: 0,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 12,
+          shadowOpacity: 0,
         },
-        tabBarBackground: () => Platform.OS !== 'web' && colors.tabBarBlur ? (
-          <BlurView
-            intensity={95}
-            tint={isDark ? 'dark' : 'light'}
-            style={StyleSheet.absoluteFill}
-          />
-        ) : Platform.OS !== 'web' ? (
-          <BlurView
-            intensity={0}
-            tint={isDark ? 'dark' : 'light'}
-            style={[StyleSheet.absoluteFill, { backgroundColor: colors.tabBarBackground || colors.surface }]}
-          />
-        ) : null,
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '600',
@@ -61,7 +46,7 @@ export default function TabLayout() {
         name="planner"
         options={{
           title: "Accueil",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <Home
               color={focused ? colors.primary : colors.textSecondary}
               size={24}
@@ -73,8 +58,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="hotels"
         options={{
-          title: "Hôtels",
-          tabBarIcon: ({ color, focused }) => (
+          title: "Hôtel",
+          tabBarIcon: ({ focused }) => (
             <Hotel
               color={focused ? colors.primary : colors.textSecondary}
               size={24}
@@ -87,7 +72,7 @@ export default function TabLayout() {
         name="activities"
         options={{
           title: "Activités",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <MapPin
               color={focused ? colors.primary : colors.textSecondary}
               size={24}
@@ -99,9 +84,22 @@ export default function TabLayout() {
       <Tabs.Screen
         name="restaurants"
         options={{
-          title: "Restos",
-          tabBarIcon: ({ color, focused }) => (
+          title: "Restaurants",
+          tabBarIcon: ({ focused }) => (
             <UtensilsCrossed
+              color={focused ? colors.primary : colors.textSecondary}
+              size={24}
+              strokeWidth={focused ? 2.5 : 2}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Mon espace",
+          tabBarIcon: ({ focused }) => (
+            <User
               color={focused ? colors.primary : colors.textSecondary}
               size={24}
               strokeWidth={focused ? 2.5 : 2}
@@ -113,7 +111,7 @@ export default function TabLayout() {
         name="more"
         options={{
           title: "Plus",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <MoreHorizontal
               color={focused ? colors.primary : colors.textSecondary}
               size={24}
@@ -125,4 +123,3 @@ export default function TabLayout() {
     </Tabs>
   );
 }
-

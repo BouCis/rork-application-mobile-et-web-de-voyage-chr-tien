@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { MapPin, Calendar, Heart } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { theme } from '@/constants/theme';
 import { Trip } from '@/types';
-import { useAppStore } from '@/store/useAppStore';
 
 interface TripCardProps {
   trip: Trip;
@@ -12,9 +11,8 @@ interface TripCardProps {
 }
 
 export function TripCard({ trip, onPress }: TripCardProps) {
-  const { favoriteTrips, toggleFavoriteTrip } = useAppStore();
-  const isFavorite = favoriteTrips.includes(trip.id);
-  
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
       day: 'numeric',
@@ -51,12 +49,23 @@ export function TripCard({ trip, onPress }: TripCardProps) {
     }
   };
 
+  const [coverError, setCoverError] = useState<boolean>(false);
+  const onImageError = useCallback(() => {
+    console.log('[TripCard] cover image error, using fallback');
+    setCoverError(true);
+  }, []);
+
   return (
     <Card style={styles.card}>
       <View style={styles.cardInner}>
         <Pressable onPress={onPress} style={styles.tappableArea} accessibilityRole="button" testID={`card-trip-${trip.id}`}>
-          {trip.coverImage && (
-            <Image source={{ uri: trip.coverImage }} style={styles.coverImage} />
+          {(trip.coverImage || coverError) && (
+            <Image
+              source={{ uri: coverError ? 'https://images.unsplash.com/photo-1502920917128-1aa500764ce7?w=1200&auto=format' : (trip.coverImage as string) }}
+              style={styles.coverImage}
+              onError={onImageError}
+              accessibilityLabel="Image de couverture du voyage"
+            />
           )}
 
           <View style={styles.content}>
@@ -94,7 +103,7 @@ export function TripCard({ trip, onPress }: TripCardProps) {
         </Pressable>
 
         <Pressable
-          onPress={() => toggleFavoriteTrip(trip.id)}
+          onPress={() => setIsFavorite((v) => !v)}
           style={styles.favoriteButton}
           accessibilityRole="button"
           testID={`btn-favorite-${trip.id}`}
