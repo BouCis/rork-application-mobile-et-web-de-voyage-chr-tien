@@ -16,12 +16,16 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.textMuted,
         headerShown: false,
         tabBarHideOnKeyboard: true,
+        tabBarBackground: () => (
+          <View style={{ flex: 1, backgroundColor: colors.surface }} />
+        ),
         tabBarStyle: {
-          position: 'relative',
           backgroundColor: colors.surface,
-          borderTopWidth: 0,
+          borderTopWidth: 1,
+          borderTopColor: colors.border,
           paddingHorizontal: 8,
           elevation: 0,
+          shadowOpacity: 0,
         },
         tabBarLabelStyle: {
           fontSize: 10,
