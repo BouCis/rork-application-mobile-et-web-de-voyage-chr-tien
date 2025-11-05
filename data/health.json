@@ -1,0 +1,6 @@
+{
+  "France": {"vaccinations": [{"name": "Rappels vaccinaux (DT-Polio)", "recommended": true}]},
+  "États-Unis": {"vaccinations": [{"name": "Hépatite A", "recommended": true}, {"name": "ROR (si non immunisé)", "recommended": true}]},
+  "Japon": {"vaccinations": [{"name": "Hépatite A", "recommended": true}, {"name": "Encéphalite japonaise", "recommended": false, "description": "Si séjour rural prolongé"}], "risks": ["Saisons d'allergies", "Typhons (été)"]},
+  "Brésil": {"vaccinations": [{"name": "Fièvre jaune", "required": true}, {"name": "Hépatite A", "recommended": true}, {"name": "Typhoïde", "recommended": true}], "risks": ["Dengue", "Paludisme (zones spécifiques)", "Eau non potable"]}
+}

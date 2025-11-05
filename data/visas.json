@@ -1,0 +1,6 @@
+{
+  "France": {"required": false, "type": "visa-free", "duration": "Libre circulation UE", "cost": 0, "processingTime": "—", "requirements": ["Carte d'identité ou passeport valide"], "link": "https://europa.eu/youreurope/citizens/travel/entry-exit/index_fr.htm"},
+  "États-Unis": {"required": true, "type": "ESTA", "duration": "90 jours", "cost": 21, "processingTime": "72 heures", "requirements": ["Passeport valide 6 mois", "Demande ESTA", "Billet retour"], "link": "https://esta.cbp.dhs.gov/"},
+  "Japon": {"required": false, "type": "exemption", "duration": "90 jours", "cost": 0, "processingTime": "—", "requirements": ["Passeport valide", "Billet retour"], "link": "https://www.mofa.go.jp/j_info/visit/visa/short/novisa.html"},
+  "Brésil": {"required": true, "type": "eVisa", "duration": "90 jours", "cost": 0, "processingTime": "3-10 jours", "requirements": ["Passeport 6 mois", "Billet retour", "Preuve de fonds"], "link": "https://www.gov.br/mre/pt-br"}
+}

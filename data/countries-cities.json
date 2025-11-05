@@ -1,0 +1,7 @@
+{
+  "FR": {"name": "France", "cities": [{"name": "Paris", "lat": 48.8566, "lng": 2.3522}, {"name": "Lyon", "lat": 45.764, "lng": 4.8357}, {"name": "Marseille", "lat": 43.2965, "lng": 5.3698}]},
+  "IT": {"name": "Italie", "cities": [{"name": "Rome", "lat": 41.9028, "lng": 12.4964}, {"name": "Milan", "lat": 45.4642, "lng": 9.19}]},
+  "ES": {"name": "Espagne", "cities": [{"name": "Madrid", "lat": 40.4168, "lng": -3.7038}, {"name": "Barcelone", "lat": 41.3851, "lng": 2.1734}]},
+  "US": {"name": "États-Unis", "cities": [{"name": "New York", "lat": 40.7128, "lng": -74.006}, {"name": "Los Angeles", "lat": 34.0522, "lng": -118.2437}]},
+  "JP": {"name": "Japon", "cities": [{"name": "Tokyo", "lat": 35.6762, "lng": 139.6503}, {"name": "Kyoto", "lat": 35.0116, "lng": 135.7681}]}
+}
