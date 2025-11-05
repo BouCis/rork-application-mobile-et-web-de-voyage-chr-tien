@@ -10,6 +10,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      initialRouteName="planner"
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
@@ -22,7 +23,6 @@ export default function TabLayout() {
           paddingHorizontal: 8,
           elevation: 0,
         },
-        // removed custom tabBarBackground to fix rendering artifacts on some platforms
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '600',
@@ -54,7 +54,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="hotels"
         options={{
-          title: "Hôtels",
+          title: "Hotel",
           tabBarIcon: ({ focused }) => (
             <Hotel
               color={focused ? colors.primary : colors.textSecondary}
@@ -67,7 +67,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="activities"
         options={{
-          title: "Activités",
+          title: "Activite",
           tabBarIcon: ({ focused }) => (
             <MapPin
               color={focused ? colors.primary : colors.textSecondary}
@@ -80,7 +80,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="restaurants"
         options={{
-          title: "Restos",
+          title: "Restaurant",
           tabBarIcon: ({ focused }) => (
             <UtensilsCrossed
               color={focused ? colors.primary : colors.textSecondary}
