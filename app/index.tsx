@@ -124,7 +124,7 @@ export default function WelcomeScreen() {
       <View style={styles.content} testID="welcome-content">
         <Animated.View style={[styles.card, { transform: [{ scale: logoScale }], opacity: logoOpacity }]} testID="welcome-logo-card">
           <Image
-            source={require('@/assets/images/icon.png')}
+            source={require('../assets/images/icon.png')}
             style={styles.logo}
             contentFit="cover"
             transition={200}
