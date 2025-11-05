@@ -12,13 +12,36 @@ async function getAmadeusToken() {
       body: `grant_type=client_credentials&client_id=${encodeURIComponent(key)}&client_secret=${encodeURIComponent(secret)}`,
     });
     if (!res.ok) return null;
-    const json = await res.json() as { access_token: string; expires_in: number };
+    const json = (await res.json()) as { access_token: string; expires_in: number };
     return json.access_token;
   } catch (e) {
     console.error('[amadeus] token error', e);
     return null;
   }
 }
+
+export const searchCityOrAirportProcedure = publicProcedure
+  .input(z.object({ keyword: z.string().min(2), subType: z.enum(['CITY', 'AIRPORT', 'ANY']).optional() }))
+  .query(async ({ input }) => {
+    const token = await getAmadeusToken();
+    if (!token) {
+      return { provider: 'Amadeus', items: [], mode: 'simulation' as const };
+    }
+    try {
+      const url = new URL('https://test.api.amadeus.com/v1/reference-data/locations');
+      const subType = input.subType && input.subType !== 'ANY' ? input.subType : 'CITY,AIRPORT';
+      url.searchParams.set('subType', subType);
+      url.searchParams.set('keyword', input.keyword);
+      url.searchParams.set('page[limit]', '10');
+      const res = await fetch(url.toString(), { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error('Amadeus locations error');
+      const json = await res.json();
+      return { provider: 'Amadeus', items: json?.data ?? [], mode: 'live' as const };
+    } catch (e) {
+      console.error('[amadeus] locations error', e);
+      return { provider: 'Amadeus', items: [], mode: 'simulation' as const };
+    }
+  });
 
 export const searchFlightsProcedure = publicProcedure
   .input(z.object({ origin: z.string(), destination: z.string(), departureDate: z.string() }))

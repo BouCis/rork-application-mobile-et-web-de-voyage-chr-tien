@@ -16,7 +16,7 @@ import { createActivityProcedure } from "./routes/activities/create";
 import { createBookingProcedure } from "./routes/activities/bookings/create";
 import { getUserBookingsProcedure } from "./routes/activities/bookings/get";
 import { sendVerificationEmailProcedure } from "./routes/emails/send-verification";
-import { searchFlightsProcedure, searchHotelsProcedure } from "./routes/external/amadeus";
+import { searchFlightsProcedure, searchHotelsProcedure, searchCityOrAirportProcedure } from "./routes/external/amadeus";
 import { searchPlacesProcedure } from "./routes/external/places";
 
 export const appRouter = createTRPCRouter({
@@ -56,6 +56,7 @@ export const appRouter = createTRPCRouter({
     amadeus: createTRPCRouter({
       flights: searchFlightsProcedure,
       hotels: searchHotelsProcedure,
+      cityOrAirport: searchCityOrAirportProcedure,
     }),
     places: createTRPCRouter({
       search: searchPlacesProcedure,
