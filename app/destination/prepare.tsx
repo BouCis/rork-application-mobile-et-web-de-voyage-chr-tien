@@ -56,13 +56,39 @@ interface BudgetBreakdown {
 export default function DestinationPrepareScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const params = useLocalSearchParams<{ destinationId: string }>();
+  const params = useLocalSearchParams<{ destinationId?: string; name?: string; lat?: string; lng?: string; placeId?: string }>();
   const { colors } = useTheme();
   
   const [showResults, setShowResults] = useState<boolean>(false);
   const [travelData, setTravelData] = useState<TravelFormData | null>(null);
 
-  const destination = getDestinationById(params.destinationId);
+  const destination: Destination | undefined = (() => {
+    if (params.destinationId) return getDestinationById(params.destinationId);
+    const name = params.name ?? 'Destination';
+    const lat = params.lat ? Number(params.lat) : 0;
+    const lng = params.lng ? Number(params.lng) : 0;
+    const idSafe = name.toLowerCase().replace(/\s+/g, '-');
+    const stub: Destination = {
+      id: `custom-${idSafe}`,
+      name,
+      country: '—',
+      continent: '—',
+      type: 'city',
+      description: 'Planification personnalisée à partir de votre recherche.',
+      image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1200&auto=format',
+      rating: 4.6,
+      coordinates: { latitude: lat, longitude: lng },
+      bestTimeToVisit: 'Selon saison',
+      recommendedDuration: '3-7 jours',
+      highlights: [],
+      categories: ['cultural'],
+      averageBudget: { budget: 60, moderate: 120, luxury: 260 },
+      currency: 'EUR',
+      languages: ['—'],
+      timezone: '—',
+    };
+    return stub;
+  })();
 
   const handleBack = useCallback(() => {
     router.back();

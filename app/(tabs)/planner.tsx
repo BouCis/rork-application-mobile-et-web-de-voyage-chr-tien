@@ -29,7 +29,7 @@ import {
 } from 'lucide-react-native';
 import { useApp } from '@/store/AppContext';
 import { useTheme } from '@/store/ThemeContext';
-import { searchDestinations, type Destination as DestinationType } from '@/data/destinations';
+import { trpc } from '@/lib/trpc';
 
 const { width } = Dimensions.get('window');
 
@@ -83,6 +83,16 @@ const palette = {
   border: 'rgba(255,255,255,0.06)',
 } as const;
 
+type GPPlace = {
+  place_id?: string;
+  name?: string;
+  formatted_address?: string;
+  rating?: number;
+  types?: string[];
+  geometry?: { location?: { lat?: number; lng?: number } };
+  photos?: unknown[];
+};
+
 export default function PlannerScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -131,16 +141,34 @@ export default function PlannerScreen() {
     router.push('/trip/create');
   }, [router]);
 
-  const handleSelectSearchDestination = useCallback((destination: DestinationType) => {
+  const handleSelectPlace = useCallback((p: GPPlace) => {
     setSearchQuery('');
     setShowSearchResults(false);
-    router.push({ pathname: '/destination/prepare', params: { destinationId: destination.id } });
+    const lat = p.geometry?.location?.lat ?? 0;
+    const lng = p.geometry?.location?.lng ?? 0;
+    const name = p.name ?? '';
+    const pid = p.place_id ?? '';
+    router.push({ pathname: '/destination/prepare', params: { name, lat: String(lat), lng: String(lng), placeId: pid } });
   }, [router]);
 
   const handleSearchFocus = useCallback(() => setShowSearchResults(true), []);
   const handleSearchBlur = useCallback(() => setTimeout(() => setShowSearchResults(false), 180), []);
 
-  const searchResults = useMemo(() => searchDestinations(searchQuery), [searchQuery]);
+  const placesQuery = trpc.external.places.search.useQuery(
+    { query: searchQuery },
+    { enabled: searchQuery.trim().length >= 2 }
+  );
+
+  const searchResults = useMemo<GPPlace[]>(() => {
+    const items: unknown = placesQuery.data?.items ?? [];
+    if (!Array.isArray(items)) return [];
+    // Prefer cities/localities
+    const filtered = (items as GPPlace[]).filter((it) => {
+      const types = it.types ?? [];
+      return types.includes('locality') || types.includes('administrative_area_level_1') || types.includes('administrative_area_level_2');
+    });
+    return filtered.length > 0 ? filtered : (items as GPPlace[]).slice(0, 8);
+  }, [placesQuery.data]);
 
   const shortcuts = useMemo(() => ['Weekend', 'Plage', 'Montagne', 'Cité d’art', 'Road-trip'], []);
 
@@ -283,20 +311,30 @@ export default function PlannerScreen() {
             {showSearchResults && (
               <View style={styles.resultsWrap} testID="search-results">
                 <ScrollView keyboardShouldPersistTaps="handled" nestedScrollEnabled>
-                  {searchResults.length > 0 ? (
-                    searchResults.map((d) => (
-                      <Pressable key={d.id} style={styles.resultItem} onPress={() => handleSelectSearchDestination(d)}>
+                  {placesQuery.isLoading ? (
+                    <View style={{ padding: 14 }}>
+                      <Text style={styles.resultMeta}>Recherche…</Text>
+                    </View>
+                  ) : placesQuery.error ? (
+                    <View style={{ padding: 14 }}>
+                      <Text style={styles.resultMeta}>Erreur de recherche. Réessaie.</Text>
+                    </View>
+                  ) : searchResults.length > 0 ? (
+                    searchResults.map((p) => (
+                      <Pressable key={p.place_id ?? p.name} style={styles.resultItem} onPress={() => handleSelectPlace(p)}>
                         <MapPin color={palette.action} size={16} />
                         <View style={{ flex: 1 }}>
-                          <Text style={styles.resultName}>{d.name}</Text>
-                          <Text style={styles.resultMeta}>{d.country} • {d.continent}</Text>
+                          <Text style={styles.resultName}>{p.name}</Text>
+                          <Text style={styles.resultMeta}>{p.formatted_address}</Text>
                         </View>
-                        <Text style={styles.resultMeta}>{d.averageBudget.budget}€/j</Text>
+                        {typeof p.rating === 'number' ? (
+                          <Text style={styles.resultMeta}>★ {p.rating.toFixed(1)}</Text>
+                        ) : null}
                       </Pressable>
                     ))
                   ) : (
                     <View style={{ padding: 14 }}>
-                      <Text style={styles.resultMeta}>{searchQuery ? 'Aucune destination' : 'Tapez pour rechercher'}</Text>
+                      <Text style={styles.resultMeta}>{searchQuery ? 'Aucun résultat' : 'Tapez pour rechercher'}</Text>
                     </View>
                   )}
                 </ScrollView>
