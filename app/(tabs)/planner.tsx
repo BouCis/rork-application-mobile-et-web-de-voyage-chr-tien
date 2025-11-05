@@ -93,6 +93,9 @@ export default function PlannerScreen() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
   const [selectedShortcut, setSelectedShortcut] = useState<string>('');
+  const [failedDeck, setFailedDeck] = useState<Record<string, boolean>>({});
+  const [failedAround, setFailedAround] = useState<Record<number, boolean>>({});
+  const [failedWish, setFailedWish] = useState<Record<number, boolean>>({});
 
   const promptScale = useRef(new Animated.Value(1)).current;
 
@@ -310,7 +313,12 @@ export default function PlannerScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.deckScroll}>
             {trendingDestinations.map((d) => (
               <View key={d.id} style={styles.deckCard}>
-                <Image source={{ uri: d.image }} style={styles.deckImage} />
+                <Image
+                  source={{ uri: failedDeck[d.id] ? 'https://images.unsplash.com/photo-1502920917128-1aa500764ce7?w=1200&auto=format' : d.image }}
+                  style={styles.deckImage}
+                  onError={() => setFailedDeck((s) => ({ ...s, [d.id]: true }))}
+                  accessibilityLabel={`Inspiration ${d.name}`}
+                />
                 <View style={styles.deckOverlay}>
                   <View style={styles.deckTopRow}>
                     <View>
@@ -339,7 +347,12 @@ export default function PlannerScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
             {['Café', 'Parc', 'Musée', 'Viewpoint', 'Plage'].map((n, i) => (
               <View key={n + i} style={styles.roundCard}>
-                <Image source={{ uri: `https://images.unsplash.com/photo-150${i}0${i}0${i}0-aaaa?w=400&auto=format` }} style={styles.roundThumb} />
+                <Image
+                  source={{ uri: failedAround[i] ? 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&auto=format' : `https://images.unsplash.com/photo-150${i}0${i}0${i}0-aaaa?w=400&auto=format` }}
+                  style={styles.roundThumb}
+                  onError={() => setFailedAround((s) => ({ ...s, [i]: true }))}
+                  accessibilityLabel={`Spot ${n}`}
+                />
                 <Text style={styles.roundLabel}>{n}</Text>
                 <Text style={styles.roundMeta}>{(i + 1) * 0.6} km • 4.{i + 3}</Text>
               </View>
@@ -352,7 +365,12 @@ export default function PlannerScreen() {
           <View style={styles.grid}>
             {[1, 2, 3, 4].map((i) => (
               <View key={i} style={styles.wishTile}>
-                <Image source={{ uri: `https://images.unsplash.com/photo-15${i}0${i}0${i}0-aaaa?w=800` }} style={{ width: '100%', height: '100%' }} />
+                <Image
+                  source={{ uri: failedWish[i] ? 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&auto=format' : `https://images.unsplash.com/photo-15${i}0${i}0${i}0-aaaa?w=800` }}
+                  style={{ width: '100%', height: '100%' }}
+                  onError={() => setFailedWish((s) => ({ ...s, [i]: true }))}
+                  accessibilityLabel={`Wishlist ${i}`}
+                />
                 <View style={styles.wishBadge}><Text style={styles.wishBadgeText}>−{10 * i}% vol (simulé)</Text></View>
               </View>
             ))}

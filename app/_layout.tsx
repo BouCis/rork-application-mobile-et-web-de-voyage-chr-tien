@@ -7,6 +7,7 @@ import { StyleSheet } from "react-native";
 import { AppProvider } from "@/store/AppContext";
 import { ThemeProvider } from "@/store/ThemeContext";
 import { trpc, trpcClient } from "@/lib/trpc";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -109,7 +110,9 @@ export default function RootLayout() {
         <ThemeProvider>
           <AppProvider>
             <GestureHandlerRootView style={styles.container}>
-              <RootLayoutNav />
+              <ErrorBoundary>
+                <RootLayoutNav />
+              </ErrorBoundary>
             </GestureHandlerRootView>
           </AppProvider>
         </ThemeProvider>

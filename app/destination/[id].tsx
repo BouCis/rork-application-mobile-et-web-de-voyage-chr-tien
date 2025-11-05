@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -126,6 +126,12 @@ export default function DestinationDetailScreen() {
     router.push('/trip/create');
   };
 
+  const [heroError, setHeroError] = useState<boolean>(false);
+  const onHeroError = useCallback(() => {
+    console.log('[Destination] hero image error, fallback');
+    setHeroError(true);
+  }, []);
+
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -179,9 +185,11 @@ export default function DestinationDetailScreen() {
       >
         <View style={styles.heroSection}>
           <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800' }}
+            source={{ uri: heroError ? 'https://images.unsplash.com/photo-1502920917128-1aa500764ce7?w=1200&auto=format' : 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800' }}
             style={styles.heroImage}
             resizeMode="cover"
+            onError={onHeroError}
+            accessibilityLabel="Photo de destination"
           />
           <LinearGradient
             colors={['transparent', 'rgba(15, 23, 42, 0.9)']}
