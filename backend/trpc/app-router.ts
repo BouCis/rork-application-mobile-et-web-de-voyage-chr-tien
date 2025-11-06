@@ -1,82 +1,46 @@
-import { createTRPCRouter, publicProcedure } from "./create-context";
-import { hiProcedure } from "./routes/example/hi/route";
-import { createUserProcedure } from "./routes/users/create";
-import { getUserProcedure, getUserByEmailProcedure } from "./routes/users/get";
-import { updateUserProcedure } from "./routes/users/update";
-import { deleteUserProcedure } from "./routes/users/delete";
-import { createTripProcedure } from "./routes/trips/create";
-import { getTripsByUserProcedure, getTripByIdProcedure } from "./routes/trips/get";
-import { updateTripProcedure } from "./routes/trips/update";
-import { deleteTripProcedure } from "./routes/trips/delete";
-import { getAllActivitiesProcedure, getActivityByIdProcedure } from "./routes/activities/get";
-import { planTripProcedure } from "./routes/trips/plan";
-import { fetchVisaInfoProcedure } from "./routes/trips/visa-info";
-import { fetchHealthInfoProcedure } from "./routes/trips/health-info";
-import { createActivityProcedure } from "./routes/activities/create";
-import { createBookingProcedure } from "./routes/activities/bookings/create";
-import { getUserBookingsProcedure } from "./routes/activities/bookings/get";
-import { sendVerificationEmailProcedure } from "./routes/emails/send-verification";
-import { searchFlightsProcedure, searchHotelsProcedure, searchCityOrAirportProcedure } from "./routes/external/amadeus";
-import { searchPlacesProcedure } from "./routes/external/places";
+import { Hono } from "hono";
+import { trpcServer } from "@hono/trpc-server";
+import { cors } from "hono/cors";
+import { appRouter } from "./trpc/app-router";
+import { createContext } from "./trpc/create-context";
+import "dotenv/config";
 
-export const appRouter = createTRPCRouter({
-  // === HEALTH CHECK ===
-  health: publicProcedure.query(() => {
-    return {
-      status: "ok",
-      message: "Backend RORK en ligne",
-      timestamp: new Date().toISOString(),
-      env: "production",
-    };
-  }),
+const app = new Hono();
 
-  example: createTRPCRouter({
-    hi: hiProcedure,
-  }),
+app.use(
+  "*",
+  cors({
+    origin: "*",
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    exposeHeaders: ["Content-Length"],
+    maxAge: 86400,
+    credentials: false,
+  })
+);
 
-  users: createTRPCRouter({
-    create: createUserProcedure,
-    get: getUserProcedure,
-    getByEmail: getUserByEmailProcedure,
-    update: updateUserProcedure,
-    delete: deleteUserProcedure,
-  }),
+// tRPC monté sur /api/*
+app.use(
+  "/api/*",
+  trpcServer({
+    router: appRouter,
+    createContext,
+    endpoint: "/api", // IMPORTANT
+    onError(opts) {
+      const { error, type, path } = opts;
+      console.error("[tRPC Error]", {
+        type,
+        path,
+        error: error.message,
+        code: error.code,
+      });
+    },
+  })
+);
 
-  trips: createTRPCRouter({
-    create: createTripProcedure,
-    getByUser: getTripsByUserProcedure,
-    getById: getTripByIdProcedure,
-    update: updateTripProcedure,
-    delete: deleteTripProcedure,
-    plan: planTripProcedure,
-    visaInfo: fetchVisaInfoProcedure,
-    healthInfo: fetchHealthInfoProcedure,
-  }),
-
-  activities: createTRPCRouter({
-    getAll: getAllActivitiesProcedure,
-    getById: getActivityByIdProcedure,
-    create: createActivityProcedure,
-    bookings: createTRPCRouter({
-      create: createBookingProcedure,
-      getByUser: getUserBookingsProcedure,
-    }),
-  }),
-
-  emails: createTRPCRouter({
-    sendVerification: sendVerificationEmailProcedure,
-  }),
-
-  external: createTRPCRouter({
-    amadeus: createTRPCRouter({
-      flights: searchFlightsProcedure,
-      hotels: searchHotelsProcedure,
-      cityOrAirport: searchCityOrAirportProcedure,
-    }),
-    places: createTRPCRouter({
-      search: searchPlacesProcedure,
-    }),
-  }),
+// Route de test simple
+app.get("/api", (c) => {
+  return c.json({ status: "ok", message: "API is running" });
 });
 
-export type AppRouter = typeof appRouter;
+export default app;
