@@ -7,6 +7,7 @@ import "dotenv/config";
 
 const app = new Hono();
 
+// CORS global
 app.use(
   "*",
   cors({
@@ -19,7 +20,7 @@ app.use(
   })
 );
 
-// tRPC monté sur /api/*
+// tRPC sur /api/*
 app.use(
   "/api/*",
   trpcServer({
@@ -37,9 +38,17 @@ app.use(
   })
 );
 
-// Route de test simple
+// Test simple
 app.get("/api", (c) => {
   return c.json({ status: "ok", message: "API is running" });
 });
+
+// Port Render
+const port = process.env.PORT || 3000;
+Bun.serve({
+  port: Number(port),
+  fetch: app.fetch,
+});
+console.log(`Server running on http://localhost:${port}`);
 
 export default app;
