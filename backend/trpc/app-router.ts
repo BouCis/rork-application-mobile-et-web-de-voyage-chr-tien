@@ -58,9 +58,7 @@ export const appRouter = createTRPCRouter({
       hotels: searchHotelsProcedure,
       cityOrAirport: searchCityOrAirportProcedure,
     }),
-    places: createTRPCRouter({
-      search: searchPlacesProcedure,
-    }),
+    places: searchPlacesProcedure,
   }),
 });
 

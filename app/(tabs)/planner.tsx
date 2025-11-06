@@ -28,7 +28,6 @@ import {
   Compass,
 } from 'lucide-react-native';
 import { useApp } from '@/store/AppContext';
-import { useTheme } from '@/store/ThemeContext';
 import { trpc } from '@/lib/trpc';
 
 const { width } = Dimensions.get('window');
@@ -97,7 +96,6 @@ export default function PlannerScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { trips } = useApp();
-  const { colors } = useTheme(); // keeping theme available for future hooks
 
   const [scrollY] = useState<Animated.Value>(new Animated.Value(0));
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -151,7 +149,7 @@ export default function PlannerScreen() {
   const handleSearchFocus = useCallback(() => setShowSearchResults(true), []);
   const handleSearchBlur = useCallback(() => setTimeout(() => setShowSearchResults(false), 180), []);
 
-  const placesQuery = trpc.external.places.search.useQuery(
+  const placesQuery = trpc.external.places.useQuery(
     { query: searchQuery },
     { enabled: searchQuery.trim().length >= 2 }
   );
