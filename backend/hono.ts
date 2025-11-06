@@ -19,13 +19,12 @@ app.use(
   })
 );
 
-// tRPC monté sur /api/*
+// tRPC monté sur /api/* (sans endpoint explicite)
 app.use(
   "/api/*",
   trpcServer({
     router: appRouter,
     createContext,
-    endpoint: "/api",
     onError(opts) {
       const { error, type, path } = opts;
       console.error("[tRPC Error]", {
