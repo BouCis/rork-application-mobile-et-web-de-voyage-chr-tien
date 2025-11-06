@@ -44,6 +44,7 @@ export default function SearchResultsScreen() {
     { 
       enabled: !!params.cityName && !params.cityCode,
       staleTime: 1000 * 60 * 5,
+      retry: 0,
     }
   );
 
@@ -62,6 +63,7 @@ export default function SearchResultsScreen() {
     { 
       enabled: activeTab === 'flights' && !!origin && !!detectedCityCode && !!departureDate && searchTrigger > 0,
       staleTime: 1000 * 60 * 2,
+      retry: 0,
     }
   );
 
@@ -70,6 +72,7 @@ export default function SearchResultsScreen() {
     { 
       enabled: activeTab === 'hotels' && !!detectedCityCode && searchTrigger > 0,
       staleTime: 1000 * 60 * 5,
+      retry: 0,
     }
   );
 

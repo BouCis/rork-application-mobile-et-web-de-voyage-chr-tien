@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -29,6 +29,7 @@ import {
 } from 'lucide-react-native';
 import { useApp } from '@/store/AppContext';
 import { trpc } from '@/lib/trpc';
+import countriesCities from '@/data/countries-cities.json';
 
 const { width } = Dimensions.get('window');
 
@@ -151,19 +152,43 @@ export default function PlannerScreen() {
 
   const placesQuery = trpc.external.places.search.useQuery(
     { query: searchQuery },
-    { enabled: searchQuery.trim().length >= 2 }
+    { enabled: searchQuery.trim().length >= 2, retry: 0, staleTime: 1000 * 60 }
   );
+
+  const offlineResults = useMemo<GPPlace[]>(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (q.length < 2) return [];
+    const list: GPPlace[] = [];
+    const entries = Object.entries(countriesCities as Record<string, { name: string; cities: string[] }>);
+    for (const [, val] of entries) {
+      const countryName = (val as any).name ?? '';
+      if (typeof countryName === 'string' && countryName.toLowerCase().includes(q)) {
+        list.push({ name: countryName, formatted_address: countryName });
+      }
+      const cities = (val as any).cities as string[] | undefined;
+      if (Array.isArray(cities)) {
+        for (const city of cities) {
+          if (city.toLowerCase().includes(q)) {
+            list.push({ name: city, formatted_address: `${city}, ${countryName}` });
+          }
+        }
+      }
+      if (list.length >= 20) break;
+    }
+    return list.slice(0, 20);
+  }, [searchQuery]);
 
   const searchResults = useMemo<GPPlace[]>(() => {
     const items: unknown = placesQuery.data?.items ?? [];
-    if (!Array.isArray(items)) return [];
-    // Prefer cities/localities
-    const filtered = (items as GPPlace[]).filter((it) => {
+    const arr = Array.isArray(items) ? (items as GPPlace[]) : [];
+    const typed = arr.filter((it) => {
       const types = it.types ?? [];
       return types.includes('locality') || types.includes('administrative_area_level_1') || types.includes('administrative_area_level_2');
     });
-    return filtered.length > 0 ? filtered : (items as GPPlace[]).slice(0, 8);
-  }, [placesQuery.data]);
+    if (typed.length > 0) return typed;
+    if (arr.length > 0) return arr.slice(0, 8);
+    return offlineResults;
+  }, [placesQuery.data, offlineResults]);
 
   const shortcuts = useMemo(() => ['Weekend', 'Plage', 'Montagne', 'Cité d’art', 'Road-trip'], []);
 
@@ -312,7 +337,7 @@ export default function PlannerScreen() {
                     </View>
                   ) : placesQuery.error ? (
                     <View style={{ padding: 14 }}>
-                      <Text style={styles.resultMeta}>Erreur de recherche. Réessaie.</Text>
+                      <Text style={styles.resultMeta}>Serveur indisponible — suggestions hors‑ligne</Text>
                     </View>
                   ) : searchResults.length > 0 ? (
                     searchResults.map((p) => (
