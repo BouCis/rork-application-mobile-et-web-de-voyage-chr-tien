@@ -20,9 +20,9 @@ app.use(
   })
 );
 
-// tRPC monté sur /api (simple)
+// tRPC monté sur /api/trpc/*
 app.use(
-  "/api",
+  "/api/trpc/*",
   trpcServer({
     router: appRouter,
     createContext,
