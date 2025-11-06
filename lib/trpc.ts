@@ -38,7 +38,7 @@ const getBaseUrl = () => {
 
 const fetchWithTimeout: typeof fetch = async (input, init) => {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12000);
+  const timeout = setTimeout(() => controller.abort(), 6500);
   try {
     const res = await fetch(input as RequestInfo, { ...(init ?? {}), signal: controller.signal });
     return res as Response;

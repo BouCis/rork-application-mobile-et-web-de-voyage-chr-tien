@@ -100,6 +100,7 @@ export default function PlannerScreen() {
 
   const [scrollY] = useState<Animated.Value>(new Animated.Value(0));
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [debouncedQuery, setDebouncedQuery] = useState<string>('');
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
   const [selectedShortcut, setSelectedShortcut] = useState<string>('');
   const [failedDeck, setFailedDeck] = useState<Record<string, boolean>>({});
@@ -148,11 +149,15 @@ export default function PlannerScreen() {
   }, [router]);
 
   const handleSearchFocus = useCallback(() => setShowSearchResults(true), []);
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedQuery(searchQuery.trim()), 280);
+    return () => clearTimeout(id);
+  }, [searchQuery]);
   const handleSearchBlur = useCallback(() => setTimeout(() => setShowSearchResults(false), 180), []);
 
   const placesQuery = trpc.external.places.search.useQuery(
-    { query: searchQuery },
-    { enabled: searchQuery.trim().length >= 2, retry: 0, staleTime: 1000 * 60 }
+    { query: debouncedQuery },
+    { enabled: debouncedQuery.length >= 2, retry: 0, staleTime: 1000 * 60 }
   );
 
   const offlineResults = useMemo<GPPlace[]>(() => {
@@ -176,7 +181,7 @@ export default function PlannerScreen() {
       if (list.length >= 20) break;
     }
     return list.slice(0, 20);
-  }, [searchQuery]);
+  }, [debouncedQuery]);
 
   const searchResults = useMemo<GPPlace[]>(() => {
     const items: unknown = placesQuery.data?.items ?? [];
@@ -331,15 +336,7 @@ export default function PlannerScreen() {
             {showSearchResults && (
               <View style={styles.resultsWrap} testID="search-results">
                 <ScrollView keyboardShouldPersistTaps="handled" nestedScrollEnabled>
-                  {placesQuery.isLoading ? (
-                    <View style={{ padding: 14 }}>
-                      <Text style={styles.resultMeta}>Recherche…</Text>
-                    </View>
-                  ) : placesQuery.error ? (
-                    <View style={{ padding: 14 }}>
-                      <Text style={styles.resultMeta}>Serveur indisponible — suggestions hors‑ligne</Text>
-                    </View>
-                  ) : searchResults.length > 0 ? (
+                  {searchResults.length > 0 ? (
                     searchResults.map((p) => (
                       <Pressable key={p.place_id ?? p.name} style={styles.resultItem} onPress={() => handleSelectPlace(p)}>
                         <MapPin color={palette.action} size={16} />
@@ -352,9 +349,17 @@ export default function PlannerScreen() {
                         ) : null}
                       </Pressable>
                     ))
+                  ) : placesQuery.isLoading ? (
+                    <View style={{ padding: 14 }}>
+                      <Text style={styles.resultMeta}>Recherche…</Text>
+                    </View>
+                  ) : placesQuery.error ? (
+                    <View style={{ padding: 14 }}>
+                      <Text style={styles.resultMeta}>Serveur indisponible — suggestions hors‑ligne</Text>
+                    </View>
                   ) : (
                     <View style={{ padding: 14 }}>
-                      <Text style={styles.resultMeta}>{searchQuery ? 'Aucun résultat' : 'Tapez pour rechercher'}</Text>
+                      <Text style={styles.resultMeta}>{debouncedQuery ? 'Aucun résultat' : 'Tapez pour rechercher'}</Text>
                     </View>
                   )}
                 </ScrollView>
