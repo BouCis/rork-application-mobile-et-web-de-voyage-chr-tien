@@ -20,10 +20,10 @@ import { searchFlightsProcedure, searchHotelsProcedure, searchCityOrAirportProce
 import { searchPlacesProcedure } from "./routes/external/places";
 
 export const appRouter = createTRPCRouter({
-  // === STATUS CHECK (accessible via /api/status) ===
+  // === STATUS CHECK ===
   status: publicProcedure.query(() => {
     return {
-      status: "ok",
+      status: "ok,
       message: "Backend RORK en ligne",
       timestamp: new Date().toISOString(),
       env: "production",
