@@ -19,7 +19,7 @@ app.use(
   })
 );
 
-// tRPC monté sur /api/* (sans endpoint explicite)
+// tRPC monté sur /api/*
 app.use(
   "/api/*",
   trpcServer({
