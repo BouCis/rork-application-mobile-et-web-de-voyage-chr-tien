@@ -181,7 +181,7 @@ export default function PlannerScreen() {
       if (list.length >= 20) break;
     }
     return list.slice(0, 20);
-  }, [debouncedQuery]);
+  }, [searchQuery]);
 
   const searchResults = useMemo<GPPlace[]>(() => {
     const items: unknown = placesQuery.data?.items ?? [];
