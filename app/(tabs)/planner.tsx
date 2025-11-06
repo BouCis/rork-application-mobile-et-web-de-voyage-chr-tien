@@ -149,7 +149,7 @@ export default function PlannerScreen() {
   const handleSearchFocus = useCallback(() => setShowSearchResults(true), []);
   const handleSearchBlur = useCallback(() => setTimeout(() => setShowSearchResults(false), 180), []);
 
-  const placesQuery = trpc.external.places.useQuery(
+  const placesQuery = trpc.external.places.search.useQuery(
     { query: searchQuery },
     { enabled: searchQuery.trim().length >= 2 }
   );
