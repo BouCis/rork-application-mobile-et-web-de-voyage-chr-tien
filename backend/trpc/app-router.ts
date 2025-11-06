@@ -1,4 +1,4 @@
-import { createTRPCRouter } from "./create-context";
+import { createTRPCRouter, publicProcedure } from "./create-context";
 import { hiProcedure } from "./routes/example/hi/route";
 import { createUserProcedure } from "./routes/users/create";
 import { getUserProcedure, getUserByEmailProcedure } from "./routes/users/get";
@@ -20,9 +20,20 @@ import { searchFlightsProcedure, searchHotelsProcedure, searchCityOrAirportProce
 import { searchPlacesProcedure } from "./routes/external/places";
 
 export const appRouter = createTRPCRouter({
+  // === HEALTH CHECK ===
+  health: publicProcedure.query(() => {
+    return {
+      status: "ok",
+      message: "Backend RORK en ligne",
+      timestamp: new Date().toISOString(),
+      env: "production",
+    };
+  }),
+
   example: createTRPCRouter({
     hi: hiProcedure,
   }),
+
   users: createTRPCRouter({
     create: createUserProcedure,
     get: getUserProcedure,
@@ -30,6 +41,7 @@ export const appRouter = createTRPCRouter({
     update: updateUserProcedure,
     delete: deleteUserProcedure,
   }),
+
   trips: createTRPCRouter({
     create: createTripProcedure,
     getByUser: getTripsByUserProcedure,
@@ -40,6 +52,7 @@ export const appRouter = createTRPCRouter({
     visaInfo: fetchVisaInfoProcedure,
     healthInfo: fetchHealthInfoProcedure,
   }),
+
   activities: createTRPCRouter({
     getAll: getAllActivitiesProcedure,
     getById: getActivityByIdProcedure,
@@ -49,9 +62,11 @@ export const appRouter = createTRPCRouter({
       getByUser: getUserBookingsProcedure,
     }),
   }),
+
   emails: createTRPCRouter({
     sendVerification: sendVerificationEmailProcedure,
   }),
+
   external: createTRPCRouter({
     amadeus: createTRPCRouter({
       flights: searchFlightsProcedure,
