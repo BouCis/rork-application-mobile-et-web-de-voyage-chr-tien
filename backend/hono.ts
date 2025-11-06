@@ -1,4 +1,3 @@
-// backend/hono.ts
 import { Hono } from "hono";
 import { trpcServer } from "@hono/trpc-server";
 import { cors } from "hono/cors";
@@ -21,12 +20,13 @@ app.use(
   })
 );
 
-// tRPC monté sur /api/*
+// tRPC monté sur /api/* avec endpoint explicite
 app.use(
   "/api/*",
   trpcServer({
     router: appRouter,
     createContext,
+    endpoint: "/api", // AJOUTÉ
     onError(opts) {
       const { error, type, path } = opts;
       console.error("[tRPC Error]", {
