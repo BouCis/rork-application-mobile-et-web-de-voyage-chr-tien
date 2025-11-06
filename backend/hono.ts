@@ -1,3 +1,4 @@
+// backend/hono.ts
 import { Hono } from "hono";
 import { trpcServer } from "@hono/trpc-server";
 import { cors } from "hono/cors";
@@ -20,7 +21,7 @@ app.use(
   })
 );
 
-// tRPC sur /api/*
+// tRPC monté sur /api/*
 app.use(
   "/api/*",
   trpcServer({
@@ -38,7 +39,7 @@ app.use(
   })
 );
 
-// Test simple
+// Route de test simple
 app.get("/api", (c) => {
   return c.json({ status: "ok", message: "API is running" });
 });
