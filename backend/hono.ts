@@ -26,6 +26,7 @@ app.use(
   trpcServer({
     router: appRouter,
     createContext,
+    endpoint: "/api/trpc", // FIX : Strip le prefix pour mapper "status"
     onError(opts) {
       const { error, type, path } = opts;
       console.error("[tRPC Error]", {
