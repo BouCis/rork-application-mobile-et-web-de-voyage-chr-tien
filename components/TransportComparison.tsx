@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -19,7 +19,7 @@ import {
   Users,
   ExternalLink,
 } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
+import { useTheme } from '@/store/ThemeContext';
 import { TransportOption } from '@/types';
 
 interface TransportComparisonProps {
@@ -46,6 +46,8 @@ const transportColors = {
 };
 
 export function TransportComparison({ options, onSelectOption }: TransportComparisonProps) {
+  const { colors, spacing, borderRadius, fontSize } = useTheme();
+  
   const formatDuration = (duration: string) => {
     return duration.replace('h', 'h ').replace('m', 'min');
   };
@@ -55,18 +57,203 @@ export function TransportComparison({ options, onSelectOption }: TransportCompar
       <Star
         key={i}
         size={12}
-        color={i < comfort ? theme.colors.secondary : theme.colors.border}
-        fill={i < comfort ? theme.colors.secondary : 'transparent'}
+        color={i < comfort ? colors.secondary : colors.border}
+        fill={i < comfort ? colors.secondary : 'transparent'}
       />
     ));
   };
 
   const getCarbonColor = (footprint?: number) => {
-    if (!footprint) return theme.colors.success;
-    if (footprint < 50) return theme.colors.success;
-    if (footprint < 200) return theme.colors.warning;
-    return theme.colors.error;
+    if (!footprint) return colors.success;
+    if (footprint < 50) return colors.success;
+    if (footprint < 200) return colors.warning;
+    return colors.error;
   };
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      padding: spacing.lg,
+      backgroundColor: colors.white,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    headerTitle: {
+      fontSize: fontSize.lg,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    headerSubtitle: {
+      fontSize: fontSize.sm,
+      color: colors.textSecondary,
+      marginTop: spacing.xs,
+    },
+    optionsList: {
+      padding: spacing.lg,
+      gap: spacing.md,
+    },
+    transportCard: {
+      backgroundColor: colors.white,
+      borderRadius: borderRadius.md,
+      padding: spacing.md,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    cardHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: spacing.md,
+    },
+    transportInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    transportIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    providerName: {
+      fontSize: fontSize.md,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    transportType: {
+      fontSize: fontSize.sm,
+      color: colors.textSecondary,
+    },
+    priceContainer: {
+      alignItems: 'flex-end',
+    },
+    price: {
+      fontSize: fontSize.lg,
+      fontWeight: '700',
+      color: colors.primary,
+    },
+    currency: {
+      fontSize: fontSize.xs,
+      color: colors.textSecondary,
+    },
+    routeContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+      paddingHorizontal: spacing.sm,
+    },
+    routePoint: {
+      flex: 1,
+      alignItems: 'center',
+    },
+    routeTime: {
+      fontSize: fontSize.md,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    routeLocation: {
+      fontSize: fontSize.xs,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginTop: spacing.xs,
+    },
+    routeLine: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+      marginHorizontal: spacing.md,
+    },
+    routeDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: colors.primary,
+    },
+    routePath: {
+      flex: 1,
+      height: 2,
+      backgroundColor: colors.border,
+      marginHorizontal: spacing.xs,
+    },
+    detailsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    detailItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    detailText: {
+      fontSize: fontSize.sm,
+      color: colors.textSecondary,
+    },
+    stopsText: {
+      fontSize: fontSize.sm,
+      color: colors.warning,
+      fontWeight: '500',
+    },
+    comfortStars: {
+      flexDirection: 'row',
+      gap: 2,
+    },
+    classContainer: {
+      marginBottom: spacing.sm,
+    },
+    classText: {
+      fontSize: fontSize.sm,
+      color: colors.textSecondary,
+      fontStyle: 'italic',
+    },
+    bookingContainer: {
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      paddingTop: spacing.sm,
+    },
+    bookingButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.xs,
+      paddingVertical: spacing.sm,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+      borderColor: colors.primary,
+    },
+    bookingText: {
+      fontSize: fontSize.sm,
+      fontWeight: '600',
+      color: colors.primary,
+    },
+    emptyContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: spacing.xl,
+    },
+    emptyText: {
+      fontSize: fontSize.lg,
+      fontWeight: '600',
+      color: colors.text,
+      textAlign: 'center',
+      marginBottom: spacing.sm,
+    },
+    emptySubtext: {
+      fontSize: fontSize.sm,
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+  }), [colors, spacing, borderRadius, fontSize]);
 
   const renderTransportCard = (option: TransportOption) => {
     const IconComponent = transportIcons[option.type];
@@ -86,7 +273,7 @@ export function TransportComparison({ options, onSelectOption }: TransportCompar
         <View style={styles.cardHeader}>
           <View style={styles.transportInfo}>
             <View style={[styles.transportIcon, { backgroundColor: transportColor }]}>
-              <IconComponent size={20} color={theme.colors.white} />
+              <IconComponent size={20} color={colors.white} />
             </View>
             <View>
               <Text style={styles.providerName}>{option.provider}</Text>
@@ -127,7 +314,7 @@ export function TransportComparison({ options, onSelectOption }: TransportCompar
         {/* Details */}
         <View style={styles.detailsContainer}>
           <View style={styles.detailItem}>
-            <Clock size={14} color={theme.colors.textSecondary} />
+            <Clock size={14} color={colors.textSecondary} />
             <Text style={styles.detailText}>{formatDuration(option.duration)}</Text>
           </View>
           
@@ -156,8 +343,8 @@ export function TransportComparison({ options, onSelectOption }: TransportCompar
           
           {option.accessibility && (
             <View style={styles.detailItem}>
-              <Users size={14} color={theme.colors.success} />
-              <Text style={[styles.detailText, { color: theme.colors.success }]}>
+              <Users size={14} color={colors.success} />
+              <Text style={[styles.detailText, { color: colors.success }]}>
                 Accessible
               </Text>
             </View>
@@ -182,7 +369,7 @@ export function TransportComparison({ options, onSelectOption }: TransportCompar
               }}
               activeOpacity={0.7}
             >
-              <ExternalLink size={16} color={theme.colors.primary} />
+              <ExternalLink size={16} color={colors.primary} />
               <Text style={styles.bookingText}>Réserver</Text>
             </TouchableOpacity>
           </View>
@@ -217,184 +404,3 @@ export function TransportComparison({ options, onSelectOption }: TransportCompar
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  header: {
-    padding: theme.spacing.lg,
-    backgroundColor: theme.colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  headerTitle: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: '700',
-    color: theme.colors.text,
-  },
-  headerSubtitle: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
-    marginTop: theme.spacing.xs,
-  },
-  optionsList: {
-    padding: theme.spacing.lg,
-    gap: theme.spacing.md,
-  },
-  transportCard: {
-    backgroundColor: theme.colors.white,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.md,
-    ...theme.shadows.sm,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: theme.spacing.md,
-  },
-  transportInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-  },
-  transportIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  providerName: {
-    fontSize: theme.fontSize.md,
-    fontWeight: '600',
-    color: theme.colors.text,
-  },
-  transportType: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
-  },
-  priceContainer: {
-    alignItems: 'flex-end',
-  },
-  price: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: '700',
-    color: theme.colors.primary,
-  },
-  currency: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.textSecondary,
-  },
-  routeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: theme.spacing.md,
-    paddingHorizontal: theme.spacing.sm,
-  },
-  routePoint: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  routeTime: {
-    fontSize: theme.fontSize.md,
-    fontWeight: '700',
-    color: theme.colors.text,
-  },
-  routeLocation: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    marginTop: theme.spacing.xs,
-  },
-  routeLine: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    marginHorizontal: theme.spacing.md,
-  },
-  routeDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: theme.colors.primary,
-  },
-  routePath: {
-    flex: 1,
-    height: 2,
-    backgroundColor: theme.colors.border,
-    marginHorizontal: theme.spacing.xs,
-  },
-  detailsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
-  },
-  detailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.xs,
-  },
-  detailText: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
-  },
-  stopsText: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.warning,
-    fontWeight: '500',
-  },
-  comfortStars: {
-    flexDirection: 'row',
-    gap: 2,
-  },
-  classContainer: {
-    marginBottom: theme.spacing.sm,
-  },
-  classText: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
-    fontStyle: 'italic',
-  },
-  bookingContainer: {
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-    paddingTop: theme.spacing.sm,
-  },
-  bookingButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing.xs,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.primary,
-  },
-  bookingText: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: '600',
-    color: theme.colors.primary,
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: theme.spacing.xl,
-  },
-  emptyText: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: '600',
-    color: theme.colors.text,
-    textAlign: 'center',
-    marginBottom: theme.spacing.sm,
-  },
-  emptySubtext: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-  },
-});
