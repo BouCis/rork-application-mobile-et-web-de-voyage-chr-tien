@@ -296,13 +296,6 @@ export interface WeatherForecast {
   windSpeed: number;
 }
 
-export interface TodoItem {
-  id: string;
-  text: string;
-  completed: boolean;
-  createdAt: string;
-}
-
 export interface TravelPlan {
   id: string;
   destination: string;
