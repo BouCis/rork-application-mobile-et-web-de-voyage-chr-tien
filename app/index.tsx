@@ -5,19 +5,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { Plane, Sparkles } from 'lucide-react-native';
-
-const palette = {
-  background: '#0B0F14',
-  surface: '#111821',
-  action: '#3BA3FF',
-  price: '#FF7A3D',
-  text: '#D9E2EC',
-  textSecondary: '#8AA1B4',
-  border: 'rgba(255,255,255,0.06)',
-} as const;
+import { useTheme } from '@/store/ThemeContext';
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
 
   const logoScale = useRef(new Animated.Value(0.85)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
@@ -91,7 +83,7 @@ export default function WelcomeScreen() {
   const styles = useMemo(() => StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: palette.background,
+      backgroundColor: colors.background,
     },
     gradient: {
       ...StyleSheet.absoluteFillObject,
@@ -109,14 +101,14 @@ export default function WelcomeScreen() {
       justifyContent: 'center',
     },
     logoCard: {
-      backgroundColor: palette.surface,
+      backgroundColor: colors.surface,
       borderRadius: 32,
       padding: 32,
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 1,
-      borderColor: palette.border,
-      shadowColor: palette.action,
+      borderColor: colors.border,
+      shadowColor: colors.primary,
       shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.15,
       shadowRadius: 24,
@@ -131,35 +123,35 @@ export default function WelcomeScreen() {
       position: 'absolute',
       top: -10,
       right: -10,
-      backgroundColor: palette.action,
+      backgroundColor: colors.primary,
       padding: 12,
       borderRadius: 999,
       borderWidth: 3,
-      borderColor: palette.background,
+      borderColor: colors.background,
     },
     sparkleIcon: {
       position: 'absolute',
       bottom: -8,
       left: -8,
-      backgroundColor: palette.price,
+      backgroundColor: colors.secondary,
       padding: 10,
       borderRadius: 999,
       borderWidth: 3,
-      borderColor: palette.background,
+      borderColor: colors.background,
     },
     textContainer: {
       alignItems: 'center',
       gap: 8,
     },
     appName: {
-      color: palette.text,
+      color: colors.text,
       fontSize: 36,
       fontWeight: '800' as const,
       letterSpacing: 1,
       textAlign: 'center',
     },
     tagline: {
-      color: palette.textSecondary,
+      color: colors.textSecondary,
       fontSize: 16,
       fontWeight: '600' as const,
       textAlign: 'center',
@@ -174,7 +166,7 @@ export default function WelcomeScreen() {
       gap: 12,
     },
     loadingText: {
-      color: palette.textSecondary,
+      color: colors.textSecondary,
       fontSize: 13,
       fontWeight: '500' as const,
     },
@@ -186,15 +178,15 @@ export default function WelcomeScreen() {
       width: 6,
       height: 6,
       borderRadius: 3,
-      backgroundColor: palette.action,
+      backgroundColor: colors.primary,
       opacity: 0.6,
     },
-  }), []);
+  }), [colors]);
 
   return (
     <SafeAreaView style={styles.container} testID="welcome-safearea">
       <LinearGradient
-        colors={[palette.background, '#14202B', palette.background]}
+        colors={isDark ? [colors.background, colors.backgroundSecondary, colors.background] : [colors.background, colors.backgroundLight, colors.background]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
