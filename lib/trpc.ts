@@ -1,8 +1,9 @@
 import { createTRPCReact } from "@trpc/react-query";
-import { createTRPCClient, httpLink } from "@trpc/client";
+import { httpBatchLink } from "@trpc/client";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
 import type { AppRouter } from "@/backend/trpc/app-router";
+import superjson from "superjson";
 
 export const trpc = createTRPCReact<AppRouter>();
 
@@ -47,11 +48,12 @@ const fetchWithTimeout: typeof fetch = async (input, init) => {
   }
 };
 
-export const trpcClient = createTRPCClient<AppRouter>({
+export const trpcClient = trpc.createClient({
   links: [
-    httpLink({
+    httpBatchLink({
       url: `${getBaseUrl()}/api/trpc`,
       fetch: fetchWithTimeout as any,
+      transformer: superjson,
     }),
   ],
 });
