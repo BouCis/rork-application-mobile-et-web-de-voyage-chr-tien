@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Home, Hotel, MapPin, UtensilsCrossed, MoreHorizontal, User } from "lucide-react-native";
+import { Home, Hotel, MapPin, UtensilsCrossed, User, MoreHorizontal } from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
 
