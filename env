@@ -4,4 +4,5 @@ AMADEUS_API_SECRET=6OTzl6vl2kv1HdgM
 GOOGLE_PLACES_API_KEY=AIzaSyBbbgqEZB36kTI3gqL-ldiTE8zIRMRbWy4
 
 # === FRONTEND EXPO (LOCAL - Expo Go) ===
-EXPO_PUBLIC_RORK_API_BASE_URL=http://192.168.0.21:3000
+# Leave empty for auto-detection on Rork infrastructure
+EXPO_PUBLIC_RORK_API_BASE_URL=
