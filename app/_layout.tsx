@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useState } from "react";
@@ -123,18 +123,16 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <trpc.Provider client={trpcClient} queryClient={queryClient}>
-        <ThemeProvider>
-          <AppProvider>
-            <GestureHandlerRootView style={styles.container}>
-              <ErrorBoundary>
-                <RootLayoutNav />
-              </ErrorBoundary>
-            </GestureHandlerRootView>
-          </AppProvider>
-        </ThemeProvider>
-      </trpc.Provider>
-    </QueryClientProvider>
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <ThemeProvider>
+        <AppProvider>
+          <GestureHandlerRootView style={styles.container}>
+            <ErrorBoundary>
+              <RootLayoutNav />
+            </ErrorBoundary>
+          </GestureHandlerRootView>
+        </AppProvider>
+      </ThemeProvider>
+    </trpc.Provider>
   );
 }
