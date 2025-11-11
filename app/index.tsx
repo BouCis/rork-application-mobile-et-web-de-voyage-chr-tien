@@ -4,45 +4,69 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
-import { useTheme } from '@/store/ThemeContext';
+import { Plane, Sparkles } from 'lucide-react-native';
+
+const palette = {
+  background: '#0B0F14',
+  surface: '#111821',
+  action: '#3BA3FF',
+  price: '#FF7A3D',
+  text: '#D9E2EC',
+  textSecondary: '#8AA1B4',
+  border: 'rgba(255,255,255,0.06)',
+} as const;
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const { colors, fontSize, fontWeight, spacing, borderRadius, shadows, animation } = useTheme();
 
-  const logoScale = useRef(new Animated.Value(0.8)).current;
+  const logoScale = useRef(new Animated.Value(0.85)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
   const textOpacity = useRef(new Animated.Value(0)).current;
-  const textTranslateY = useRef(new Animated.Value(12)).current;
+  const textTranslateY = useRef(new Animated.Value(20)).current;
+  const planeRotate = useRef(new Animated.Value(0)).current;
+  const sparkleScale = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.sequence([
       Animated.parallel([
         Animated.timing(logoOpacity, {
           toValue: 1,
-          duration: animation.normal,
+          duration: 600,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
         }),
         Animated.spring(logoScale, {
           toValue: 1,
-          friction: 6,
-          tension: 80,
+          friction: 7,
+          tension: 60,
+          useNativeDriver: true,
+        }),
+        Animated.timing(planeRotate, {
+          toValue: 1,
+          duration: 800,
+          easing: Easing.out(Easing.back(1.5)),
           useNativeDriver: true,
         }),
       ]),
       Animated.parallel([
         Animated.timing(textOpacity, {
           toValue: 1,
-          duration: animation.normal,
-          delay: 80,
+          duration: 400,
+          delay: 100,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
         }),
         Animated.timing(textTranslateY, {
           toValue: 0,
-          duration: animation.normal,
-          easing: Easing.out(Easing.quad),
+          duration: 500,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.spring(sparkleScale, {
+          toValue: 1,
+          friction: 4,
+          tension: 40,
+          delay: 200,
           useNativeDriver: true,
         }),
       ]),
@@ -54,15 +78,20 @@ export default function WelcomeScreen() {
       } catch (e) {
         console.log('Navigation error from welcome to planner', e);
       }
-    }, 1600);
+    }, 1800);
 
     return () => clearTimeout(navTimeout);
-  }, [router, animation.normal, logoOpacity, logoScale, textOpacity, textTranslateY]);
+  }, [router, logoOpacity, logoScale, textOpacity, textTranslateY, planeRotate, sparkleScale]);
+
+  const planeRotateValue = planeRotate.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['45deg', '0deg'],
+  });
 
   const styles = useMemo(() => StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: palette.background,
     },
     gradient: {
       ...StyleSheet.absoluteFillObject,
@@ -71,74 +100,161 @@ export default function WelcomeScreen() {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: spacing.xl,
-      gap: spacing.lg,
+      paddingHorizontal: 32,
+      gap: 32,
     },
-    card: {
-      backgroundColor: colors.surface,
-      borderRadius: borderRadius.xl,
-      padding: spacing.xl,
+    logoContainer: {
+      position: 'relative',
       alignItems: 'center',
       justifyContent: 'center',
-      width: 200,
-      height: 200,
-      ...shadows.lg,
     },
-    appName: {
-      color: colors.text,
-      fontSize: fontSize.xxl,
-      fontWeight: fontWeight.extrabold,
-      letterSpacing: 0.5,
-      textAlign: 'center',
-    },
-    tagline: {
-      color: colors.textSecondary,
-      fontSize: fontSize.md,
-      fontWeight: fontWeight.medium,
-      textAlign: 'center',
-      marginTop: spacing.xs,
-    },
-    footer: {
-      position: 'absolute',
-      bottom: spacing.xl,
-      left: 0,
-      right: 0,
+    logoCard: {
+      backgroundColor: palette.surface,
+      borderRadius: 32,
+      padding: 32,
       alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: palette.border,
+      shadowColor: palette.action,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.15,
+      shadowRadius: 24,
+      elevation: 8,
     },
     logo: {
       width: 96,
       height: 96,
-      borderRadius: borderRadius.lg,
+      borderRadius: 20,
     },
-  }), [colors, fontSize, fontWeight, spacing, borderRadius, shadows]);
+    planeIcon: {
+      position: 'absolute',
+      top: -10,
+      right: -10,
+      backgroundColor: palette.action,
+      padding: 12,
+      borderRadius: 999,
+      borderWidth: 3,
+      borderColor: palette.background,
+    },
+    sparkleIcon: {
+      position: 'absolute',
+      bottom: -8,
+      left: -8,
+      backgroundColor: palette.price,
+      padding: 10,
+      borderRadius: 999,
+      borderWidth: 3,
+      borderColor: palette.background,
+    },
+    textContainer: {
+      alignItems: 'center',
+      gap: 8,
+    },
+    appName: {
+      color: palette.text,
+      fontSize: 36,
+      fontWeight: '800' as const,
+      letterSpacing: 1,
+      textAlign: 'center',
+    },
+    tagline: {
+      color: palette.textSecondary,
+      fontSize: 16,
+      fontWeight: '600' as const,
+      textAlign: 'center',
+      letterSpacing: 0.3,
+    },
+    footer: {
+      position: 'absolute',
+      bottom: 48,
+      left: 0,
+      right: 0,
+      alignItems: 'center',
+      gap: 12,
+    },
+    loadingText: {
+      color: palette.textSecondary,
+      fontSize: 13,
+      fontWeight: '500' as const,
+    },
+    dots: {
+      flexDirection: 'row',
+      gap: 6,
+    },
+    dot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: palette.action,
+      opacity: 0.6,
+    },
+  }), []);
 
   return (
     <SafeAreaView style={styles.container} testID="welcome-safearea">
       <LinearGradient
-        colors={[colors.background, colors.surface]}
+        colors={[palette.background, '#14202B', palette.background]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
       />
 
       <View style={styles.content} testID="welcome-content">
-        <Animated.View style={[styles.card, { transform: [{ scale: logoScale }], opacity: logoOpacity }]} testID="welcome-logo-card">
-          <Image
-            source={require('../assets/images/icon.png')}
-            style={styles.logo}
-            contentFit="cover"
-            transition={200}
-          />
+        <Animated.View 
+          style={[
+            styles.logoContainer,
+            { transform: [{ scale: logoScale }], opacity: logoOpacity }
+          ]} 
+          testID="welcome-logo-container"
+        >
+          <View style={styles.logoCard}>
+            <Image
+              source={require('../assets/images/icon.png')}
+              style={styles.logo}
+              contentFit="cover"
+              transition={200}
+            />
+          </View>
+          
+          <Animated.View 
+            style={[
+              styles.planeIcon,
+              { transform: [{ rotate: planeRotateValue }] }
+            ]}
+          >
+            <Plane color="#FFF" size={20} strokeWidth={2.5} />
+          </Animated.View>
+
+          <Animated.View 
+            style={[
+              styles.sparkleIcon,
+              { transform: [{ scale: sparkleScale }] }
+            ]}
+          >
+            <Sparkles color="#FFF" size={16} strokeWidth={2.5} />
+          </Animated.View>
         </Animated.View>
 
-        <Animated.View style={{ opacity: textOpacity, transform: [{ translateY: textTranslateY }] }} testID="welcome-text-wrap">
+        <Animated.View 
+          style={[
+            styles.textContainer,
+            { opacity: textOpacity, transform: [{ translateY: textTranslateY }] }
+          ]} 
+          testID="welcome-text-wrap"
+        >
           <Text style={styles.appName} testID="welcome-title">Sacàdos</Text>
-          <Text style={styles.tagline} testID="welcome-tagline">Votre compagnon de voyage</Text>
+          <Text style={styles.tagline} testID="welcome-tagline">Votre compagnon de voyage ✈️</Text>
         </Animated.View>
       </View>
 
       <View style={styles.footer} pointerEvents="none">
-        <Text style={{ color: colors.textMuted, fontSize: fontSize.sm }}>Chargement de l&apos;accueil…</Text>
+        <Text style={styles.loadingText}>Préparation de votre aventure…</Text>
+        <View style={styles.dots}>
+          <View style={[styles.dot, { opacity: 0.9 }]} />
+          <View style={[styles.dot, { opacity: 0.6 }]} />
+          <View style={[styles.dot, { opacity: 0.3 }]} />
+        </View>
       </View>
     </SafeAreaView>
   );
