@@ -81,6 +81,30 @@ function RootLayoutNav() {
           headerShown: false
         }} 
       />
+      <Stack.Screen 
+        name="tools/currency-converter" 
+        options={{ 
+          headerShown: true
+        }} 
+      />
+      <Stack.Screen 
+        name="tools/phrase-guide" 
+        options={{ 
+          headerShown: true
+        }} 
+      />
+      <Stack.Screen 
+        name="tools/emergency-numbers" 
+        options={{ 
+          headerShown: true
+        }} 
+      />
+      <Stack.Screen 
+        name="destination/search-results" 
+        options={{ 
+          headerShown: false
+        }} 
+      />
     </Stack>
   );
 }
