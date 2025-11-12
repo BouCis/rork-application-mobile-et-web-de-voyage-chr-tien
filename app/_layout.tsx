@@ -1,4 +1,4 @@
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useState } from "react";
@@ -116,23 +116,32 @@ const styles = StyleSheet.create({
 });
 
 export default function RootLayout() {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: 1,
+        staleTime: 5 * 60 * 1000,
+      },
+    },
+  }));
 
   useEffect(() => {
     SplashScreen.hideAsync();
   }, []);
 
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <ThemeProvider>
-        <AppProvider>
-          <GestureHandlerRootView style={styles.container}>
-            <ErrorBoundary>
-              <RootLayoutNav />
-            </ErrorBoundary>
-          </GestureHandlerRootView>
-        </AppProvider>
-      </ThemeProvider>
-    </trpc.Provider>
+    <QueryClientProvider client={queryClient}>
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <ThemeProvider>
+          <AppProvider>
+            <GestureHandlerRootView style={styles.container}>
+              <ErrorBoundary>
+                <RootLayoutNav />
+              </ErrorBoundary>
+            </GestureHandlerRootView>
+          </AppProvider>
+        </ThemeProvider>
+      </trpc.Provider>
+    </QueryClientProvider>
   );
 }
